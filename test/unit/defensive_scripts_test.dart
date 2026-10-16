@@ -20,7 +20,7 @@ void main() {
     );
 
     test('Scripts vault contains high quality entries with executive tone guidance', () {
-      final all = DefensiveScriptsVault.scripts;
+      const all = DefensiveScriptsVault.scripts;
       expect(all.length, greaterThanOrEqualTo(10));
 
       for (final script in all) {

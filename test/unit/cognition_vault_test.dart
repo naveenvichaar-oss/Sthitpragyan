@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sthitaprajna/features/cognition_vault/data/cognition_data_source.dart';
-import 'package:sthitaprajna/features/cognition_vault/data/models/fallacy_and_model.dart';
 
 void main() {
   group('Cognition Vault Tests', () {

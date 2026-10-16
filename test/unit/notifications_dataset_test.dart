@@ -2,6 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sthitaprajna/core/notifications/notifications_dataset_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    await NotificationsDatasetService().loadDataset();
+  });
+
   group('NotificationsDatasetService Tests', () {
     test(
       'getTriggersForDay returns 4 slots for Monday with Devanagari titles',

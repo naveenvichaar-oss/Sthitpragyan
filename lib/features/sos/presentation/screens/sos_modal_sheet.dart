@@ -10,7 +10,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/defensive_scripts_vault.dart';
-import '../../journal/data/models/journal_models.dart';
+import '../../../journal/data/models/journal_models.dart';
 
 /// The 4 states of the SOS Finite State Machine (FSM)
 enum SOSState {

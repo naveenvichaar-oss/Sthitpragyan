@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimens.dart';
-import '../../../../core/constants/app_text_styles.dart';
-import '../../../../core/database/hive_storage.dart';
-import '../../../../core/notifications/notification_service.dart';
-import '../../../../core/notifications/notifications_dataset_service.dart';
-import '../../../../shared/widgets/executive_notification_tester.dart';
-import '../../journal/data/models/journal_models.dart';
-import '../../journal/data/repositories/journal_repository.dart';
-import '../../settings/presentation/screens/settings_screen.dart';
-import '../../sos/presentation/screens/sos_modal_sheet.dart';
-import '../data/daily_rules_vault.dart';
-import '../data/models/daily_rule.dart';
-import '../data/models/streak_data.dart';
-import '../widgets/core_rule_card.dart';
-import '../widgets/executive_header.dart';
-import '../widgets/sos_shield_button.dart';
-import '../widgets/streak_badge.dart';
+import 'package:sthitaprajna/core/constants/app_colors.dart';
+import 'package:sthitaprajna/core/constants/app_dimens.dart';
+import 'package:sthitaprajna/core/constants/app_text_styles.dart';
+import 'package:sthitaprajna/core/database/hive_storage.dart';
+import 'package:sthitaprajna/core/notifications/notification_service.dart';
+import 'package:sthitaprajna/core/notifications/notifications_dataset_service.dart';
+import 'package:sthitaprajna/core/utils/haptic_service.dart';
+import 'package:sthitaprajna/features/dashboard/data/daily_rules_vault.dart';
+import 'package:sthitaprajna/features/dashboard/data/models/daily_rule.dart';
+import 'package:sthitaprajna/features/dashboard/data/models/streak_data.dart';
+import 'package:sthitaprajna/features/dashboard/presentation/widgets/core_rule_card.dart';
+import 'package:sthitaprajna/features/dashboard/presentation/widgets/executive_header.dart';
+import 'package:sthitaprajna/features/dashboard/presentation/widgets/sos_shield_button.dart';
+import 'package:sthitaprajna/features/dashboard/presentation/widgets/streak_badge.dart';
+import 'package:sthitaprajna/features/journal/data/models/journal_models.dart';
+import 'package:sthitaprajna/features/journal/data/repositories/journal_repository.dart';
+import 'package:sthitaprajna/features/recovery/presentation/screens/post_incident_recovery_screen.dart';
+import 'package:sthitaprajna/features/settings/presentation/screens/settings_screen.dart';
+import 'package:sthitaprajna/features/sos/presentation/screens/sos_modal_sheet.dart';
 
 /// DashboardScreen serves as the command center for Sthitaprajna.
 /// Features:
@@ -110,6 +111,15 @@ class DashboardScreenState extends State<DashboardScreen> {
     SOSModalSheet.show(context);
   }
 
+  void _openSlipUpRecovery() {
+    HapticService.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const PostIncidentRecoveryScreen(),
+      ),
+    );
+  }
+
   void _openNotificationSettings() {
     HapticService.selectionClick();
     if (widget.onNavigateToSettings != null) {
@@ -151,6 +161,37 @@ class DashboardScreenState extends State<DashboardScreen> {
 
                   // 3. Centerpiece: Big Floating "SOS Shield" Button
                   SOSShieldButton(onPressed: _openSOSModal),
+                  const SizedBox(height: 10),
+
+                  // Secondary Button: 'Log a Slip-Up / Reset'
+                  Center(
+                    child: OutlinedButton.icon(
+                      onPressed: _openSlipUpRecovery,
+                      icon: const Icon(
+                        Icons.restart_alt_rounded,
+                        size: 16,
+                        color: AppColors.amberWarning,
+                      ),
+                      label: const Text('Log a Slip-Up / Reset'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textPrimary,
+                        side: BorderSide(
+                          color: AppColors.amberWarning.withOpacity(0.5),
+                          width: 1.0,
+                        ),
+                        backgroundColor: AppColors.surface,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 11,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimens.radiusSmall,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
 
                   // 4. Daily Quote/Rule from notifications_dataset.json

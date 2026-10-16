@@ -14,4 +14,7 @@ abstract class HiveBoxes {
 
   /// Box containing logged SOS defensive incidents
   static const String sosIncidents = 'sthitaprajna_sos_incidents';
+
+  /// Box containing logged slip-up post-incident recovery events
+  static const String incidentLogs = 'sthitaprajna_incident_logs';
 }

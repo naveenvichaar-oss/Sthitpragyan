@@ -43,7 +43,7 @@ abstract class AppTheme {
       ),
 
       // Card Theme: Muted Zinc surface with razor-thin border
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
@@ -133,7 +133,7 @@ abstract class AppTheme {
         ),
       ),
 
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceElevated,
         elevation: 0,
         shape: RoundedRectangleBorder(

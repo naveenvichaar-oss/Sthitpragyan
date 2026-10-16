@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/journal/data/models/journal_models.dart';
+import '../../features/recovery/data/models/incident_slip_up_log.dart';
 import '../../features/settings/data/models/notification_slot_config.dart';
 import 'hive_boxes.dart';
 
@@ -20,6 +21,7 @@ class HiveStorage {
   late Box _settingsBox;
   late Box<String> _pinnedScriptsBox;
   late Box<Map> _sosIncidentsBox;
+  late Box<Map> _incidentLogsBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -41,6 +43,7 @@ class HiveStorage {
       _settingsBox = await Hive.openBox(HiveBoxes.settings);
       _pinnedScriptsBox = await Hive.openBox<String>(HiveBoxes.pinnedScripts);
       _sosIncidentsBox = await Hive.openBox<Map>(HiveBoxes.sosIncidents);
+      _incidentLogsBox = await Hive.openBox<Map>(HiveBoxes.incidentLogs);
 
       _initialized = true;
       debugPrint(
@@ -280,5 +283,26 @@ class HiveStorage {
 
   Future<void> resetNotificationSlotsToDefault() async {
     await saveNotificationSlots(NotificationSlotConfig.defaultSlots());
+  }
+
+  // ---------------------------------------------------------
+  // Slip-Up / Post-Incident Recovery Operations
+  // ---------------------------------------------------------
+
+  Future<void> saveSlipUpIncident(IncidentSlipUpLog incident) async {
+    await _incidentLogsBox.put(incident.id, incident.toMap());
+  }
+
+  List<IncidentSlipUpLog> getAllSlipUpIncidents() {
+    final list = <IncidentSlipUpLog>[];
+    for (final raw in _incidentLogsBox.values) {
+      list.add(IncidentSlipUpLog.fromMap(Map<String, dynamic>.from(raw)));
+    }
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list;
+  }
+
+  Future<void> deleteSlipUpIncident(String id) async {
+    await _incidentLogsBox.delete(id);
   }
 }

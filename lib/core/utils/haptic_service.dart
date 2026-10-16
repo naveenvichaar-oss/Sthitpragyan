@@ -41,4 +41,13 @@ class HapticService {
       await HapticFeedback.lightImpact();
     } catch (_) {}
   }
+
+  /// Triggered on successful save, drill completion, or journal commit
+  static Future<void> success() async {
+    try {
+      await HapticFeedback.mediumImpact();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await HapticFeedback.lightImpact();
+    } catch (_) {}
+  }
 }

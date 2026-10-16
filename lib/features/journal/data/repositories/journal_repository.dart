@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../core/database/hive_storage.dart';
-import '../../../core/utils/date_helpers.dart';
-import '../../dashboard/data/models/streak_data.dart';
-import '../models/journal_models.dart';
+import 'package:sthitaprajna/core/database/hive_storage.dart';
+import 'package:sthitaprajna/core/utils/date_helpers.dart';
+import 'package:sthitaprajna/features/dashboard/data/models/streak_data.dart';
+import 'package:sthitaprajna/features/journal/data/models/journal_models.dart';
 
 /// JournalRepository orchestrates storage and metric derivations for 3-Index Debriefs.
 class JournalRepository {
