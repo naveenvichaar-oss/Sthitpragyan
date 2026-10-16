@@ -30,12 +30,22 @@ class _ExpandableMicroCardState extends State<ExpandableMicroCard> {
   @override
   Widget build(BuildContext context) {
     final isFallacy = widget.item.type == CognitionType.fallacy;
+    final isRoe = widget.item.type == CognitionType.rulesOfEngagement;
     final typeBadgeColor = isFallacy
         ? AppColors.roseDanger
-        : AppColors.shieldPrimary;
+        : isRoe
+            ? AppColors.amberWarning
+            : AppColors.shieldPrimary;
     final typeBadgeMuted = isFallacy
         ? AppColors.roseMuted
-        : AppColors.shieldGlow;
+        : isRoe
+            ? AppColors.amberMuted
+            : AppColors.shieldGlow;
+    final typeBadgeText = isFallacy
+        ? 'LOGICAL FALLACY'
+        : isRoe
+            ? 'RULES OF ENGAGEMENT'
+            : 'STOIC MODEL';
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -79,7 +89,7 @@ class _ExpandableMicroCardState extends State<ExpandableMicroCard> {
                             ),
                           ),
                           child: Text(
-                            isFallacy ? 'LOGICAL FALLACY' : 'STOIC MODEL',
+                            typeBadgeText,
                             style: AppTextStyles.labelBadge.copyWith(
                               color: typeBadgeColor,
                               fontSize: 9.0,

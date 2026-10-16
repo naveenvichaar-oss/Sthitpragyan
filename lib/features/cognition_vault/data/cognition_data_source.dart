@@ -171,6 +171,46 @@ class CognitionDataSource {
       quickMaxim: 'They can touch the project; they cannot touch the mind.',
       tags: ['Invulnerability', 'Poise', 'High Tension'],
     ),
+
+    // ------------------------------------------------------------------
+    // SECTION 3: EXECUTIVE RULES OF ENGAGEMENT
+    // ------------------------------------------------------------------
+    CognitionItem(
+      id: 'roe_cog_01',
+      type: CognitionType.rulesOfEngagement,
+      title: 'Offer Choices to Expose Intent',
+      subtitle: 'To reveal true intent, offer choices—preferences expose character.',
+      latinName: 'Optio Probat Hominem',
+      definition: 'When adversaries disguise their true agenda behind vague or contradictory demands, present binary professional choices with clear trade-offs. Their selection forces their actual motives into daylight.',
+      corporateManifestation: 'A manager gives confusing directives, refusing to commit to scope while hinting at dissatisfaction.',
+      antidoteProtocol: 'Present Option A (Velocity focus) vs Option B (Robustness focus) in writing. Ask: "Which priority guides our milestone?"',
+      quickMaxim: 'Preferences expose character; force binary commitments in writing.',
+      tags: ['Rules of Engagement', 'Manipulation', 'Intent', 'Options'],
+    ),
+    CognitionItem(
+      id: 'roe_cog_02',
+      type: CognitionType.rulesOfEngagement,
+      title: 'Victim Card Disengagement',
+      subtitle: 'Never argue with someone playing the victim card—stick strictly to facts and formal closure.',
+      latinName: 'Facies Non Lacrimae',
+      definition: 'Emotional manipulation where an underperforming or passive-aggressive peer weaponizes perceived persecution or martyrdom to derail objective scrutiny.',
+      corporateManifestation: '"Why are you always picking on my deliverables? Everyone knows you favor the frontend team!"',
+      antidoteProtocol: 'Refuse all emotional debate. Reiterate factual deliverables and documented SLA without apology: "We are reviewing Jira item 402 against the acceptance criteria. Here is the delta."',
+      quickMaxim: 'Drama demands an audience; facts terminate the theater.',
+      tags: ['Rules of Engagement', 'Victimhood', 'Emotional Shield', 'Boundaries'],
+    ),
+    CognitionItem(
+      id: 'roe_cog_03',
+      type: CognitionType.rulesOfEngagement,
+      title: 'Strategic Silence on Abstract Criticism',
+      subtitle: 'Demand objective specifics on abstract criticism, then embrace strategic silence.',
+      latinName: 'Silentium Strategicum',
+      definition: 'When met with unsubstantiated, vague disapproval designed to induce self-doubt, require concrete metrics and maintain complete silence while they struggle to substantiate it.',
+      corporateManifestation: '"I\'m just not feeling that your team is aligned with our executive ethos."',
+      antidoteProtocol: 'Ask: "What specific objective criteria or data points are you measuring that alignment against?" Then stay completely silent. Do not nod, do not fidget, do not speak.',
+      quickMaxim: 'The first person to speak after a calibrated question loses frame.',
+      tags: ['Rules of Engagement', 'Silence', 'Executive Frame', 'Critique'],
+    ),
   ];
 
   static List<CognitionItem> getFallacies() {
@@ -179,6 +219,10 @@ class CognitionDataSource {
 
   static List<CognitionItem> getMentalModels() {
     return items.where((i) => i.type == CognitionType.mentalModel).toList();
+  }
+
+  static List<CognitionItem> getRulesOfEngagement() {
+    return items.where((i) => i.type == CognitionType.rulesOfEngagement).toList();
   }
 
   static List<CognitionItem> search(String query, [CognitionType? filterType]) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../shared/widgets/voice_dictation_button.dart';
 
 /// SingleLineOutputInput implements the strict single-line constraint for
 /// Index 3: "Core Output". Prohibits rambling or doom-journaling.
@@ -102,6 +103,10 @@ class SingleLineOutputInput extends StatelessWidget {
                 Icons.bolt_rounded,
                 size: 18,
                 color: AppColors.shieldPrimary,
+              ),
+              suffixIcon: VoiceDictationButton(
+                controller: controller,
+                onDictated: onChanged,
               ),
             ),
           ),

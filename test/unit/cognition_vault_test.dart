@@ -3,14 +3,17 @@ import 'package:sthitaprajna/features/cognition_vault/data/cognition_data_source
 
 void main() {
   group('Cognition Vault Tests', () {
-    test('DataSource provides both fallacies and mental models', () {
+    test('DataSource provides fallacies, mental models, and rules of engagement', () {
       final fallacies = CognitionDataSource.getFallacies();
       final models = CognitionDataSource.getMentalModels();
+      final rules = CognitionDataSource.getRulesOfEngagement();
 
       expect(fallacies.isNotEmpty, isTrue);
       expect(models.isNotEmpty, isTrue);
+      expect(rules.isNotEmpty, isTrue);
       expect(fallacies.length, greaterThanOrEqualTo(6));
       expect(models.length, greaterThanOrEqualTo(6));
+      expect(rules.length, greaterThanOrEqualTo(3));
     });
 
     test('All items have complete fields for micro-card rendering', () {
@@ -32,7 +35,7 @@ void main() {
         final controlSearch = CognitionDataSource.search('Control');
         expect(controlSearch.any((i) => i.title.contains('Control')), isTrue);
 
-        final adHominemSearch = CognitionDataSource.search('Hominem');
+        final adHominemSearch = CognitionDataSource.search('Ad Hominem');
         expect(adHominemSearch.length, equals(1));
         expect(adHominemSearch.first.title, contains('Ad Hominem'));
 

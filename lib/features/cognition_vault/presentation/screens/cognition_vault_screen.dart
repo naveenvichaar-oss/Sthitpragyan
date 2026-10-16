@@ -95,8 +95,10 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
     final query = _modelSearchController.text.trim();
     CognitionType? filterType;
     if (_selectedModelFilterIndex == 1) {
-      filterType = CognitionType.fallacy;
+      filterType = CognitionType.rulesOfEngagement;
     } else if (_selectedModelFilterIndex == 2) {
+      filterType = CognitionType.fallacy;
+    } else if (_selectedModelFilterIndex == 3) {
       filterType = CognitionType.mentalModel;
     }
 
@@ -543,14 +545,19 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         ),
         const SizedBox(height: 12),
 
-        Row(
-          children: [
-            _buildModelFilterChip(0, 'ALL (${CognitionDataSource.items.length})'),
-            const SizedBox(width: 8),
-            _buildModelFilterChip(1, 'FALLACIES (${CognitionDataSource.getFallacies().length})'),
-            const SizedBox(width: 8),
-            _buildModelFilterChip(2, 'STOIC MODELS (${CognitionDataSource.getMentalModels().length})'),
-          ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildModelFilterChip(0, 'ALL (${CognitionDataSource.items.length})'),
+              const SizedBox(width: 6),
+              _buildModelFilterChip(1, 'RULES OF ENGAGEMENT (${CognitionDataSource.getRulesOfEngagement().length})'),
+              const SizedBox(width: 6),
+              _buildModelFilterChip(2, 'FALLACIES (${CognitionDataSource.getFallacies().length})'),
+              const SizedBox(width: 6),
+              _buildModelFilterChip(3, 'STOIC MODELS (${CognitionDataSource.getMentalModels().length})'),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
 
@@ -572,35 +579,33 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
 
   Widget _buildModelFilterChip(int index, String label) {
     final isSelected = _selectedModelFilterIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          HapticService.selectionClick();
-          setState(() {
-            _selectedModelFilterIndex = index;
-            _applyModelFilters();
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-            border: Border.all(
-              color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
-            ),
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        setState(() {
+          _selectedModelFilterIndex = index;
+          _applyModelFilters();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+          border: Border.all(
+            color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
           ),
-          child: Text(
-            label,
-            style: AppTextStyles.labelBadge.copyWith(
-              fontSize: 9.0,
-              color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.labelBadge.copyWith(
+            fontSize: 9.0,
+            color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );

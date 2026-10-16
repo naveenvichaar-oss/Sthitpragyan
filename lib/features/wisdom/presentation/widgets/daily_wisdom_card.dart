@@ -5,6 +5,7 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/wisdom_entry.dart';
 import '../../data/services/wisdom_vault_service.dart';
 
@@ -168,6 +169,11 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
               ),
               Row(
                 children: [
+                  VoiceTtsButton(
+                    textToSpeak: '${_currentWisdom.title}. ${_currentWisdom.originalText}. ${_currentWisdom.translation}. Executive Takeaway: ${_currentWisdom.executiveTakeaway}',
+                    tooltip: 'Listen to wisdom readout',
+                  ),
+                  const SizedBox(width: 4),
                   IconButton(
                     icon: const Icon(
                       Icons.refresh_rounded,

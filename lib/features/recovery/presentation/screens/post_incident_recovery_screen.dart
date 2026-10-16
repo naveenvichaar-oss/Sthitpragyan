@@ -6,7 +6,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/incident_slip_up_log.dart';
-import 'package:sthitaprajna/features/wisdom/data/models/wisdom_entry.dart';
+import '../../../../shared/widgets/voice_dictation_button.dart';
 import 'package:sthitaprajna/features/wisdom/data/services/wisdom_vault_service.dart';
 import 'package:sthitaprajna/features/wisdom/presentation/widgets/emergency_perspective_modal.dart';
 import '../widgets/box_breathing_drill_modal.dart';
@@ -592,6 +592,7 @@ class _PostIncidentRecoveryScreenState
                   width: 1.5,
                 ),
               ),
+              suffixIcon: VoiceDictationButton(controller: _reflectionController),
             ),
           ),
           const SizedBox(height: 24),
@@ -730,6 +731,7 @@ class _PostIncidentRecoveryScreenState
                   width: 1.5,
                 ),
               ),
+              suffixIcon: VoiceDictationButton(controller: _rewriteController),
             ),
           ),
           const SizedBox(height: 20),

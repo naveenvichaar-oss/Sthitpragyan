@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/wisdom_entry.dart';
 import '../../data/services/wisdom_vault_service.dart';
 
@@ -132,9 +133,21 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                   ),
                 ],
               ),
-              IconButton(
-                icon: const Icon(Icons.close_rounded, color: AppColors.textMuted),
-                onPressed: () => Navigator.of(context).pop(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  VoiceTtsButton(
+                    textToSpeak:
+                        '${entry.title}. ${entry.originalText}. ${entry.translation}. Takeaway: ${entry.executiveTakeaway}',
+                    size: 20,
+                    tooltip: 'Listen to emergency perspective',
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: AppColors.textMuted),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
               ),
             ],
           ),

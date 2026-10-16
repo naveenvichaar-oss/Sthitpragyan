@@ -100,6 +100,8 @@ void main() {
         coreOutputSummary:
             'कॉर्पोरेट टैक्स पर 800 शब्दों का एक्सक्लूसिव विश्लेषण',
         provocationHandled: 'मीटिंग में 4 सेकंड पॉज देकर बात संभाली',
+        audioMemoPath: '/data/user/0/audio_memos/memo_123.m4a',
+        videoReflectionPath: '/data/user/0/video_reflections/video_123.mp4',
       );
 
       final map = original.toMap();
@@ -114,6 +116,8 @@ void main() {
       expect(restored.boundaryMaintained, equals(original.boundaryMaintained));
       expect(restored.coreOutputSummary, equals(original.coreOutputSummary));
       expect(restored.provocationHandled, equals(original.provocationHandled));
+      expect(restored.audioMemoPath, equals(original.audioMemoPath));
+      expect(restored.videoReflectionPath, equals(original.videoReflectionPath));
     });
 
     test('SosIncidentLog serialization roundtrip preserves telemetry', () {

@@ -322,6 +322,79 @@ class PastDebriefsList extends StatelessWidget {
                     ],
                   ),
                 ],
+                if (entry.audioMemoPath != null ||
+                    entry.videoReflectionPath != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      if (entry.audioMemoPath != null)
+                        Container(
+                          margin: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.emeraldSuccess.withValues(
+                              alpha: 0.15,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.mic_rounded,
+                                size: 10,
+                                color: AppColors.emeraldSuccess,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                'AUDIO MEMO',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: AppColors.emeraldSuccess,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (entry.videoReflectionPath != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.shieldPrimary.withValues(
+                              alpha: 0.15,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.videocam_rounded,
+                                size: 10,
+                                color: AppColors.shieldPrimary,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                'VIDEO DRILL',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: AppColors.shieldPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

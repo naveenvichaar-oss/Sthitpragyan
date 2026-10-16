@@ -5,6 +5,7 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/daily_rule.dart';
 
 /// CoreRuleCard showcases the designated daily quote/rule from notifications_dataset.json
@@ -130,21 +131,33 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                     ),
                   ],
                 ),
-                IconButton(
-                  onPressed: () {
-                    HapticService.selectionClick();
-                    if (_showDataset) {
-                      widget.onNextDatasetTrigger();
-                    } else {
-                      widget.onNextRule();
-                    }
-                  },
-                  icon: const Icon(Icons.sync_rounded, size: 18),
-                  color: AppColors.textSecondary,
-                  tooltip: _showDataset
-                      ? 'Cycle through today\'s 4 dataset slots'
-                      : 'Cycle to next Stoic rule',
-                  splashRadius: 18,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    VoiceTtsButton(
+                      textToSpeak: _showDataset && trigger != null
+                          ? '${trigger.title}. ${trigger.body}'
+                          : '${widget.rule.title}. ${widget.rule.aphorism}. Tactical Action: ${widget.rule.tacticalAction}',
+                      tooltip: 'Listen to rule in calm executive voice',
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      onPressed: () {
+                        HapticService.selectionClick();
+                        if (_showDataset) {
+                          widget.onNextDatasetTrigger();
+                        } else {
+                          widget.onNextRule();
+                        }
+                      },
+                      icon: const Icon(Icons.sync_rounded, size: 18),
+                      color: AppColors.textSecondary,
+                      tooltip: _showDataset
+                          ? 'Cycle through today\'s 4 dataset slots'
+                          : 'Cycle to next Stoic rule',
+                      splashRadius: 18,
+                    ),
+                  ],
                 ),
               ],
             ),

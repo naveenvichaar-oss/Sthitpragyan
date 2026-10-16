@@ -7,6 +7,9 @@ import '../../../../core/utils/date_helpers.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/journal_models.dart';
 import '../../data/repositories/journal_repository.dart';
+import '../../../../shared/widgets/voice_dictation_button.dart';
+import '../widgets/audio_memo_recorder_modal.dart';
+import '../widgets/video_reflection_drill_modal.dart';
 import '../widgets/past_debriefs_list.dart';
 
 /// JournalScreen implements the official 60-Second Evening Debrief Mapping.
@@ -34,6 +37,8 @@ class _JournalScreenState extends State<JournalScreen> {
   bool _isSaving = false;
   List<DailyJournalEntry> _historicalEntries = [];
   DailyJournalEntry? _todayEntry;
+  String? _audioMemoPath;
+  String? _videoReflectionPath;
 
   @override
   void initState() {
@@ -50,6 +55,8 @@ class _JournalScreenState extends State<JournalScreen> {
       _boundaryMaintained = _todayEntry!.boundaryMaintained;
       _outputController.text = _todayEntry!.coreOutputSummary;
       _provocationController.text = _todayEntry!.provocationHandled ?? '';
+      _audioMemoPath = _todayEntry!.audioMemoPath;
+      _videoReflectionPath = _todayEntry!.videoReflectionPath;
     }
     setState(() {});
   }
@@ -130,6 +137,8 @@ class _JournalScreenState extends State<JournalScreen> {
       provocationHandled: _provocationController.text.trim().isEmpty
           ? null
           : _provocationController.text.trim(),
+      audioMemoPath: _audioMemoPath,
+      videoReflectionPath: _videoReflectionPath,
     );
 
     await _repository.saveEntry(entry);
@@ -671,6 +680,7 @@ class _JournalScreenState extends State<JournalScreen> {
                         size: 18,
                         color: AppColors.shieldPrimary,
                       ),
+                      suffixIcon: VoiceDictationButton(controller: _outputController),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -706,6 +716,297 @@ class _JournalScreenState extends State<JournalScreen> {
                         size: 16,
                         color: AppColors.amberWarning,
                       ),
+                      suffixIcon: VoiceDictationButton(controller: _provocationController),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // -------------------------------------------------------------
+            // Media Reflection: Audio Memo & 60s Video Composure Review
+            // -------------------------------------------------------------
+            Container(
+              padding: const EdgeInsets.all(AppDimens.space16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.borderSubtle),
+                            ),
+                            child: Text(
+                              'MEDIA AUDIT',
+                              style: AppTextStyles.labelBadge.copyWith(
+                                color: AppColors.shieldPrimary,
+                                fontSize: 9.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'REFLECTIVE MEDIA (OPTIONAL)',
+                            style: AppTextStyles.heading.copyWith(fontSize: 14.0),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '100% ON-DEVICE',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          fontSize: 9.0,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Capture a discreet verbal audio memo or a 60-second front-camera composure review.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Option 1: Quick Audio Memo
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _audioMemoPath != null
+                            ? AppColors.emeraldSuccess.withValues(alpha: 0.4)
+                            : AppColors.borderSubtle,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _audioMemoPath != null
+                                ? AppColors.emeraldSuccess.withValues(alpha: 0.15)
+                                : AppColors.surface,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            _audioMemoPath != null
+                                ? Icons.mic_rounded
+                                : Icons.mic_none_rounded,
+                            size: 18,
+                            color: _audioMemoPath != null
+                                ? AppColors.emeraldSuccess
+                                : AppColors.shieldPrimary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _audioMemoPath != null
+                                    ? 'VERBAL MEMO ATTACHED'
+                                    : 'QUICK AUDIO MEMO',
+                                style: AppTextStyles.labelBadge.copyWith(
+                                  color: _audioMemoPath != null
+                                      ? AppColors.emeraldSuccess
+                                      : AppColors.textPrimary,
+                                  fontSize: 9.5,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _audioMemoPath != null
+                                    ? 'Local audio note saved with audit'
+                                    : 'Record discrete spoken reflections',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textMuted,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_audioMemoPath != null) ...[
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded,
+                                size: 18, color: AppColors.roseDanger),
+                            tooltip: 'Remove audio memo',
+                            onPressed: () {
+                              HapticService.lightImpact();
+                              setState(() => _audioMemoPath = null);
+                            },
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        OutlinedButton(
+                          onPressed: () async {
+                            HapticService.selectionClick();
+                            final result = await AudioMemoRecorderModal.show(
+                              context,
+                              existingPath: _audioMemoPath,
+                            );
+                            if (result != null) {
+                              setState(() => _audioMemoPath = result);
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _audioMemoPath != null
+                                ? AppColors.emeraldSuccess
+                                : AppColors.textPrimary,
+                            side: BorderSide(
+                              color: _audioMemoPath != null
+                                  ? AppColors.emeraldSuccess
+                                  : AppColors.borderMedium,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          child: Text(
+                            _audioMemoPath != null ? 'UPDATE' : 'RECORD',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Option 2: 60-Second Video Composure Review
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _videoReflectionPath != null
+                            ? AppColors.emeraldSuccess.withValues(alpha: 0.4)
+                            : AppColors.borderSubtle,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _videoReflectionPath != null
+                                ? AppColors.emeraldSuccess.withValues(alpha: 0.15)
+                                : AppColors.surface,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            _videoReflectionPath != null
+                                ? Icons.videocam_rounded
+                                : Icons.videocam_outlined,
+                            size: 18,
+                            color: _videoReflectionPath != null
+                                ? AppColors.emeraldSuccess
+                                : AppColors.shieldPrimary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _videoReflectionPath != null
+                                    ? 'COMPOSURE DRILL ATTACHED'
+                                    : '60-SECOND COMPOSURE DRILL',
+                                style: AppTextStyles.labelBadge.copyWith(
+                                  color: _videoReflectionPath != null
+                                      ? AppColors.emeraldSuccess
+                                      : AppColors.textPrimary,
+                                  fontSize: 9.5,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _videoReflectionPath != null
+                                    ? 'Front-lens posture review recorded'
+                                    : 'Review jaw poise and physical calmness',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textMuted,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_videoReflectionPath != null) ...[
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded,
+                                size: 18, color: AppColors.roseDanger),
+                            tooltip: 'Remove video reflection',
+                            onPressed: () {
+                              HapticService.lightImpact();
+                              setState(() => _videoReflectionPath = null);
+                            },
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        OutlinedButton(
+                          onPressed: () async {
+                            HapticService.selectionClick();
+                            final result =
+                                await VideoReflectionDrillModal.show(
+                              context,
+                              existingPath: _videoReflectionPath,
+                            );
+                            if (result != null) {
+                              setState(() => _videoReflectionPath = result);
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _videoReflectionPath != null
+                                ? AppColors.emeraldSuccess
+                                : AppColors.textPrimary,
+                            side: BorderSide(
+                              color: _videoReflectionPath != null
+                                  ? AppColors.emeraldSuccess
+                                  : AppColors.borderMedium,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          child: Text(
+                            _videoReflectionPath != null ? 'RETAKE' : 'REVIEW',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -25,6 +25,12 @@ class DailyJournalEntry extends HiveObject {
   @HiveField(6)
   final String? provocationHandled; // Micro-reflection / strategic resolution
 
+  @HiveField(7)
+  final String? audioMemoPath; // Local on-device path to audio recording (.m4a)
+
+  @HiveField(8)
+  final String? videoReflectionPath; // Local on-device path to 60s composure review video (.mp4)
+
   DailyJournalEntry({
     required this.id,
     required this.entryDate,
@@ -33,6 +39,8 @@ class DailyJournalEntry extends HiveObject {
     required this.boundaryMaintained,
     required this.coreOutputSummary,
     this.provocationHandled,
+    this.audioMemoPath,
+    this.videoReflectionPath,
   });
 
   /// Qualitative Hindi & English state label
@@ -85,6 +93,8 @@ class DailyJournalEntry extends HiveObject {
       'boundaryMaintained': boundaryMaintained,
       'coreOutputSummary': coreOutputSummary,
       'provocationHandled': provocationHandled,
+      'audioMemoPath': audioMemoPath,
+      'videoReflectionPath': videoReflectionPath,
     };
   }
 
@@ -110,6 +120,8 @@ class DailyJournalEntry extends HiveObject {
           map['coreOutput'] as String? ??
           '',
       provocationHandled: map['provocationHandled'] as String?,
+      audioMemoPath: map['audioMemoPath'] as String?,
+      videoReflectionPath: map['videoReflectionPath'] as String?,
     );
   }
 }
@@ -133,13 +145,15 @@ class DailyJournalEntryAdapter extends TypeAdapter<DailyJournalEntry> {
       boundaryMaintained: fields[4] as bool? ?? true,
       coreOutputSummary: fields[5] as String? ?? '',
       provocationHandled: fields[6] as String?,
+      audioMemoPath: fields[7] as String?,
+      videoReflectionPath: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, DailyJournalEntry obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -153,7 +167,11 @@ class DailyJournalEntryAdapter extends TypeAdapter<DailyJournalEntry> {
       ..writeByte(5)
       ..write(obj.coreOutputSummary)
       ..writeByte(6)
-      ..write(obj.provocationHandled);
+      ..write(obj.provocationHandled)
+      ..writeByte(7)
+      ..write(obj.audioMemoPath)
+      ..writeByte(8)
+      ..write(obj.videoReflectionPath);
   }
 }
 

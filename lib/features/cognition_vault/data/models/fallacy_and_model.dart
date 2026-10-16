@@ -1,4 +1,4 @@
-enum CognitionType { fallacy, mentalModel }
+enum CognitionType { fallacy, mentalModel, rulesOfEngagement }
 
 /// Micro-card model representing either a corporate Logical Fallacy
 /// or a classic Stoic Mental Model.

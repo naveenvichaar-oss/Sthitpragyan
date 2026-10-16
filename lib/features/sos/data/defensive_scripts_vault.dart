@@ -164,11 +164,43 @@ class DefensiveScriptsVault {
       tacticalRationale: 'Offers two clear alternatives while forcing the requester to own the quality trade-off.',
       toneGuidance: 'Firm, decisive, consultative.',
     ),
+
+    // -------------------------------------------------------------
+    // Category 6: Executive Rules of Engagement (Tactical Doctrines)
+    // -------------------------------------------------------------
+    DefensiveScript(
+      id: 'roe_script_01',
+      category: 'Rules of Engagement',
+      scenario: 'To reveal true intent, offer choices—preferences expose character.',
+      hostileTrigger: 'Hidden agendas, ambiguous corporate demands, or manipulative politicking.',
+      executiveScript: 'I see two distinct ways to move this forward: Option A focuses on velocity, while Option B protects reliability. Which of these two aligns with your core priority?',
+      tacticalRationale: 'To reveal true intent, offer choices—preferences expose character. Never guess what they want; let their selection commit their motives in writing.',
+      toneGuidance: 'Calm, measured, consultative, zero defensive justification.',
+    ),
+    DefensiveScript(
+      id: 'roe_script_02',
+      category: 'Rules of Engagement',
+      scenario: 'Never argue with someone playing the victim card—stick strictly to facts and formal closure.',
+      hostileTrigger: '"You are always targeting me / No one supports my department / This is so unfair!"',
+      executiveScript: 'Let\'s focus strictly on the agreed milestones and documented criteria. The current delta is X; here is the factual remediation path. Let\'s record this and proceed.',
+      tacticalRationale: 'Never argue with someone playing the victim card—stick strictly to facts and formal closure. Emotional validation fuels the drama cycle; factual clarity terminates it.',
+      toneGuidance: 'Neutral, flat, firm tone; do not match emotional hysterics.',
+    ),
+    DefensiveScript(
+      id: 'roe_script_03',
+      category: 'Rules of Engagement',
+      scenario: 'Demand objective specifics on abstract criticism, then embrace strategic silence.',
+      hostileTrigger: '"This report doesn\'t feel right / Your team isn\'t showing executive presence."',
+      executiveScript: 'What specific objective metrics or factual criteria are you measuring that against? [Strategic silence: Maintain direct eye contact, do not fill the silence].',
+      tacticalRationale: 'Demand objective specifics on abstract criticism, then embrace strategic silence. Forces the critic to either substantiate or withdraw their bluster.',
+      toneGuidance: 'Slow, steady cadence, direct eye contact; zero rush to fill the silence.',
+    ),
   ];
 
   static List<String> get categories {
     return [
       'All',
+      'Rules of Engagement',
       'Unjust Accusation',
       'Intimidation',
       'Impossible Deadlines',

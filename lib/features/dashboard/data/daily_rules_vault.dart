@@ -90,6 +90,30 @@ class DailyRulesVault {
       tacticalAction: 'Treat a toxic manager not as a roadblock, but as a sparring partner strengthening your boundary-setting and legal documentation muscles.',
       corporateContext: 'Micromanagement, shifting requirements.',
     ),
+    DailyRule(
+      id: 11,
+      title: 'OFFER CHOICES TO EXPOSE CHARACTER',
+      aphorism: 'To reveal true intent, offer choices—preferences expose character.',
+      source: 'Executive Rule of Engagement 1',
+      tacticalAction: 'When met with ambiguous intent or manipulative hints, give binary operational options with explicit trade-offs. Their choice commits their real motive in writing.',
+      corporateContext: 'Unclear executive mandates, scope games, political maneuvering.',
+    ),
+    DailyRule(
+      id: 12,
+      title: 'THE VICTIM CARD SHIELD',
+      aphorism: 'Never argue with someone playing the victim card—stick strictly to facts and formal closure.',
+      source: 'Executive Rule of Engagement 2',
+      tacticalAction: 'Refuse to enter emotional theater or offer apologetic reassurance. State documented deliverables, timeline delta, and close the discussion factually.',
+      corporateContext: 'Martyrdom tactics, guilt-tripping peers, accusatory escalations.',
+    ),
+    DailyRule(
+      id: 13,
+      title: 'STRATEGIC SILENCE ON ABSTRACT CRITIQUE',
+      aphorism: 'Demand objective specifics on abstract criticism, then embrace strategic silence.',
+      source: 'Executive Rule of Engagement 3',
+      tacticalAction: 'Ask: "What objective metrics or criteria are you measuring that against?" Then maintain unbroken eye contact in complete silence. Let them struggle to substantiate the bluster.',
+      corporateContext: 'Subjective reviews, vague disapproval, posturing superiors.',
+    ),
   ];
 
   /// Returns today's designated rule based on day-of-year index

@@ -5,6 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/wisdom_entry.dart';
 
 /// WisdomCard displays a structured entry from the Wisdom Vault with
@@ -140,6 +141,12 @@ class _WisdomCardState extends State<WisdomCard> {
                               ],
                             ),
                           ),
+                        VoiceTtsButton(
+                          textToSpeak: '${widget.entry.title}. ${widget.entry.originalText}. ${widget.entry.translation}. Executive Takeaway: ${widget.entry.executiveTakeaway}',
+                          size: 16,
+                          tooltip: 'Listen to passage in calm voice',
+                        ),
+                        const SizedBox(width: 8),
                         IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
