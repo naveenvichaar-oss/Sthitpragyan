@@ -26,6 +26,46 @@ class DefensiveScriptsVault {
 
   static const List<DefensiveScript> scripts = [
     // -------------------------------------------------------------
+    // Core Category A: Unjust Accusation / Vague Critique
+    // -------------------------------------------------------------
+    DefensiveScript(
+      id: 'spec_cat_a',
+      category: 'Unjust Accusation',
+      scenario: 'अमूर्त आरोप, अस्पष्ट आलोचना या गलत दोषारोपण।',
+      hostileTrigger: 'इस काम में कोई दम नहीं है / एंगल ठीक नहीं लगा / "Your approach makes no sense"',
+      executiveScript: 'भाषा या एंगल में क्या विशिष्ट फैक्चुअल बदलाव चाहिए? कृपया बिंदु स्पष्ट करें।',
+      tacticalRationale: 'कभी सफाई न दें। गेंद उनके पाले में डालें।',
+      toneGuidance: 'तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।',
+    ),
+
+    // -------------------------------------------------------------
+    // Core Category B: Intimidation / Micro-Dominance
+    // -------------------------------------------------------------
+    DefensiveScript(
+      id: 'spec_cat_b',
+      category: 'Intimidation',
+      scenario: 'आवाज ऊंची करना, धौंस जमाना या माइक्रो-डोमिनेंस दिखाना।',
+      hostileTrigger: 'तुम्हें समझ नहीं आ रहा मैं क्या कह रहा हूँ / "You need to fix your attitude"',
+      executiveScript: 'नोट कर लिया है। इसे रिव्यू करके अपडेट करता हूँ।',
+      tacticalRationale: 'सपाट टोन, शून्य मुस्कान, 3 सेकंड आई-कांटेक्ट।',
+      toneGuidance: 'धीमी गति, गहरी आवाज, आँखों में सीधा संपर्क।',
+    ),
+
+    // -------------------------------------------------------------
+    // Core Category C: Impossible Deadlines / Exploitative Allocation
+    // -------------------------------------------------------------
+    DefensiveScript(
+      id: 'spec_cat_c',
+      category: 'Impossible Deadlines',
+      scenario: 'असंभव डेडलाइन या अचानक नया काम थोपना।',
+      hostileTrigger:
+          'यह काम आज रात तक ही चाहिए / "I need this done right now regardless"',
+      executiveScript: 'प्राथमिकता तय कर दीजिए। मौजूदा 2 मुख्य टास्क में से किसे होल्ड पर डालना है?',
+      tacticalRationale: 'काम से मना नहीं किया, तार्किक सीमा खींच दी।',
+      toneGuidance: 'पेशेवर, तार्किक, स्पष्ट सीमा रेखा।',
+    ),
+
+    // -------------------------------------------------------------
     // Category 1: Interruption & Over-talking
     // -------------------------------------------------------------
     DefensiveScript(
@@ -111,16 +151,6 @@ class DefensiveScriptsVault {
       tacticalRationale: 'Exposes covert guilt-tripping by demanding professional specificity.',
       toneGuidance: 'Polite, unruffled, professional.',
     ),
-    DefensiveScript(
-      id: 'pas_02',
-      category: 'Passive Aggression',
-      scenario: 'Snide remarks during a review meeting.',
-      hostileTrigger:
-          '"Well, if you really think that\'s the best you can do..."',
-      executiveScript: 'I evaluate proposals against empirical metrics. What specific change in the output metric do you recommend?',
-      tacticalRationale: 'Converts subjective disdain into actionable quantitative critique, which passive aggressors cannot support.',
-      toneGuidance: 'Direct, open, unhurried.',
-    ),
 
     // -------------------------------------------------------------
     // Category 5: Scope Creep & Manufactured Urgency
@@ -134,40 +164,19 @@ class DefensiveScriptsVault {
       tacticalRationale: 'Offers two clear alternatives while forcing the requester to own the quality trade-off.',
       toneGuidance: 'Firm, decisive, consultative.',
     ),
-    DefensiveScript(
-      id: 'urg_02',
-      category: 'Scope Creep',
-      scenario: 'Manager adds a major project without adjusting bandwidth.',
-      hostileTrigger: '"Can you just squeeze this in on top of your existing deliverables?"',
-      executiveScript: 'My capacity is currently committed to Project Alpha. If this new initiative takes precedence, which milestone in Alpha should we pause?',
-      tacticalRationale: 'Reminds leadership that time is zero-sum without saying a defiant "no".',
-      toneGuidance: 'Calmly operational.',
-    ),
-
-    // -------------------------------------------------------------
-    // Category 6: Emotional Baiting & Derailment
-    // -------------------------------------------------------------
-    DefensiveScript(
-      id: 'bat_01',
-      category: 'Emotional Baiting',
-      scenario:
-          'Personalized attack on competence or status in front of peers.',
-      hostileTrigger: '"Are you even qualified to make this call?"',
-      executiveScript: 'My responsibility here is to evaluate the technical risk according to company standards. Let\'s keep the discussion focused on the architectural impact.',
-      tacticalRationale: 'Ignores the bait completely. Does not defend self-worth; protects scope authority.',
-      toneGuidance: 'Unflinching eye contact, lower chest resonance, unsmiling stillness.',
-    ),
   ];
 
   static List<String> get categories {
     return [
       'All',
+      'Unjust Accusation',
+      'Intimidation',
+      'Impossible Deadlines',
       'Interruption',
       'Gaslighting',
       'Blame Shifting',
       'Passive Aggression',
       'Scope Creep',
-      'Emotional Baiting',
     ];
   }
 

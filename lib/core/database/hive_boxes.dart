@@ -11,4 +11,7 @@ abstract class HiveBoxes {
 
   /// Box containing saved or bookmarked defensive scripts
   static const String pinnedScripts = 'sthitaprajna_pinned_scripts';
+
+  /// Box containing logged SOS defensive incidents
+  static const String sosIncidents = 'sthitaprajna_sos_incidents';
 }

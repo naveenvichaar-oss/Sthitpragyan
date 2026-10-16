@@ -3,16 +3,21 @@ import 'package:sthitaprajna/features/sos/data/defensive_scripts_vault.dart';
 
 void main() {
   group('DefensiveScriptsVault Tests', () {
-    test('Vault has all core categories', () {
-      final categories = DefensiveScriptsVault.categories;
-      expect(categories, contains('All'));
-      expect(categories, contains('Interruption'));
-      expect(categories, contains('Gaslighting'));
-      expect(categories, contains('Blame Shifting'));
-      expect(categories, contains('Passive Aggression'));
-      expect(categories, contains('Scope Creep'));
-      expect(categories, contains('Emotional Baiting'));
-    });
+    test(
+      'Vault has all core categories including FSM specification categories',
+      () {
+        final categories = DefensiveScriptsVault.categories;
+        expect(categories, contains('All'));
+        expect(categories, contains('Unjust Accusation'));
+        expect(categories, contains('Intimidation'));
+        expect(categories, contains('Impossible Deadlines'));
+        expect(categories, contains('Interruption'));
+        expect(categories, contains('Gaslighting'));
+        expect(categories, contains('Blame Shifting'));
+        expect(categories, contains('Passive Aggression'));
+        expect(categories, contains('Scope Creep'));
+      },
+    );
 
     test('Scripts vault contains high quality entries with executive tone guidance', () {
       final all = DefensiveScriptsVault.scripts;
@@ -28,18 +33,23 @@ void main() {
       }
     });
 
-    test('Category filtering functions correctly', () {
-      final gaslighting = DefensiveScriptsVault.getByCategory('Gaslighting');
-      expect(gaslighting.isNotEmpty, isTrue);
-      for (final item in gaslighting) {
-        expect(item.category, equals('Gaslighting'));
-      }
+    test('Category filtering functions correctly for core specification categories', () {
+      final unjust = DefensiveScriptsVault.getByCategory('Unjust Accusation');
+      expect(unjust.isNotEmpty, isTrue);
+      expect(unjust.first.executiveScript, contains('विशिष्ट फैक्चुअल बदलाव'));
 
-      final interruption = DefensiveScriptsVault.getByCategory('Interruption');
-      expect(interruption.isNotEmpty, isTrue);
-      for (final item in interruption) {
-        expect(item.category, equals('Interruption'));
-      }
+      final intimidation = DefensiveScriptsVault.getByCategory('Intimidation');
+      expect(intimidation.isNotEmpty, isTrue);
+      expect(intimidation.first.executiveScript, contains('नोट कर लिया है'));
+
+      final deadlines = DefensiveScriptsVault.getByCategory(
+        'Impossible Deadlines',
+      );
+      expect(deadlines.isNotEmpty, isTrue);
+      expect(
+        deadlines.first.executiveScript,
+        contains('प्राथमिकता तय कर दीजिए'),
+      );
     });
   });
 }

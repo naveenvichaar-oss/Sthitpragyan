@@ -17,6 +17,7 @@ class HiveStorage {
   late Box _streakBox;
   late Box _settingsBox;
   late Box<String> _pinnedScriptsBox;
+  late Box<Map> _sosIncidentsBox;
 
   /// Initializes Hive and opens required boxes
   Future<void> init() async {
@@ -29,6 +30,7 @@ class HiveStorage {
       _streakBox = await Hive.openBox(HiveBoxes.streak);
       _settingsBox = await Hive.openBox(HiveBoxes.settings);
       _pinnedScriptsBox = await Hive.openBox<String>(HiveBoxes.pinnedScripts);
+      _sosIncidentsBox = await Hive.openBox<Map>(HiveBoxes.sosIncidents);
 
       _initialized = true;
       debugPrint('[HiveStorage] Successfully initialized offline database.');
@@ -136,6 +138,29 @@ class HiveStorage {
 
   bool isScriptPinned(String scriptId) {
     return _pinnedScriptsBox.containsKey(scriptId);
+  }
+
+  // ---------------------------------------------------------
+  // SOS Incident Logging (For Evening Review)
+  // ---------------------------------------------------------
+
+  Future<void> logSOSIncident(Map<String, dynamic> incident) async {
+    final id =
+        incident['id'] ?? DateTime.now().millisecondsSinceEpoch.toString();
+    await _sosIncidentsBox.put(id, incident);
+  }
+
+  List<Map<String, dynamic>> getAllSOSIncidents() {
+    final list = <Map<String, dynamic>>[];
+    for (final raw in _sosIncidentsBox.values) {
+      list.add(Map<String, dynamic>.from(raw));
+    }
+    list.sort((a, b) {
+      final aDate = a['timestamp'] as String? ?? '';
+      final bDate = b['timestamp'] as String? ?? '';
+      return bDate.compareTo(aDate);
+    });
+    return list;
   }
 
   // ---------------------------------------------------------
