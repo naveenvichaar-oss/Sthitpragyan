@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimens.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/notifications/notification_service.dart';
+import '../../core/notifications/notifications_dataset_service.dart';
 import '../../core/utils/haptic_service.dart';
 
 /// ExecutiveNotificationTester allows immediate testing and inspection
@@ -23,7 +24,10 @@ class ExecutiveNotificationTester extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final triggers = NotificationService.dailyTriggers;
+    final datasetTriggers = NotificationsDatasetService().getTodayTriggers();
+    final triggers = datasetTriggers.isNotEmpty
+        ? datasetTriggers
+        : NotificationService.dailyTriggers;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),

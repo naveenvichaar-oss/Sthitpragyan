@@ -5,6 +5,7 @@ import 'app.dart';
 import 'core/constants/app_colors.dart';
 import 'core/database/hive_storage.dart';
 import 'core/notifications/notification_service.dart';
+import 'core/notifications/notifications_dataset_service.dart';
 import 'features/journal/data/repositories/journal_repository.dart';
 
 void main() async {
@@ -22,6 +23,9 @@ void main() async {
     ),
   );
 
+  // Load 7-day scheduled Stoic triggers from notifications_dataset.json
+  await NotificationsDatasetService().loadDataset();
+
   // Initialize offline-first zero-telemetry local storage
   await HiveStorage().init();
 
@@ -29,7 +33,7 @@ void main() async {
   await JournalRepository().seedInitialDataIfEmpty();
 
   // Initialize and schedule local daily Stoic notifications
-  // (05:45 AM, 09:30 AM, 02:00 PM, 09:30 PM)
+  // (05:45 AM, 09:30 AM / 09:00 AM, 02:00 PM, 09:30 PM)
   await NotificationService().init();
 
   runApp(const SthitaprajnaApp());
