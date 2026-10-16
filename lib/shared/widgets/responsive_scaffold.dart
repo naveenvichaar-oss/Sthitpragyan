@@ -7,6 +7,7 @@ import '../../core/utils/haptic_service.dart';
 import '../../features/cognition_vault/presentation/screens/cognition_vault_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/journal/presentation/screens/journal_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/sos/presentation/screens/sos_modal_sheet.dart';
 
 /// ResponsiveScaffold provides adaptive layout for both Mobile and Tablet screens.
@@ -57,9 +58,11 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
         key: _dashboardKey,
         onNavigateToJournal: _navigateToJournal,
         onNavigateToVault: () => _onTabSelected(2),
+        onNavigateToSettings: () => _onTabSelected(3),
       ),
       JournalScreen(onEntrySaved: _handleDebriefSaved),
       const CognitionVaultScreen(),
+      const SettingsScreen(),
     ];
 
     if (isTablet) {
@@ -139,6 +142,11 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   selectedIcon: Icon(Icons.psychology_rounded),
                   label: Text('VAULT'),
                 ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.tune_outlined),
+                  selectedIcon: Icon(Icons.tune_rounded),
+                  label: Text('SETTINGS'),
+                ),
               ],
             ),
             const VerticalDivider(width: 1, color: AppColors.borderSubtle),
@@ -208,6 +216,14 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   color: AppColors.shieldPrimary,
                 ),
                 label: 'Vault',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.tune_outlined, color: AppColors.textMuted),
+                selectedIcon: Icon(
+                  Icons.tune_rounded,
+                  color: AppColors.shieldPrimary,
+                ),
+                label: 'Settings',
               ),
             ],
           ),

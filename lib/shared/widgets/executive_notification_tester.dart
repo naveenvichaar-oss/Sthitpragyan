@@ -6,6 +6,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../core/notifications/notifications_dataset_service.dart';
 import '../../core/utils/haptic_service.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 
 /// ExecutiveNotificationTester allows immediate testing and inspection
 /// of the 4 scheduled daily Stoic triggers.
@@ -185,6 +186,22 @@ class ExecutiveNotificationTester extends StatelessWidget {
                 ),
               );
             },
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            icon: const Icon(Icons.tune_rounded, size: 16),
+            label: const Text('CUSTOMIZE SLOTS & SCHEDULE IN SETTINGS'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.shieldPrimary,
+              side: const BorderSide(color: AppColors.shieldPrimary),
+              minimumSize: const Size(double.infinity, 42),
+            ),
           ),
           const SizedBox(height: 16),
           Center(

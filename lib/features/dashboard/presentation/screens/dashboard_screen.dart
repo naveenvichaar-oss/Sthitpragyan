@@ -9,6 +9,7 @@ import '../../../../core/notifications/notifications_dataset_service.dart';
 import '../../../../shared/widgets/executive_notification_tester.dart';
 import '../../journal/data/models/journal_models.dart';
 import '../../journal/data/repositories/journal_repository.dart';
+import '../../settings/presentation/screens/settings_screen.dart';
 import '../../sos/presentation/screens/sos_modal_sheet.dart';
 import '../data/daily_rules_vault.dart';
 import '../data/models/daily_rule.dart';
@@ -23,15 +24,17 @@ import '../widgets/streak_badge.dart';
 /// 1. Minimalist dark theme (Zinc-950/900)
 /// 2. Big floating "SOS Shield" button at the center
 /// 3. Daily quote/rule from notifications_dataset.json (and Stoic rules)
-/// 4. Direct navigation to 3-Index Journal and Cognition Vault
+/// 4. Direct navigation to 3-Index Journal, Cognition Vault, and Settings
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onNavigateToJournal;
   final VoidCallback? onNavigateToVault;
+  final VoidCallback? onNavigateToSettings;
 
   const DashboardScreen({
     super.key,
     required this.onNavigateToJournal,
     this.onNavigateToVault,
+    this.onNavigateToSettings,
   });
 
   @override
@@ -108,7 +111,14 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _openNotificationSettings() {
-    ExecutiveNotificationTester.show(context);
+    HapticService.selectionClick();
+    if (widget.onNavigateToSettings != null) {
+      widget.onNavigateToSettings!();
+    } else {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const SettingsScreen()));
+    }
   }
 
   @override

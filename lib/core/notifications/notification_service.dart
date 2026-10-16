@@ -4,6 +4,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../database/hive_storage.dart';
+import '../../features/settings/data/models/notification_slot_config.dart';
 import 'notifications_dataset_service.dart';
 
 /// NotificationTrigger represents a scheduled strategic stoic prompt
@@ -157,8 +159,26 @@ class NotificationService {
     return true;
   }
 
-  /// Schedules all 7-day stoic notifications from notifications_dataset.json
-  Future<void> scheduleAllDailyTriggers() async {
+  /// Schedules all stoic notifications according to the customizable slots saved in Hive.
+  /// Automatically accounts for enabled/disabled slots and day-of-week active filters.
+  Future<void> scheduleAllConfiguredTriggers() async {
+    // 1. Cancel all existing scheduled triggers first to avoid orphaned alarms
+    await cancelAll();
+
+    // 2. Check master switch
+    if (HiveStorage().isInitialized &&
+        !HiveStorage().getNotificationsEnabled()) {
+      debugPrint(
+        '[NotificationService] Master notifications switch is OFF. All notifications cancelled.',
+      );
+      return;
+    }
+
+    // 3. Retrieve configured slots from local storage
+    final slots = HiveStorage().isInitialized
+        ? HiveStorage().getNotificationSlots()
+        : NotificationSlotConfig.defaultSlots();
+
     const days = [
       'Monday',
       'Tuesday',
@@ -169,36 +189,78 @@ class NotificationService {
       'Sunday',
     ];
 
-    for (int weekday = 1; weekday <= 7; weekday++) {
-      final dayName = days[weekday - 1];
-      final dayTriggers = NotificationsDatasetService().getTriggersForDay(
-        dayName,
-      );
+    int scheduledCount = 0;
 
-      for (int slotIdx = 0; slotIdx < dayTriggers.length; slotIdx++) {
-        final trigger = dayTriggers[slotIdx];
-        // Unique ID per weekday and slot (e.g., weekday 1: 101, 102; weekday 2: 201...)
-        final scheduleId = weekday * 100 + slotIdx + 1;
-        await _scheduleWeeklyTrigger(weekday, scheduleId, trigger);
+    for (final slot in slots) {
+      if (!slot.isEnabled) continue;
+
+      for (final weekday in slot.activeDays) {
+        if (weekday < 1 || weekday > 7) continue;
+        final dayName = days[weekday - 1];
+
+        // Determine title & body
+        String notificationTitle = slot.title;
+        String notificationBody = slot.body;
+
+        // If it's a standard/base slot, pull rich day-specific Devanagari text from dataset!
+        if (!slot.isCustom) {
+          final dayTriggers = NotificationsDatasetService().getTriggersForDay(
+            dayName,
+          );
+          NotificationTrigger? match;
+          for (final t in dayTriggers) {
+            final catA = t.category.toLowerCase().replaceAll(' ', '');
+            final catB = slot.category.toLowerCase().replaceAll(' ', '');
+            final nameB = slot.slotName.toLowerCase().replaceAll(' ', '');
+            if (catA == catB ||
+                catA == nameB ||
+                t.title.toLowerCase().contains(slot.category.toLowerCase())) {
+              match = t;
+              break;
+            }
+          }
+
+          if (match != null) {
+            notificationTitle = '${slot.formattedTime} • ${match.title}';
+            notificationBody = match.body;
+          }
+        }
+
+        final scheduleId = (slot.numericId % 1000) * 10 + weekday;
+
+        await _scheduleWeeklyTrigger(
+          weekday: weekday,
+          scheduleId: scheduleId,
+          hour: slot.hour,
+          minute: slot.minute,
+          title: notificationTitle,
+          body: notificationBody,
+          category: slot.category,
+        );
+        scheduledCount++;
       }
     }
+
     debugPrint(
-      '[NotificationService] Successfully scheduled 7-day notification matrix.',
+      '[NotificationService] Successfully scheduled $scheduledCount reminders across ${slots.where((s) => s.isEnabled).length} active slots.',
     );
   }
 
+  /// Alias for backward compatibility
+  Future<void> scheduleAllDailyTriggers() => scheduleAllConfiguredTriggers();
+
   /// Schedules a weekly recurring trigger for a specific weekday and time
-  Future<void> _scheduleWeeklyTrigger(
-    int weekday,
-    int scheduleId,
-    NotificationTrigger trigger,
-  ) async {
+  Future<void> _scheduleWeeklyTrigger({
+    required int weekday,
+    required int scheduleId,
+    required int hour,
+    required int minute,
+    required String title,
+    required String body,
+    required String category,
+  }) async {
     try {
-      final scheduledDate = _nextInstanceOfDayAndTime(
-        weekday,
-        trigger.hour,
-        trigger.minute,
-      );
+      final scheduledDate = _nextInstanceOfDayAndTime(weekday, hour, minute);
 
       const androidDetails = AndroidNotificationDetails(
         'sthitaprajna_scheduled_channel',
@@ -223,15 +285,15 @@ class NotificationService {
 
       await _notificationsPlugin.zonedSchedule(
         scheduleId,
-        trigger.title,
-        trigger.body,
+        title,
+        body,
         scheduledDate,
         details,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-        payload: trigger.category,
+        payload: category,
       );
     } catch (e) {
       debugPrint(
@@ -266,6 +328,42 @@ class NotificationService {
     return scheduledDate;
   }
 
+  /// Fires an instant test notification for a configured reminder slot
+  Future<void> fireTestNotificationForSlot(NotificationSlotConfig slot) async {
+    const androidDetails = AndroidNotificationDetails(
+      'sthitaprajna_immediate_test',
+      'Stoic Test Triggers',
+      channelDescription: 'Immediate test dispatch for stoic notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      enableVibration: true,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    final title = '[TEST] ${slot.formattedTime} • ${slot.title}';
+    final body = slot.body.isNotEmpty
+        ? slot.body
+        : 'Strategic grounding reminder for ${slot.slotName}.';
+
+    await _notificationsPlugin.show(
+      slot.numericId + 9000,
+      title,
+      body,
+      details,
+      payload: 'TEST_${slot.category}',
+    );
+  }
+
   /// Fires an instant test notification for any trigger so the executive can inspect it immediately
   Future<void> fireTestNotification(NotificationTrigger trigger) async {
     const androidDetails = AndroidNotificationDetails(
@@ -295,6 +393,14 @@ class NotificationService {
       details,
       payload: 'TEST_${trigger.category}',
     );
+  }
+
+  /// Toggles the master notification switch and immediately reschedules or cancels all alarms
+  Future<void> toggleMasterNotifications(bool enabled) async {
+    if (HiveStorage().isInitialized) {
+      await HiveStorage().setNotificationsEnabled(enabled);
+    }
+    await scheduleAllConfiguredTriggers();
   }
 
   /// Cancels all scheduled notifications

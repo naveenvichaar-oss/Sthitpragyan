@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/journal/data/models/journal_models.dart';
+import '../../features/settings/data/models/notification_slot_config.dart';
 import 'hive_boxes.dart';
 
 /// HiveStorage provides zero-telemetry, offline-first local persistence.
@@ -223,5 +224,61 @@ class HiveStorage {
 
   Future<void> setActiveRuleIndex(int index) async {
     await _settingsBox.put('active_rule_index', index);
+  }
+
+  // ---------------------------------------------------------
+  // Custom Dynamic Notification Slots
+  // ---------------------------------------------------------
+
+  List<NotificationSlotConfig> getNotificationSlots() {
+    final raw = _settingsBox.get('custom_notification_slots');
+    if (raw is List && raw.isNotEmpty) {
+      try {
+        final list = <NotificationSlotConfig>[];
+        for (final item in raw) {
+          if (item is Map) {
+            list.add(
+              NotificationSlotConfig.fromMap(Map<String, dynamic>.from(item)),
+            );
+          }
+        }
+        if (list.isNotEmpty) return list;
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing custom slots: $e');
+      }
+    }
+    return NotificationSlotConfig.defaultSlots();
+  }
+
+  Future<void> saveNotificationSlots(List<NotificationSlotConfig> slots) async {
+    final serialized = slots.map((s) => s.toMap()).toList();
+    await _settingsBox.put('custom_notification_slots', serialized);
+  }
+
+  Future<void> updateNotificationSlot(NotificationSlotConfig slot) async {
+    final slots = getNotificationSlots();
+    final index = slots.indexWhere((s) => s.id == slot.id);
+    if (index != -1) {
+      slots[index] = slot;
+    } else {
+      slots.add(slot);
+    }
+    await saveNotificationSlots(slots);
+  }
+
+  Future<void> addNotificationSlot(NotificationSlotConfig slot) async {
+    final slots = getNotificationSlots();
+    slots.add(slot);
+    await saveNotificationSlots(slots);
+  }
+
+  Future<void> deleteNotificationSlot(String slotId) async {
+    final slots = getNotificationSlots();
+    slots.removeWhere((s) => s.id == slotId);
+    await saveNotificationSlots(slots);
+  }
+
+  Future<void> resetNotificationSlotsToDefault() async {
+    await saveNotificationSlots(NotificationSlotConfig.defaultSlots());
   }
 }
