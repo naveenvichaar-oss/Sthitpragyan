@@ -17,4 +17,10 @@ abstract class HiveBoxes {
 
   /// Box containing logged slip-up post-incident recovery events
   static const String incidentLogs = 'sthitaprajna_incident_logs';
+
+  /// Box containing saved public-domain and user-added external resource links
+  static const String resourceVault = 'sthitaprajna_resource_vault';
+
+  /// Box containing user's daily affirmations and active wisdom selections
+  static const String affirmations = 'sthitaprajna_affirmations';
 }

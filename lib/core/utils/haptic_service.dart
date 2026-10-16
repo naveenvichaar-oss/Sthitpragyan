@@ -50,4 +50,13 @@ class HapticService {
       await HapticFeedback.lightImpact();
     } catch (_) {}
   }
+
+  /// Triggered on input validation failure or invalid operation
+  static Future<void> error() async {
+    try {
+      await HapticFeedback.heavyImpact();
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      await HapticFeedback.heavyImpact();
+    } catch (_) {}
+  }
 }

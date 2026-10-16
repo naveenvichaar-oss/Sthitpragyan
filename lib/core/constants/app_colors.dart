@@ -49,6 +49,7 @@ abstract class AppColors {
     0xFFF43F5E,
   ); // Rose 500 (Acute panic / hijack)
   static const Color roseMuted = Color(0x1FF43F5E); // Rose 12% fill
+  static const Color redError = roseDanger; // Error alias
 
   // Breathing Pulse Gradient stops
   static const Color breathPulseOuter = Color(0x1538BDF8);

@@ -9,6 +9,21 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- Safe intent/URL launching for external web links, YouTube, Google Drive, Google Keep -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <package android:name="com.google.android.youtube" />
+        <package android:name="com.google.android.apps.docs" />
+        <package android:name="com.google.android.keep" />
+    </queries>
+
     <application
         android:label="Sthitaprajna"
         android:name="${applicationName}"

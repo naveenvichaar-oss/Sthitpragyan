@@ -6,6 +6,9 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/incident_slip_up_log.dart';
+import 'package:sthitaprajna/features/wisdom/data/models/wisdom_entry.dart';
+import 'package:sthitaprajna/features/wisdom/data/services/wisdom_vault_service.dart';
+import 'package:sthitaprajna/features/wisdom/presentation/widgets/emergency_perspective_modal.dart';
 import '../widgets/box_breathing_drill_modal.dart';
 import '../widgets/damage_control_card.dart';
 
@@ -39,6 +42,10 @@ class PostIncidentRecoveryScreen extends StatefulWidget {
 class _PostIncidentRecoveryScreenState
     extends State<PostIncidentRecoveryScreen> {
   final HiveStorage _storage = HiveStorage();
+
+  // Screen Tab State: 0 = Post-Mortem Audit & Drills, 1 = Emergency Perspective (60s Read)
+  int _selectedRecoveryTab = 0;
+  int _selectedPerspectiveIndex = 0;
 
   // 1. Post-Mortem selections
   String _selectedTrigger = 'Toxic Boss';
@@ -218,55 +225,182 @@ class _PostIncidentRecoveryScreenState
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.auto_stories_rounded,
+              color: AppColors.amberWarning,
+              size: 20,
+            ),
+            tooltip: '60s Emergency Read Modal',
+            onPressed: () => EmergencyPerspectiveModal.show(context),
+          ),
+        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      body: Column(
         children: [
-          // Banner
-          Container(
-            padding: const EdgeInsets.all(AppDimens.space14),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
-              border: Border.all(
-                color: AppColors.amberWarning.withOpacity(0.3),
-                width: 1.0,
+          // Segmented Tab Selector
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                border: Border.all(color: AppColors.borderSubtle),
               ),
+              child: Row(
+                children: [
+                  _buildTabButton(0, 'POST-MORTEM & DRILLS', Icons.assignment_outlined),
+                  const SizedBox(width: 4),
+                  _buildTabButton(1, 'EMERGENCY PERSPECTIVE (60s)', Icons.auto_stories_rounded),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: _selectedRecoveryTab == 0
+                ? _buildPostMortemListView(activeArch)
+                : _buildEmergencyPerspectiveView(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(int index, String label, IconData icon) {
+    final isSelected = _selectedRecoveryTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedRecoveryTab = index;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: isSelected ? AppColors.amberWarning : Colors.transparent,
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 13,
+                color: isSelected ? AppColors.amberWarning : AppColors.textMuted,
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelBadge.copyWith(
+                    fontSize: 8.5,
+                    color: isSelected
+                        ? AppColors.amberWarning
+                        : AppColors.textSecondary,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostMortemListView(ArchetypeGuidance activeArch) {
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      children: [
+        // Banner
+        Container(
+          padding: const EdgeInsets.all(AppDimens.space14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+            border: Border.all(
+              color: AppColors.amberWarning.withOpacity(0.3),
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.psychology_alt_rounded,
+                color: AppColors.amberWarning,
+                size: 26,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'NO SELF-FLAGELATION • ONLY COGNITIVE CALIBRATION',
+                      style: AppTextStyles.labelBadge.copyWith(
+                        fontSize: 8.5,
+                        color: AppColors.amberWarning,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'A slip-up is data, not defeat. Extract the trigger, lower adrenaline, and lock in the correct verbal frame.',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 60-Second Emergency Read Shortcut
+        GestureDetector(
+          onTap: () {
+            HapticService.selectionClick();
+            setState(() => _selectedRecoveryTab = 1);
+          },
+          child: Container(
+            margin: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated,
+              borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+              border: Border.all(color: AppColors.amberWarning.withOpacity(0.4)),
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.psychology_alt_rounded,
-                  color: AppColors.amberWarning,
-                  size: 26,
-                ),
-                const SizedBox(width: 12),
+                const Icon(Icons.flash_on_rounded, size: 16, color: AppColors.amberWarning),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'NO SELF-FLAGELATION • ONLY COGNITIVE CALIBRATION',
-                        style: AppTextStyles.labelBadge.copyWith(
-                          fontSize: 8.5,
-                          color: AppColors.amberWarning,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'A slip-up is data, not defeat. Extract the trigger, lower adrenaline, and lock in the correct verbal frame.',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Spike in adrenaline? Take a 60-second Stoic perspective read first.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.amberWarning,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
+                const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.amberWarning),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+        ),
+        const SizedBox(height: 16),
 
           // -----------------------------------------------------------
           // STEP 1: 30-SECOND POST-MORTEM
@@ -650,8 +784,7 @@ class _PostIncidentRecoveryScreenState
           ),
           const SizedBox(height: 32),
         ],
-      ),
-    );
+      );
   }
 
   Widget _buildChipSection({
@@ -697,6 +830,320 @@ class _PostIncidentRecoveryScreenState
             );
           }).toList(),
         ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------
+  // 60-Second Emergency Perspective Inline View
+  // ---------------------------------------------------------
+  Widget _buildEmergencyPerspectiveView() {
+    final service = WisdomVaultService();
+    var perspectives = service.getEmergencyPerspectives();
+    if (perspectives.isEmpty) {
+      perspectives = service.getAllEntries();
+    }
+
+    if (perspectives.isEmpty) {
+      return const Center(child: Text('No emergency perspectives available'));
+    }
+
+    final safeIndex = _selectedPerspectiveIndex % perspectives.length;
+    final activePerspective = perspectives[safeIndex];
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      children: [
+        // Top 60-Sec Reset Header Banner
+        Container(
+          padding: const EdgeInsets.all(AppDimens.space14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+            border: Border.all(color: AppColors.amberWarning.withOpacity(0.35)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.amberWarning.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.timer_outlined,
+                  color: AppColors.amberWarning,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '60-SECOND EMERGENCY PERSPECTIVE',
+                      style: AppTextStyles.labelBadge.copyWith(
+                        color: AppColors.amberWarning,
+                        fontSize: 8.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Detach your ego from praise and blame. Ground yourself in timeless stoic sovereignty before taking action.',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Perspective Selection Chips
+        Text(
+          'SELECT EMERGENCY PROTOCOL',
+          style: AppTextStyles.labelBadge.copyWith(fontSize: 9),
+        ),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(perspectives.length, (index) {
+              final item = perspectives[index];
+              final isSelected = safeIndex == index;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(item.title),
+                  selected: isSelected,
+                  onSelected: (val) {
+                    if (val) {
+                      HapticService.selectionClick();
+                      setState(() {
+                        _selectedPerspectiveIndex = index;
+                      });
+                    }
+                  },
+                  selectedColor: AppColors.amberWarning.withOpacity(0.15),
+                  backgroundColor: AppColors.surface,
+                  side: BorderSide(
+                    color: isSelected
+                        ? AppColors.amberWarning
+                        : AppColors.borderSubtle,
+                  ),
+                  labelStyle: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                    color: isSelected
+                        ? AppColors.amberWarning
+                        : AppColors.textSecondary,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                ),
+              );
+            }),
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Main Perspective Card
+        Container(
+          padding: const EdgeInsets.all(AppDimens.space16),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+            border: Border.all(
+              color: AppColors.amberWarning.withOpacity(0.3),
+              width: 1.0,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Source & Category Pill
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: AppColors.borderSubtle),
+                    ),
+                    child: Text(
+                      activePerspective.categoryName.toUpperCase(),
+                      style: AppTextStyles.labelBadge.copyWith(
+                        fontSize: 8.5,
+                        color: AppColors.shieldPrimary,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${safeIndex + 1} OF ${perspectives.length}',
+                    style: AppTextStyles.metricSmall.copyWith(
+                      fontSize: 10,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Title & Source
+              Text(
+                activePerspective.title,
+                style: AppTextStyles.heading.copyWith(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                activePerspective.source,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textMuted,
+                  fontSize: 11,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Quote Box
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.amberWarning.withOpacity(0.2),
+                  ),
+                ),
+                child: Text(
+                  '"${activePerspective.originalText}"',
+                  style: TextStyle(
+                    fontFamily: 'serif',
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                    height: 1.5,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Translation
+              Text(
+                'ESSENCE / अनुवाद:',
+                style: AppTextStyles.labelBadge.copyWith(
+                  fontSize: 8.5,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                activePerspective.translation,
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontSize: 12,
+                  height: 1.45,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Executive Action Takeaway Box
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.borderSubtle),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.shield_rounded,
+                          size: 14,
+                          color: AppColors.shieldPrimary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'EXECUTIVE TAKEAWAY • EGO DETACHMENT',
+                          style: AppTextStyles.labelBadge.copyWith(
+                            color: AppColors.shieldPrimary,
+                            fontSize: 8.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      activePerspective.executiveTakeaway,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        fontSize: 11.5,
+                        color: AppColors.textPrimary,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Quick Action Buttons: Box Breathing & Return to Post-Mortem
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _openBoxBreathingDrill,
+                icon: const Icon(Icons.air_rounded, size: 16),
+                label: const Text('BOX BREATHING (2M)'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.shieldPrimary,
+                  side: const BorderSide(color: AppColors.shieldPrimary),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  HapticService.selectionClick();
+                  setState(() {
+                    _selectedRecoveryTab = 0;
+                  });
+                },
+                icon: const Icon(Icons.edit_note_rounded, size: 16),
+                label: const Text('DAMAGE CONTROL'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.amberWarning,
+                  foregroundColor: AppColors.background,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
       ],
     );
   }

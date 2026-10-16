@@ -44,6 +44,13 @@ abstract class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
+  static const TextStyle titleSmall = TextStyle(
+    fontSize: 14.0,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.2,
+    color: AppColors.textPrimary,
+  );
+
   // Body & Reading
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 15.0,

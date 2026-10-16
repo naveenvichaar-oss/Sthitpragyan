@@ -7,6 +7,7 @@ import 'core/database/hive_storage.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/notifications/notifications_dataset_service.dart';
 import 'features/journal/data/repositories/journal_repository.dart';
+import 'features/wisdom/data/services/wisdom_vault_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,9 @@ void main() async {
 
   // Load 7-day scheduled Stoic triggers from notifications_dataset.json
   await NotificationsDatasetService().loadDataset();
+
+  // Load offline wisdom vault entries (Gita, Stoicism, Behavioral Psychology)
+  await WisdomVaultService().init();
 
   // Initialize offline-first zero-telemetry local storage
   await HiveStorage().init();

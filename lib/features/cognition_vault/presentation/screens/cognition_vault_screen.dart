@@ -3,57 +3,160 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../wisdom/data/models/resource_link.dart';
+import '../../../wisdom/data/models/wisdom_entry.dart';
+import '../../../wisdom/data/services/wisdom_vault_service.dart';
+import '../../../wisdom/presentation/widgets/add_resource_modal_sheet.dart';
+import '../../../wisdom/presentation/widgets/resource_hub_card.dart';
+import '../../../wisdom/presentation/widgets/wisdom_card.dart';
 import '../../data/cognition_data_source.dart';
 import '../../data/models/fallacy_and_model.dart';
 import '../widgets/cognition_search_bar.dart';
 import '../widgets/expandable_micro_card.dart';
 
-/// CognitionVaultScreen hosts micro-cards on Logical Fallacies and Stoic Mental Models.
+/// CognitionVaultScreen hosts the unified Wisdom Vault & Resource Sanctuary:
+/// 1. Wisdom Cards: Gita & Sthitaprajna, Western Stoicism, Behavioral Psychology.
+/// 2. Resource Hub: Pre-seeded public-domain classics + personal Drive/Keep/YouTube links.
+/// 3. Mental Models: Logical fallacies and cognitive defense mechanisms.
 class CognitionVaultScreen extends StatefulWidget {
-  const CognitionVaultScreen({super.key});
+  final int initialSegment;
+
+  const CognitionVaultScreen({
+    super.key,
+    this.initialSegment = 0,
+  });
 
   @override
   State<CognitionVaultScreen> createState() => _CognitionVaultScreenState();
 }
 
 class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  int _selectedFilterIndex = 0; // 0: All, 1: Fallacies, 2: Stoic Models
+  final HiveStorage _storage = HiveStorage();
+  final WisdomVaultService _wisdomService = WisdomVaultService();
 
-  List<CognitionItem> _filteredItems = [];
+  // Top Segment Control: 0 = Wisdom Cards, 1 = Resource Hub, 2 = Mental Models
+  int _selectedMainSegment = 0;
+
+  // Search controllers
+  final TextEditingController _wisdomSearchController = TextEditingController();
+  final TextEditingController _modelSearchController = TextEditingController();
+
+  // Wisdom Tab State
+  String _selectedWisdomCategory = 'all';
+  List<WisdomEntry> _filteredWisdom = [];
+  String? _activeAffirmationId;
+
+  // Resource Hub State
+  List<ResourceLink> _resources = [];
+  String _selectedResourceFilter = 'all';
+
+  // Mental Models Tab State
+  int _selectedModelFilterIndex = 0; // 0: All, 1: Fallacies, 2: Stoic Models
+  List<CognitionItem> _filteredModels = [];
 
   @override
   void initState() {
     super.initState();
-    _applyFilters();
+    _selectedMainSegment = widget.initialSegment;
+    _loadAllData();
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void _loadAllData() {
+    // 1. Wisdom entries
+    _applyWisdomFilters();
+    _activeAffirmationId = _storage.getDailyAffirmationId();
+
+    // 2. Resource links
+    _loadResources();
+
+    // 3. Mental models
+    _applyModelFilters();
   }
 
-  void _applyFilters() {
-    final query = _searchController.text.trim();
+  void _loadResources() {
+    setState(() {
+      _resources = _storage.getAllResourceLinks();
+    });
+  }
+
+  void _applyWisdomFilters() {
+    final query = _wisdomSearchController.text.trim();
+    setState(() {
+      _filteredWisdom = _wisdomService.search(
+        query,
+        category: _selectedWisdomCategory,
+      );
+    });
+  }
+
+  void _applyModelFilters() {
+    final query = _modelSearchController.text.trim();
     CognitionType? filterType;
-
-    if (_selectedFilterIndex == 1) {
+    if (_selectedModelFilterIndex == 1) {
       filterType = CognitionType.fallacy;
-    } else if (_selectedFilterIndex == 2) {
+    } else if (_selectedModelFilterIndex == 2) {
       filterType = CognitionType.mentalModel;
     }
 
     setState(() {
-      _filteredItems = CognitionDataSource.search(query, filterType);
+      _filteredModels = CognitionDataSource.search(query, filterType);
     });
+  }
+
+  @override
+  void dispose() {
+    _wisdomSearchController.dispose();
+    _modelSearchController.dispose();
+    super.dispose();
+  }
+
+  void _openAddResourceSheet() {
+    HapticService.selectionClick();
+    AddResourceModalSheet.show(
+      context,
+      onSaved: () {
+        _loadResources();
+      },
+    );
+  }
+
+  Future<void> _deleteResource(String id) async {
+    HapticService.selectionClick();
+    await _storage.deleteResourceLink(id);
+    _loadResources();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Resource removed from Sanctuary.', style: TextStyle(fontSize: 12)),
+          backgroundColor: AppColors.surfaceElevated,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      floatingActionButton: _selectedMainSegment == 1
+          ? FloatingActionButton.extended(
+              onPressed: _openAddResourceSheet,
+              backgroundColor: AppColors.shieldPrimary,
+              foregroundColor: AppColors.background,
+              icon: const Icon(Icons.add_link_rounded, size: 20),
+              label: Text(
+                'ADD LINK',
+                style: AppTextStyles.labelBadge.copyWith(
+                  color: AppColors.background,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11,
+                ),
+              ),
+            )
+          : null,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -69,39 +172,39 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'INTELLECTUAL DEFENSE',
+                      'INTELLECTUAL DEFENSE & SANCTUARY',
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
-                        letterSpacing: 2.0,
+                        letterSpacing: 1.5,
+                        fontSize: 9.0,
                       ),
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      'COGNITION VAULT',
+                      'WISDOM & COGNITION',
                       style: AppTextStyles.displayMedium,
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                if (_selectedMainSegment == 1)
+                  IconButton(
+                    onPressed: _openAddResourceSheet,
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: AppColors.shieldPrimary,
+                      size: 24,
+                    ),
+                    tooltip: 'Add Custom Resource',
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-                    border: Border.all(color: AppColors.borderSubtle),
-                  ),
-                  child: Text(
-                    '${_filteredItems.length} MODELS',
-                    style: AppTextStyles.metricSmall.copyWith(fontSize: 10),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 6),
             Text(
-              'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.',
+              _selectedMainSegment == 0
+                  ? 'Classic Sthitaprajna shlokas, Western Stoicism, and Behavioral Psychology for unflinching executive composure.'
+                  : _selectedMainSegment == 1
+                      ? 'Curated public-domain literature, audio/video breakdowns, and your personal Google Drive & Keep notes.'
+                      : 'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -109,98 +212,373 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Search Bar
-            CognitionSearchBar(
-              controller: _searchController,
-              onChanged: (_) => _applyFilters(),
-              onClear: () {
-                _searchController.clear();
-                _applyFilters();
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // Filter Tabs (All / Fallacies / Mental Models)
-            Row(
-              children: [
-                _buildFilterChip(
-                  0,
-                  'ALL (${CognitionDataSource.items.length})',
-                ),
-                const SizedBox(width: 8),
-                _buildFilterChip(
-                  1,
-                  'FALLACIES (${CognitionDataSource.getFallacies().length})',
-                ),
-                const SizedBox(width: 8),
-                _buildFilterChip(
-                  2,
-                  'STOIC MODELS (${CognitionDataSource.getMentalModels().length})',
-                ),
-              ],
-            ),
+            // Top Segmented Switcher (Wisdom Cards / Resource Hub / Mental Models)
+            _buildMainSegmentBar(),
             const SizedBox(height: 16),
 
-            // Micro-Cards List
-            if (_filteredItems.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(AppDimens.space32),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
-                  border: Border.all(color: AppColors.borderSubtle),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.search_off_rounded,
-                      size: 32,
-                      color: AppColors.textDisabled,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'NO COGNITION MODELS FOUND',
-                      style: AppTextStyles.labelBadge.copyWith(
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Try adjusting your search terms.',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              )
+            // Body based on selected segment
+            if (_selectedMainSegment == 0)
+              _buildWisdomCardsView()
+            else if (_selectedMainSegment == 1)
+              _buildResourceHubView()
             else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _filteredItems.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  return ExpandableMicroCard(item: _filteredItems[index]);
-                },
-              ),
-            const SizedBox(height: 40),
+              _buildMentalModelsView(),
+
+            const SizedBox(height: 60),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(int index, String label) {
-    final isSelected = _selectedFilterIndex == index;
+  // ---------------------------------------------------------
+  // Main Segment Bar (Wisdom Cards / Resource Hub / Models)
+  // ---------------------------------------------------------
+  Widget _buildMainSegmentBar() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Row(
+        children: [
+          _buildSegmentButton(0, 'WISDOM CARDS', Icons.auto_stories_rounded),
+          const SizedBox(width: 4),
+          _buildSegmentButton(1, 'RESOURCE HUB', Icons.hub_rounded),
+          const SizedBox(width: 4),
+          _buildSegmentButton(2, 'MENTAL MODELS', Icons.psychology_rounded),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSegmentButton(int index, String label, IconData icon) {
+    final isSelected = _selectedMainSegment == index;
     return Expanded(
       child: GestureDetector(
         onTap: () {
           HapticService.selectionClick();
           setState(() {
-            _selectedFilterIndex = index;
-            _applyFilters();
+            _selectedMainSegment = index;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: isSelected ? AppColors.shieldPrimary : Colors.transparent,
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 13,
+                color: isSelected ? AppColors.shieldPrimary : AppColors.textMuted,
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelBadge.copyWith(
+                    fontSize: 9.0,
+                    color: isSelected
+                        ? AppColors.shieldPrimary
+                        : AppColors.textSecondary,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------
+  // View 1: Wisdom Cards
+  // ---------------------------------------------------------
+  Widget _buildWisdomCardsView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Search Bar
+        CognitionSearchBar(
+          controller: _wisdomSearchController,
+          hintText: 'Search shlokas, Marcus, Seneca, Kahneman...',
+          onChanged: (_) => _applyWisdomFilters(),
+          onClear: () {
+            _wisdomSearchController.clear();
+            _applyWisdomFilters();
+          },
+        ),
+        const SizedBox(height: 12),
+
+        // Category Filter Chips
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildWisdomCategoryChip('all', 'ALL WISDOM'),
+              const SizedBox(width: 6),
+              _buildWisdomCategoryChip('gita', 'GITA & STHITAPRAJNA'),
+              const SizedBox(width: 6),
+              _buildWisdomCategoryChip('western_stoicism', 'WESTERN STOICISM'),
+              const SizedBox(width: 6),
+              _buildWisdomCategoryChip('psychology_behavioral', 'BEHAVIORAL PSYCHOLOGY'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Wisdom Cards List
+        if (_filteredWisdom.isEmpty)
+          _buildEmptyPlaceholder('NO WISDOM ENTRIES FOUND', 'Try adjusting your search terms.')
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _filteredWisdom.length,
+            itemBuilder: (context, index) {
+              final entry = _filteredWisdom[index];
+              final isAffirmation = _activeAffirmationId == entry.id;
+              return WisdomCard(
+                entry: entry,
+                isAffirmation: isAffirmation,
+                onSetAffirmation: () async {
+                  await _storage.setDailyAffirmation(
+                    id: entry.id,
+                    title: entry.title,
+                    text: entry.translation,
+                    source: entry.source,
+                  );
+                  setState(() {
+                    _activeAffirmationId = entry.id;
+                  });
+                },
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildWisdomCategoryChip(String catKey, String label) {
+    final isSelected = _selectedWisdomCategory == catKey;
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        setState(() {
+          _selectedWisdomCategory = catKey;
+          _applyWisdomFilters();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+          border: Border.all(
+            color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.labelBadge.copyWith(
+            fontSize: 9.0,
+            color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------
+  // View 2: Resource Hub (Public Domain & Personal Links)
+  // ---------------------------------------------------------
+  Widget _buildResourceHubView() {
+    var displayList = _resources;
+    if (_selectedResourceFilter != 'all') {
+      displayList = displayList.where((r) {
+        return r.mediaType.toStorageString().toLowerCase() ==
+            _selectedResourceFilter.toLowerCase();
+      }).toList();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Resource Filter Chips
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildResourceFilterChip('all', 'ALL RESOURCES (${_resources.length})'),
+              const SizedBox(width: 6),
+              _buildResourceFilterChip('YouTube', 'YOUTUBE'),
+              const SizedBox(width: 6),
+              _buildResourceFilterChip('DrivePDF', 'DRIVE PDF'),
+              const SizedBox(width: 6),
+              _buildResourceFilterChip('GoogleKeep', 'GOOGLE KEEP'),
+              const SizedBox(width: 6),
+              _buildResourceFilterChip('WebLink', 'WEB ARCHIVE'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Quick Add Banner
+        Container(
+          padding: const EdgeInsets.all(AppDimens.space12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(color: AppColors.borderSubtle),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.shield_moon_rounded, size: 20, color: AppColors.shieldPrimary),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Tap any resource to launch external verified studies, audio, or notes with zero tracking.',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _openAddResourceSheet,
+                icon: const Icon(Icons.add_rounded, size: 14),
+                label: const Text('ADD', style: TextStyle(fontSize: 11)),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.shieldPrimary,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // List
+        if (displayList.isEmpty)
+          _buildEmptyPlaceholder(
+            'NO RESOURCES IN THIS CLUSTER',
+            'Tap "+ ADD LINK" to add custom YouTube, Drive, or Keep notes.',
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: displayList.length,
+            itemBuilder: (context, index) {
+              final res = displayList[index];
+              return ResourceHubCard(
+                resource: res,
+                onDelete: res.isUserAdded ? () => _deleteResource(res.id) : null,
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildResourceFilterChip(String filterKey, String label) {
+    final isSelected = _selectedResourceFilter == filterKey;
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        setState(() {
+          _selectedResourceFilter = filterKey;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+          border: Border.all(
+            color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.labelBadge.copyWith(
+            fontSize: 9.0,
+            color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------
+  // View 3: Mental Models & Fallacies
+  // ---------------------------------------------------------
+  Widget _buildMentalModelsView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CognitionSearchBar(
+          controller: _modelSearchController,
+          hintText: 'Search strawman, gaslighting, ad hominem...',
+          onChanged: (_) => _applyModelFilters(),
+          onClear: () {
+            _modelSearchController.clear();
+            _applyModelFilters();
+          },
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            _buildModelFilterChip(0, 'ALL (${CognitionDataSource.items.length})'),
+            const SizedBox(width: 8),
+            _buildModelFilterChip(1, 'FALLACIES (${CognitionDataSource.getFallacies().length})'),
+            const SizedBox(width: 8),
+            _buildModelFilterChip(2, 'STOIC MODELS (${CognitionDataSource.getMentalModels().length})'),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        if (_filteredModels.isEmpty)
+          _buildEmptyPlaceholder('NO COGNITION MODELS FOUND', 'Try adjusting your search terms.')
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _filteredModels.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              return ExpandableMicroCard(item: _filteredModels[index]);
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildModelFilterChip(int index, String label) {
+    final isSelected = _selectedModelFilterIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedModelFilterIndex = index;
+            _applyModelFilters();
           });
         },
         child: Container(
@@ -210,25 +588,48 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
             border: Border.all(
-              color: isSelected
-                  ? AppColors.shieldPrimary
-                  : AppColors.borderSubtle,
-              width: 1.0,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
             ),
           ),
           child: Text(
             label,
             style: AppTextStyles.labelBadge.copyWith(
               fontSize: 9.0,
-              color: isSelected
-                  ? AppColors.shieldPrimary
-                  : AppColors.textSecondary,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyPlaceholder(String title, String subtitle) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppDimens.space32),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.search_off_rounded, size: 32, color: AppColors.textDisabled),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: AppTextStyles.labelBadge.copyWith(letterSpacing: 1.5),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

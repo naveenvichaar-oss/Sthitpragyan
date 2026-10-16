@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../features/journal/data/models/journal_models.dart';
 import '../../features/recovery/data/models/incident_slip_up_log.dart';
 import '../../features/settings/data/models/notification_slot_config.dart';
+import '../../features/wisdom/data/models/resource_link.dart';
 import 'hive_boxes.dart';
 
 /// HiveStorage provides zero-telemetry, offline-first local persistence.
@@ -22,6 +23,8 @@ class HiveStorage {
   late Box<String> _pinnedScriptsBox;
   late Box<Map> _sosIncidentsBox;
   late Box<Map> _incidentLogsBox;
+  late Box<Map> _resourceVaultBox;
+  late Box _affirmationsBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -44,6 +47,15 @@ class HiveStorage {
       _pinnedScriptsBox = await Hive.openBox<String>(HiveBoxes.pinnedScripts);
       _sosIncidentsBox = await Hive.openBox<Map>(HiveBoxes.sosIncidents);
       _incidentLogsBox = await Hive.openBox<Map>(HiveBoxes.incidentLogs);
+      _resourceVaultBox = await Hive.openBox<Map>(HiveBoxes.resourceVault);
+      _affirmationsBox = await Hive.openBox(HiveBoxes.affirmations);
+
+      // Pre-seed verified public-domain resources on first launch
+      if (_resourceVaultBox.isEmpty) {
+        for (final item in ResourceLink.preSeededResources()) {
+          await _resourceVaultBox.put(item.id, item.toMap());
+        }
+      }
 
       _initialized = true;
       debugPrint(
@@ -304,5 +316,77 @@ class HiveStorage {
 
   Future<void> deleteSlipUpIncident(String id) async {
     await _incidentLogsBox.delete(id);
+  }
+
+  // ---------------------------------------------------------
+  // Resource Vault Operations (ResourceLink)
+  // ---------------------------------------------------------
+
+  List<ResourceLink> getAllResourceLinks() {
+    final list = <ResourceLink>[];
+    for (final raw in _resourceVaultBox.values) {
+      try {
+        list.add(ResourceLink.fromMap(Map<String, dynamic>.from(raw)));
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing resource: $e');
+      }
+    }
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
+  }
+
+  Future<void> saveResourceLink(ResourceLink resource) async {
+    await _resourceVaultBox.put(resource.id, resource.toMap());
+  }
+
+  Future<void> deleteResourceLink(String id) async {
+    await _resourceVaultBox.delete(id);
+  }
+
+  Future<void> resetResourceLinksToDefault() async {
+    await _resourceVaultBox.clear();
+    for (final item in ResourceLink.preSeededResources()) {
+      await _resourceVaultBox.put(item.id, item.toMap());
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Affirmation & Daily Wisdom Anchor Operations
+  // ---------------------------------------------------------
+
+  String? getDailyAffirmationId() {
+    return _affirmationsBox.get('active_affirmation_id') as String?;
+  }
+
+  String? getDailyAffirmationTitle() {
+    return _affirmationsBox.get('active_affirmation_title') as String?;
+  }
+
+  String? getDailyAffirmationText() {
+    return _affirmationsBox.get('active_affirmation_text') as String?;
+  }
+
+  String? getDailyAffirmationSource() {
+    return _affirmationsBox.get('active_affirmation_source') as String?;
+  }
+
+  Future<void> setDailyAffirmation({
+    required String id,
+    required String title,
+    required String text,
+    required String source,
+  }) async {
+    await _affirmationsBox.put('active_affirmation_id', id);
+    await _affirmationsBox.put('active_affirmation_title', title);
+    await _affirmationsBox.put('active_affirmation_text', text);
+    await _affirmationsBox.put('active_affirmation_source', source);
+    await _affirmationsBox.put('active_affirmation_date', DateTime.now().toIso8601String());
+  }
+
+  Future<void> clearDailyAffirmation() async {
+    await _affirmationsBox.delete('active_affirmation_id');
+    await _affirmationsBox.delete('active_affirmation_title');
+    await _affirmationsBox.delete('active_affirmation_text');
+    await _affirmationsBox.delete('active_affirmation_source');
   }
 }

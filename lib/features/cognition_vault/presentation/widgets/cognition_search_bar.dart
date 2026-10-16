@@ -9,12 +9,14 @@ class CognitionSearchBar extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
+  final String? hintText;
 
   const CognitionSearchBar({
     super.key,
     required this.controller,
     required this.onChanged,
     required this.onClear,
+    this.hintText,
   });
 
   @override
@@ -24,7 +26,7 @@ class CognitionSearchBar extends StatelessWidget {
       onChanged: onChanged,
       style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
       decoration: InputDecoration(
-        hintText: 'Search fallacies, stoic models, corporate traps...',
+        hintText: hintText ?? 'Search fallacies, stoic models, corporate traps...',
         prefixIcon: const Icon(
           Icons.search_rounded,
           size: 20,

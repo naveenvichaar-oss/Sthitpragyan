@@ -19,6 +19,7 @@ import 'package:sthitaprajna/features/journal/data/repositories/journal_reposito
 import 'package:sthitaprajna/features/recovery/presentation/screens/post_incident_recovery_screen.dart';
 import 'package:sthitaprajna/features/settings/presentation/screens/settings_screen.dart';
 import 'package:sthitaprajna/features/sos/presentation/screens/sos_modal_sheet.dart';
+import 'package:sthitaprajna/features/wisdom/presentation/widgets/daily_wisdom_card.dart';
 
 /// DashboardScreen serves as the command center for Sthitaprajna.
 /// Features:
@@ -201,9 +202,13 @@ class DashboardScreenState extends State<DashboardScreen> {
                     onNextRule: _cycleNextRule,
                     onNextDatasetTrigger: _cycleNextDatasetTrigger,
                   ),
+                  const SizedBox(height: 14),
+
+                  // 5. Daily Rotating "Wisdom of the Day" Card
+                  DailyWisdomCard(onOpenVault: widget.onNavigateToVault),
                   const SizedBox(height: 16),
 
-                  // 5. Direct Quick Navigation Row: Journal Debrief & Cognition Vault
+                  // 6. Direct Quick Navigation Row: Journal Debrief & Cognition Vault
                   Row(
                     children: [
                       // Navigation to 3-Index Journal Screen
