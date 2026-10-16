@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'app.dart';
+import 'core/constants/app_colors.dart';
+import 'core/database/hive_storage.dart';
+import 'core/notifications/notification_service.dart';
+import 'features/journal/data/repositories/journal_repository.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Pure dark mode status bar & navigation bar overlays
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: AppColors.background,
+      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
+
+  // Initialize offline-first zero-telemetry local storage
+  await HiveStorage().init();
+
+  // Populate initial demonstration/onboarding data if cold start
+  await JournalRepository().seedInitialDataIfEmpty();
+
+  // Initialize and schedule local daily Stoic notifications
+  // (05:45 AM, 09:30 AM, 02:00 PM, 09:30 PM)
+  await NotificationService().init();
+
+  runApp(const SthitaprajnaApp());
+}
