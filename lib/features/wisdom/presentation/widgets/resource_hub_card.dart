@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/resource_link.dart';
+import '../../utils/resource_launcher_service.dart';
 
 /// ResourceHubCard displays curated classic literature or personal Drive/Keep notes
-/// with external link launching via url_launcher.
+/// with in-app YouTube player and in-app Web/PDF viewer support.
 class ResourceHubCard extends StatelessWidget {
   final ResourceLink resource;
   final VoidCallback? onDelete;
@@ -18,58 +18,6 @@ class ResourceHubCard extends StatelessWidget {
     required this.resource,
     this.onDelete,
   });
-
-  Future<void> _launchExternalUrl(BuildContext context) async {
-    HapticService.selectionClick();
-
-    final rawUrl = resource.url.trim();
-    if (rawUrl.isEmpty) {
-      _showError(context, 'Resource URL is empty.');
-      return;
-    }
-
-    Uri? uri;
-    try {
-      uri = Uri.parse(rawUrl);
-      if (!uri.hasScheme) {
-        uri = Uri.parse('https://$rawUrl');
-      }
-    } catch (e) {
-      _showError(context, 'Invalid resource URL format.');
-      return;
-    }
-
-    try {
-      final launched = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-
-      if (!launched) {
-        // Fallback to platform default if externalApplication fails
-        await launchUrl(uri, mode: LaunchMode.platformDefault);
-      }
-    } catch (e) {
-      if (context.mounted) {
-        _showError(context, 'Could not open URL: $e');
-      }
-    }
-  }
-
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline_rounded, color: AppColors.redError, size: 16),
-            const SizedBox(width: 8),
-            Expanded(child: Text(message, style: const TextStyle(fontSize: 12))),
-          ],
-        ),
-        backgroundColor: AppColors.surfaceElevated,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +34,7 @@ class ResourceHubCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
-          onTap: () => _launchExternalUrl(context),
+          onTap: () => ResourceLauncherService.openResource(context, resource: resource),
           child: Padding(
             padding: const EdgeInsets.all(AppDimens.space14),
             child: Row(
@@ -96,9 +44,9 @@ class ResourceHubCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: mediaColor.withOpacity(0.12),
+                    color: mediaColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-                    border: Border.all(color: mediaColor.withOpacity(0.25)),
+                    border: Border.all(color: mediaColor.withValues(alpha: 0.25)),
                   ),
                   child: Icon(
                     resource.mediaType.iconData,
@@ -122,7 +70,7 @@ class ResourceHubCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: mediaColor.withOpacity(0.15),
+                              color: mediaColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -203,7 +151,7 @@ class ResourceHubCard extends StatelessWidget {
                             child: Text(
                               resource.url,
                               style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.shieldPrimary.withOpacity(0.8),
+                                color: AppColors.shieldPrimary.withValues(alpha: 0.8),
                                 fontSize: 10,
                                 decoration: TextDecoration.underline,
                               ),

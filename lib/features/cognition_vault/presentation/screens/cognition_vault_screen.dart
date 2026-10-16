@@ -453,7 +453,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Tap any resource to launch external verified studies, audio, or notes with zero tracking.',
+                  'Tap any resource to open classical texts, Drive PDFs, or YouTube videos seamlessly inside the app.',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                     fontSize: 11,
