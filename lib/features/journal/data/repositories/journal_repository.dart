@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/database/hive_storage.dart';
 import '../../../core/utils/date_helpers.dart';
 import '../../dashboard/data/models/streak_data.dart';
-import '../models/journal_entry.dart';
+import '../models/journal_models.dart';
 
 /// JournalRepository orchestrates storage and metric derivations for 3-Index Debriefs.
 class JournalRepository {
@@ -13,33 +13,30 @@ class JournalRepository {
     : _storage = storage ?? HiveStorage();
 
   /// Saves today's debrief and calculates updated streak
-  Future<void> saveEntry(JournalEntry entry) async {
+  Future<void> saveEntry(DailyJournalEntry entry) async {
     // 1. Save entry to Hive
-    await _storage.saveJournalEntry(entry.dateKey, entry.toMap());
+    await _storage.saveDailyJournalEntry(entry);
 
     // 2. Update streak
-    await _updateStreakOnSubmission(entry.dateKey);
+    await _updateStreakOnSubmission(entry.entryDate);
 
-    debugPrint('[JournalRepository] Saved debrief for ${entry.dateKey}');
+    debugPrint('[JournalRepository] Saved debrief for ${entry.entryDate}');
   }
 
   /// Retrieves entry for a specific day
-  JournalEntry? getEntryByDate(String dateKey) {
-    final raw = _storage.getJournalEntry(dateKey);
-    if (raw == null) return null;
-    return JournalEntry.fromMap(raw);
+  DailyJournalEntry? getEntryByDate(String dateKey) {
+    return _storage.getDailyJournalEntry(dateKey);
   }
 
   /// Retrieves today's entry if logged
-  JournalEntry? getTodayEntry() {
+  DailyJournalEntry? getTodayEntry() {
     final todayKey = DateHelpers.toStorageKey(DateTime.now());
     return getEntryByDate(todayKey);
   }
 
   /// Returns all historical debriefs sorted chronologically descending
-  List<JournalEntry> getAllEntries() {
-    final list = _storage.getAllJournalEntries();
-    return list.map((m) => JournalEntry.fromMap(m)).toList();
+  List<DailyJournalEntry> getAllEntries() {
+    return _storage.getAllDailyJournalEntries();
   }
 
   /// Calculates aggregated streak metrics and past 7 days completion
@@ -65,25 +62,26 @@ class JournalRepository {
 
     // Calculate weekly metrics over the last 7 days
     final last7Days = DateHelpers.getLast7Days(now);
-    double boundarySum = 0;
-    double reactionSum = 0;
+    int boundariesMaintainedCount = 0;
+    int reactionScoreSum = 0;
     int daysCounted = 0;
 
     for (final day in last7Days) {
       final key = DateHelpers.toStorageKey(day);
       final entry = getEntryByDate(key);
       if (entry != null) {
-        boundarySum += entry.boundaryRetained;
-        reactionSum += entry.reactionControl;
+        if (entry.boundaryMaintained) boundariesMaintainedCount++;
+        reactionScoreSum += entry.reactionControlScore;
         daysCounted++;
       }
     }
 
     final weeklyBoundaryRate = daysCounted > 0
-        ? (boundarySum / (daysCounted * 10)) * 100
+        ? (boundariesMaintainedCount / daysCounted) * 100
         : 0.0;
     final weeklyReactionAvg = daysCounted > 0
-        ? (reactionSum / daysCounted)
+        ? (reactionScoreSum / daysCounted) *
+              2.0 // scale 1-5 to 10
         : 0.0;
 
     return StreakData(
@@ -114,7 +112,6 @@ class JournalRepository {
       } else if (lastDate == null) {
         current = 1;
       } else {
-        // Gap of more than 1 day
         current = 1;
       }
 
@@ -134,28 +131,32 @@ class JournalRepository {
     await _storage.deleteJournalEntry(dateKey);
   }
 
-  /// Populates initial onboarding entries if the user is launching for the first time
+  /// Populates initial onboarding entries if cold start
   Future<void> seedInitialDataIfEmpty() async {
     if (getAllEntries().isEmpty) {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
       final twoDaysAgo = DateTime.now().subtract(const Duration(days: 2));
 
-      final sample1 = JournalEntry(
+      final sample1 = DailyJournalEntry(
         id: 'seed_01',
-        dateKey: DateHelpers.toStorageKey(twoDaysAgo),
-        timestamp: twoDaysAgo.add(const Duration(hours: 21, minutes: 15)),
-        reactionControl: 8.5,
-        boundaryRetained: 9.0,
-        coreOutput: 'Paused 5 seconds during VP ambush. Delivered data audit without panic.',
+        entryDate: DateHelpers.toStorageKey(twoDaysAgo),
+        createdAt: twoDaysAgo.add(const Duration(hours: 21, minutes: 15)),
+        reactionControlScore: 4,
+        boundaryMaintained: true,
+        coreOutputSummary:
+            'कॉर्पोरेट टैक्स पर 800 शब्दों का एक्सक्लूसिव विश्लेषण',
+        provocationHandled: 'मीटिंग में 4 सेकंड पॉज देकर बात संभाली',
       );
 
-      final sample2 = JournalEntry(
+      final sample2 = DailyJournalEntry(
         id: 'seed_02',
-        dateKey: DateHelpers.toStorageKey(yesterday),
-        timestamp: yesterday.add(const Duration(hours: 21, minutes: 40)),
-        reactionControl: 9.0,
-        boundaryRetained: 8.0,
-        coreOutput: 'Rejected Friday evening scope increase. Preserved weekend perimeter.',
+        entryDate: DateHelpers.toStorageKey(yesterday),
+        createdAt: yesterday.add(const Duration(hours: 21, minutes: 40)),
+        reactionControlScore: 5,
+        boundaryMaintained: true,
+        coreOutputSummary: 'अग्रिम प्रोजेक्ट आर्किटेक्चर डॉक्यूमेंट और कोड बेस रिव्यू पूरा किया',
+        provocationHandled:
+            'शुक्रवार देर शाम का गैर-योजित स्कोप बिना सफाई दिए अस्वीकार किया',
       );
 
       await saveEntry(sample1);

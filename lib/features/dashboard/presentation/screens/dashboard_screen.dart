@@ -5,7 +5,7 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../shared/widgets/executive_notification_tester.dart';
-import '../../journal/data/models/journal_entry.dart';
+import '../../journal/data/models/journal_models.dart';
 import '../../journal/data/repositories/journal_repository.dart';
 import '../../sos/presentation/screens/sos_modal_sheet.dart';
 import '../data/daily_rules_vault.dart';
@@ -38,7 +38,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     longestStreak: 0,
     historyMap: {},
   );
-  JournalEntry? _todayEntry;
+  DailyJournalEntry? _todayEntry;
 
   @override
   void initState() {

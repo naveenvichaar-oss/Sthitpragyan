@@ -5,11 +5,11 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/utils/date_helpers.dart';
 import '../../../../core/utils/haptic_service.dart';
-import '../../data/models/journal_entry.dart';
+import '../../data/models/journal_models.dart';
 
-/// PastDebriefsList renders historical 3-Index evening logs.
+/// PastDebriefsList renders historical 3-Index evening logs based on the official schema.
 class PastDebriefsList extends StatelessWidget {
-  final List<JournalEntry> entries;
+  final List<DailyJournalEntry> entries;
   final Function(String dateKey) onDelete;
 
   const PastDebriefsList({
@@ -37,12 +37,12 @@ class PastDebriefsList extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'NO HISTORICAL DEBRIEFS LOGGED YET',
+              'कोई पूर्व दैनिक हिसाब उपलब्ध नहीं (NO LOGS YET)',
               style: AppTextStyles.labelBadge.copyWith(letterSpacing: 1.5),
             ),
             const SizedBox(height: 4),
             Text(
-              'Complete your first 60-second evening debrief above.',
+              'आज का 60-सेकंड हिसाब ऊपर पूरा करें।',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textMuted,
               ),
@@ -60,11 +60,11 @@ class PastDebriefsList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'DEBRIEF AUDIT LOG (${entries.length})',
+              'दैनिक हिसाब इतिहास (${entries.length})',
               style: AppTextStyles.labelBadge.copyWith(letterSpacing: 1.5),
             ),
             Text(
-              'STORED LOCALLY ON-DEVICE',
+              '100% OFFLINE • ON-DEVICE HIVE',
               style: AppTextStyles.labelBadge.copyWith(
                 fontSize: 9.0,
                 color: AppColors.emeraldSuccess,
@@ -87,7 +87,7 @@ class PastDebriefsList extends StatelessWidget {
     );
   }
 
-  Widget _buildEntryCard(BuildContext context, JournalEntry entry) {
+  Widget _buildEntryCard(BuildContext context, DailyJournalEntry entry) {
     final composite = entry.compositeScore;
 
     return Container(
@@ -105,7 +105,7 @@ class PastDebriefsList extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                DateHelpers.formatExecutiveDate(entry.timestamp).toUpperCase(),
+                DateHelpers.formatExecutiveDate(entry.createdAt).toUpperCase(),
                 style: AppTextStyles.labelBadge.copyWith(
                   color: AppColors.textSecondary,
                   fontSize: 10.0,
@@ -139,7 +139,7 @@ class PastDebriefsList extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       HapticService.lightImpact();
-                      onDelete(entry.dateKey);
+                      onDelete(entry.entryDate);
                     },
                     icon: const Icon(Icons.delete_outline_rounded, size: 16),
                     color: AppColors.textDisabled,
@@ -168,7 +168,7 @@ class PastDebriefsList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'REACTION CONTROL',
+                        'REACTION SCORE',
                         style: AppTextStyles.labelBadge.copyWith(
                           fontSize: 8.5,
                           color: AppColors.textMuted,
@@ -179,17 +179,24 @@ class PastDebriefsList extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${entry.reactionControl.toStringAsFixed(1)} / 10',
+                            '${entry.reactionControlScore} / 5',
                             style: AppTextStyles.metricSmall.copyWith(
-                              color: AppColors.shieldPrimary,
+                              color: entry.reactionControlScore >= 4
+                                  ? AppColors.emeraldSuccess
+                                  : (entry.reactionControlScore >= 3
+                                        ? AppColors.shieldPrimary
+                                        : AppColors.amberWarning),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Text(
-                            entry.reactionLabel,
-                            style: AppTextStyles.bodySmall.copyWith(
-                              fontSize: 10,
-                              color: AppColors.textSecondary,
+                          Flexible(
+                            child: Text(
+                              entry.reactionLabel,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                fontSize: 9.5,
+                                color: AppColors.textSecondary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -210,7 +217,7 @@ class PastDebriefsList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'BOUNDARY RETAINED',
+                        'BOUNDARY CHECK',
                         style: AppTextStyles.labelBadge.copyWith(
                           fontSize: 8.5,
                           color: AppColors.textMuted,
@@ -221,17 +228,24 @@ class PastDebriefsList extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${entry.boundaryRetained.toStringAsFixed(1)} / 10',
+                            entry.boundaryMaintained
+                                ? 'हाँ (YES)'
+                                : 'नहीं (NO)',
                             style: AppTextStyles.metricSmall.copyWith(
-                              color: AppColors.emeraldSuccess,
+                              color: entry.boundaryMaintained
+                                  ? AppColors.emeraldSuccess
+                                  : AppColors.roseDanger,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Text(
-                            entry.boundaryLabel,
-                            style: AppTextStyles.bodySmall.copyWith(
-                              fontSize: 10,
-                              color: AppColors.textSecondary,
+                          Flexible(
+                            child: Text(
+                              entry.boundaryLabel,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                fontSize: 9.5,
+                                color: AppColors.textSecondary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -253,24 +267,61 @@ class PastDebriefsList extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               border: Border.all(color: AppColors.borderSubtle),
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.format_quote_rounded,
-                  size: 14,
-                  color: AppColors.shieldPrimary,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    entry.coreOutput,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.bolt_rounded,
+                      size: 13,
+                      color: AppColors.shieldPrimary,
                     ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'ठोस मौलिक आउटपुट (CORE DELIVERABLE)',
+                      style: AppTextStyles.labelBadge.copyWith(
+                        fontSize: 8.5,
+                        color: AppColors.shieldPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  entry.coreOutputSummary,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
+                if (entry.provocationHandled != null &&
+                    entry.provocationHandled!.trim().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  const Divider(color: AppColors.borderSubtle),
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.shield_outlined,
+                        size: 12,
+                        color: AppColors.amberWarning,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'रणनीतिक सीख: ${entry.provocationHandled}',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

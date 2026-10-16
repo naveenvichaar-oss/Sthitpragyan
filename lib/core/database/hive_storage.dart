@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../features/journal/data/models/journal_models.dart';
 import 'hive_boxes.dart';
 
 /// HiveStorage provides zero-telemetry, offline-first local persistence.
@@ -19,12 +20,20 @@ class HiveStorage {
   late Box<String> _pinnedScriptsBox;
   late Box<Map> _sosIncidentsBox;
 
-  /// Initializes Hive and opens required boxes
+  /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
     if (_initialized) return;
 
     try {
       await Hive.initFlutter();
+
+      // Register Hive TypeAdapters
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(DailyJournalEntryAdapter());
+      }
+      if (!Hive.isAdapterRegistered(2)) {
+        Hive.registerAdapter(SosIncidentLogAdapter());
+      }
 
       _journalBox = await Hive.openBox<Map>(HiveBoxes.journalEntries);
       _streakBox = await Hive.openBox(HiveBoxes.streak);
@@ -33,7 +42,9 @@ class HiveStorage {
       _sosIncidentsBox = await Hive.openBox<Map>(HiveBoxes.sosIncidents);
 
       _initialized = true;
-      debugPrint('[HiveStorage] Successfully initialized offline database.');
+      debugPrint(
+        '[HiveStorage] Successfully initialized offline database with TypeAdapters.',
+      );
     } catch (e, stack) {
       debugPrint('[HiveStorage] Initialization failure: $e\n$stack');
       rethrow;
@@ -41,38 +52,91 @@ class HiveStorage {
   }
 
   // ---------------------------------------------------------
-  // Journal Storage Operations
+  // 3-Index Journal Storage Operations (DailyJournalEntry)
   // ---------------------------------------------------------
 
-  /// Saves or updates a journal entry by its storage key or ID
   Future<void> saveJournalEntry(String key, Map<String, dynamic> data) async {
     await _journalBox.put(key, data);
   }
 
-  /// Retrieves a journal entry for a given day key (yyyy-MM-dd)
+  Future<void> saveDailyJournalEntry(DailyJournalEntry entry) async {
+    await _journalBox.put(entry.entryDate, entry.toMap());
+  }
+
+  DailyJournalEntry? getDailyJournalEntry(String dateKey) {
+    final entry = _journalBox.get(dateKey);
+    if (entry == null) return null;
+    return DailyJournalEntry.fromMap(Map<String, dynamic>.from(entry));
+  }
+
   Map<String, dynamic>? getJournalEntry(String key) {
     final entry = _journalBox.get(key);
     if (entry == null) return null;
     return Map<String, dynamic>.from(entry);
   }
 
-  /// Returns all journal entries sorted chronologically descending
+  List<DailyJournalEntry> getAllDailyJournalEntries() {
+    final entries = <DailyJournalEntry>[];
+    for (final raw in _journalBox.values) {
+      entries.add(DailyJournalEntry.fromMap(Map<String, dynamic>.from(raw)));
+    }
+    entries.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return entries;
+  }
+
   List<Map<String, dynamic>> getAllJournalEntries() {
     final entries = <Map<String, dynamic>>[];
     for (final raw in _journalBox.values) {
       entries.add(Map<String, dynamic>.from(raw));
     }
     entries.sort((a, b) {
-      final aDate = a['timestamp'] as String? ?? '';
-      final bDate = b['timestamp'] as String? ?? '';
+      final aDate =
+          a['createdAt'] as String? ?? a['timestamp'] as String? ?? '';
+      final bDate =
+          b['createdAt'] as String? ?? b['timestamp'] as String? ?? '';
       return bDate.compareTo(aDate);
     });
     return entries;
   }
 
-  /// Deletes a journal entry
   Future<void> deleteJournalEntry(String key) async {
     await _journalBox.delete(key);
+  }
+
+  // ---------------------------------------------------------
+  // SOS Incident Telemetry Operations (SosIncidentLog)
+  // ---------------------------------------------------------
+
+  Future<void> saveSosIncidentLog(SosIncidentLog incident) async {
+    await _sosIncidentsBox.put(incident.id, incident.toMap());
+  }
+
+  Future<void> logSOSIncident(Map<String, dynamic> incident) async {
+    final id =
+        incident['id'] ?? DateTime.now().millisecondsSinceEpoch.toString();
+    await _sosIncidentsBox.put(id, incident);
+  }
+
+  List<SosIncidentLog> getAllSosIncidentLogs() {
+    final list = <SosIncidentLog>[];
+    for (final raw in _sosIncidentsBox.values) {
+      list.add(SosIncidentLog.fromMap(Map<String, dynamic>.from(raw)));
+    }
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list;
+  }
+
+  List<Map<String, dynamic>> getAllSOSIncidents() {
+    final list = <Map<String, dynamic>>[];
+    for (final raw in _sosIncidentsBox.values) {
+      list.add(Map<String, dynamic>.from(raw));
+    }
+    list.sort((a, b) {
+      final aDate = a['timestamp'] as String? ?? '';
+      final bDate = b['timestamp'] as String? ?? '';
+      return bDate.compareTo(aDate);
+    });
+    return list;
   }
 
   // ---------------------------------------------------------
@@ -138,29 +202,6 @@ class HiveStorage {
 
   bool isScriptPinned(String scriptId) {
     return _pinnedScriptsBox.containsKey(scriptId);
-  }
-
-  // ---------------------------------------------------------
-  // SOS Incident Logging (For Evening Review)
-  // ---------------------------------------------------------
-
-  Future<void> logSOSIncident(Map<String, dynamic> incident) async {
-    final id =
-        incident['id'] ?? DateTime.now().millisecondsSinceEpoch.toString();
-    await _sosIncidentsBox.put(id, incident);
-  }
-
-  List<Map<String, dynamic>> getAllSOSIncidents() {
-    final list = <Map<String, dynamic>>[];
-    for (final raw in _sosIncidentsBox.values) {
-      list.add(Map<String, dynamic>.from(raw));
-    }
-    list.sort((a, b) {
-      final aDate = a['timestamp'] as String? ?? '';
-      final bDate = b['timestamp'] as String? ?? '';
-      return bDate.compareTo(aDate);
-    });
-    return list;
   }
 
   // ---------------------------------------------------------

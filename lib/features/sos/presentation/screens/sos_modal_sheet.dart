@@ -10,6 +10,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/defensive_scripts_vault.dart';
+import '../../journal/data/models/journal_models.dart';
 
 /// The 4 states of the SOS Finite State Machine (FSM)
 enum SOSState {
@@ -166,14 +167,16 @@ class _SOSModalSheetState extends State<SOSModalSheet>
 
     // Log incident to Hive for the evening review
     if (_storage.isInitialized) {
-      await _storage.logSOSIncident({
-        'id': 'incident_${DateTime.now().millisecondsSinceEpoch}',
-        'timestamp': DateTime.now().toIso8601String(),
-        'scriptId': script.id,
-        'category': script.category,
-        'scriptText': script.executiveScript,
-        'status': 'handled_neutral',
-      });
+      final now = DateTime.now();
+      final incident = SosIncidentLog(
+        id: 'sos_${now.millisecondsSinceEpoch}',
+        timestamp: now,
+        threatType: script.category,
+        scriptSelected: script.executiveScript,
+        lockCompleted: true,
+        outcomeRating: 5,
+      );
+      await _storage.saveSosIncidentLog(incident);
     }
 
     if (mounted) {

@@ -5,14 +5,12 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/utils/date_helpers.dart';
 import '../../../../core/utils/haptic_service.dart';
-import '../../data/models/journal_entry.dart';
+import '../../data/models/journal_models.dart';
 import '../../data/repositories/journal_repository.dart';
-import '../widgets/index_slider.dart';
 import '../widgets/past_debriefs_list.dart';
-import '../widgets/single_line_output_input.dart';
 
-/// JournalScreen provides the 60-second evening debrief.
-/// Built with 2 sliders and 1 single-line text input for zero-friction daily audit.
+/// JournalScreen implements the official 60-Second Evening Debrief Mapping.
+/// Title: दैनिक हिसाब (Daily Closure)
 class JournalScreen extends StatefulWidget {
   final VoidCallback? onEntrySaved;
 
@@ -25,12 +23,17 @@ class JournalScreen extends StatefulWidget {
 class _JournalScreenState extends State<JournalScreen> {
   final JournalRepository _repository = JournalRepository();
   final TextEditingController _outputController = TextEditingController();
+  final TextEditingController _provocationController = TextEditingController();
 
-  double _reactionControl = 7.0;
-  double _boundaryRetained = 8.0;
+  // 1 to 5 Reaction Score (1 = भड़का, 5 = स्थितप्रज्ञ)
+  int _reactionScore = 4;
+
+  // Boundary Integrity Check (Yes / No)
+  bool _boundaryMaintained = true;
+
   bool _isSaving = false;
-  List<JournalEntry> _historicalEntries = [];
-  JournalEntry? _todayEntry;
+  List<DailyJournalEntry> _historicalEntries = [];
+  DailyJournalEntry? _todayEntry;
 
   @override
   void initState() {
@@ -43,9 +46,10 @@ class _JournalScreenState extends State<JournalScreen> {
     _todayEntry = _repository.getTodayEntry();
 
     if (_todayEntry != null) {
-      _reactionControl = _todayEntry!.reactionControl;
-      _boundaryRetained = _todayEntry!.boundaryRetained;
-      _outputController.text = _todayEntry!.coreOutput;
+      _reactionScore = _todayEntry!.reactionControlScore;
+      _boundaryMaintained = _todayEntry!.boundaryMaintained;
+      _outputController.text = _todayEntry!.coreOutputSummary;
+      _provocationController.text = _todayEntry!.provocationHandled ?? '';
     }
     setState(() {});
   }
@@ -53,47 +57,52 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   void dispose() {
     _outputController.dispose();
+    _provocationController.dispose();
     super.dispose();
   }
 
-  Color _getReactionColor(double val) {
-    if (val >= 8.0) return AppColors.emeraldSuccess;
-    if (val >= 6.0) return AppColors.shieldPrimary;
-    if (val >= 4.0) return AppColors.amberWarning;
-    return AppColors.roseDanger;
+  String _getReactionScoreLabel(int score) {
+    switch (score) {
+      case 1:
+        return '1: भड़का (Lost Control)';
+      case 2:
+        return '2: तनाव में बोला (Under Strain)';
+      case 3:
+        return '3: न्यूट्रल रहा (Neutral)';
+      case 4:
+        return '4: पूर्ण नियंत्रण (High Poise)';
+      case 5:
+        return '5: स्थितप्रज्ञ (Absolute Stoic)';
+      default:
+        return '3: न्यूट्रल रहा';
+    }
   }
 
-  Color _getBoundaryColor(double val) {
-    if (val >= 8.0) return AppColors.emeraldSuccess;
-    if (val >= 6.0) return AppColors.shieldPrimary;
-    if (val >= 4.0) return AppColors.amberWarning;
-    return AppColors.roseDanger;
+  Color _getReactionColor(int score) {
+    switch (score) {
+      case 5:
+        return AppColors.emeraldSuccess;
+      case 4:
+        return AppColors.shieldPrimary;
+      case 3:
+        return const Color(0xFF818CF8);
+      case 2:
+        return AppColors.amberWarning;
+      case 1:
+        return AppColors.roseDanger;
+      default:
+        return AppColors.shieldPrimary;
+    }
   }
 
-  String _getReactionStatus(double val) {
-    if (val >= 9.0) return 'Absolute Sthitaprajna';
-    if (val >= 7.0) return 'High Executive Poise';
-    if (val >= 5.0) return 'Controlled Grounding';
-    if (val >= 3.0) return 'Internal Turbulence';
-    return 'Amygdala Hijacked';
-  }
-
-  String _getBoundaryStatus(double val) {
-    if (val >= 9.0) return 'Impenetrable Fortress';
-    if (val >= 7.0) return 'Firm Professional Pushback';
-    if (val >= 5.0) return 'Contained Compromise';
-    if (val >= 3.0) return 'Permeable Perimeter';
-    return 'Total Boundary Breach';
-  }
-
-  Future<void> _handleSaveDebrief() async {
+  Future<void> _handleLockDay() async {
     final text = _outputController.text.trim();
     if (text.isEmpty) {
       HapticService.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Core Output required: Record at least one lesson or decisive win.',
+            'आउटपुट अनिवार्य है: आज का कोई एक ठोस deliverable या सीख दर्ज करें।',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.background,
             ),
@@ -111,13 +120,16 @@ class _JournalScreenState extends State<JournalScreen> {
     final now = DateTime.now();
     final todayKey = DateHelpers.toStorageKey(now);
 
-    final entry = JournalEntry(
+    final entry = DailyJournalEntry(
       id: 'entry_$todayKey',
-      dateKey: todayKey,
-      timestamp: now,
-      reactionControl: _reactionControl,
-      boundaryRetained: _boundaryRetained,
-      coreOutput: text,
+      entryDate: todayKey,
+      createdAt: now,
+      reactionControlScore: _reactionScore,
+      boundaryMaintained: _boundaryMaintained,
+      coreOutputSummary: text,
+      provocationHandled: _provocationController.text.trim().isEmpty
+          ? null
+          : _provocationController.text.trim(),
     );
 
     await _repository.saveEntry(entry);
@@ -131,16 +143,32 @@ class _JournalScreenState extends State<JournalScreen> {
 
       widget.onEntrySaved?.call();
 
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Debrief committed: Equanimity Index ${entry.compositeScore}%',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.background,
-            ),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.shield_rounded,
+                color: AppColors.emeraldSuccess,
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'आज का हिसाब पूरा हुआ। तनाव यहीं विसर्जित है। (Equanimity: ${entry.compositeScore}%)',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
           backgroundColor: AppColors.textPrimary,
+          duration: const Duration(seconds: 4),
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }
@@ -165,7 +193,7 @@ class _JournalScreenState extends State<JournalScreen> {
             vertical: AppDimens.space16,
           ),
           children: [
-            // Screen Header
+            // Screen Header: "दैनिक हिसाब (Daily Closure)"
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -173,7 +201,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'EVENING AUDIT',
+                      '60-SECOND EVENING LOG',
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
                         letterSpacing: 2.0,
@@ -181,7 +209,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '3-INDEX DEBRIEF',
+                      'दैनिक हिसाब (Daily Closure)',
                       style: AppTextStyles.displayMedium,
                     ),
                   ],
@@ -203,7 +231,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     ),
                   ),
                   child: Text(
-                    isAlreadyLogged ? 'LOGGED TODAY' : 'PENDING (60s)',
+                    isAlreadyLogged ? 'हिसाब बंद (LOCKED)' : 'लंबित (PENDING)',
                     style: AppTextStyles.labelBadge.copyWith(
                       color: isAlreadyLogged
                           ? AppColors.emeraldSuccess
@@ -216,7 +244,7 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              '60-second psychological boundary review. Quantify composure, log one key takeaway, and detach from corporate residue.',
+              '60 सेकंड में मानसिक शटडाउन। उकसावे पर चित्त की स्थिरता, मर्यादा की जाँच और आज का ठोस आउटपुट दर्ज करें।',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -224,43 +252,447 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Index 1: Reaction Control
-            IndexSlider(
-              indexNumber: 'INDEX 01',
-              title: 'REACTION CONTROL',
-              description: 'How effectively did you maintain emotional equanimity when provoked, interrupted, or challenged today?',
-              value: _reactionControl,
-              onChanged: (val) => setState(() => _reactionControl = val),
-              statusLabel: _getReactionStatus(_reactionControl),
-              statusColor: _getReactionColor(_reactionControl),
+            // -------------------------------------------------------------
+            // Index 1: Reaction Score Slider
+            // Label: "आज उकसावे पर चित्त कितना स्थिर रहा?"
+            // -------------------------------------------------------------
+            Container(
+              padding: const EdgeInsets.all(AppDimens.space16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.borderSubtle),
+                            ),
+                            child: Text(
+                              'INDEX 01',
+                              style: AppTextStyles.labelBadge.copyWith(
+                                color: AppColors.shieldPrimary,
+                                fontSize: 9.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'REACTION SCORE',
+                            style: AppTextStyles.heading.copyWith(
+                              fontSize: 14.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '$_reactionScore / 5',
+                        style: AppTextStyles.metricMedium.copyWith(
+                          color: _getReactionColor(_reactionScore),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'आज उकसावे पर चित्त कितना स्थिर रहा?',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13.0,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Slider from 1 to 5
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: _getReactionColor(_reactionScore),
+                      thumbColor: AppColors.textPrimary,
+                      overlayColor: _getReactionColor(_reactionScore)
+                          .withOpacity(0.2),
+                    ),
+                    child: Slider(
+                      value: _reactionScore.toDouble(),
+                      min: 1.0,
+                      max: 5.0,
+                      divisions: 4,
+                      onChanged: (newValue) {
+                        final rounded = newValue.round();
+                        if (rounded != _reactionScore) {
+                          HapticService.lightImpact();
+                          setState(() => _reactionScore = rounded);
+                        }
+                      },
+                    ),
+                  ),
+
+                  // Dynamic Value Indicator
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getReactionColor(_reactionScore)
+                            .withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: _getReactionColor(_reactionScore)
+                              .withOpacity(0.5),
+                        ),
+                      ),
+                      child: Text(
+                        _getReactionScoreLabel(_reactionScore),
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: _getReactionColor(_reactionScore),
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
-            // Index 2: Boundary Retained
-            IndexSlider(
-              indexNumber: 'INDEX 02',
-              title: 'BOUNDARY RETAINED',
-              description: 'How firmly did you protect your calendar, personal hours, and professional scope from artificial emergencies?',
-              value: _boundaryRetained,
-              onChanged: (val) => setState(() => _boundaryRetained = val),
-              statusLabel: _getBoundaryStatus(_boundaryRetained),
-              statusColor: _getBoundaryColor(_boundaryRetained),
+            // -------------------------------------------------------------
+            // Index 2: Boundary Integrity Check (Yes / No Toggle)
+            // Label: "क्या आज बिना सफाई दिए 'ना' कहने की मर्यादा बची रही?"
+            // -------------------------------------------------------------
+            Container(
+              padding: const EdgeInsets.all(AppDimens.space16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.borderSubtle),
+                            ),
+                            child: Text(
+                              'INDEX 02',
+                              style: AppTextStyles.labelBadge.copyWith(
+                                color: AppColors.shieldPrimary,
+                                fontSize: 9.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'BOUNDARY INTEGRITY',
+                            style: AppTextStyles.heading.copyWith(
+                              fontSize: 14.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        _boundaryMaintained ? 'मर्यादा सुरक्षित' : 'सीमा खंडित',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: _boundaryMaintained
+                              ? AppColors.emeraldSuccess
+                              : AppColors.roseDanger,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'क्या आज बिना सफाई दिए \'ना\' कहने की मर्यादा बची रही?',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13.0,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Interactive Toggle Pills [हाँ (Yes) / नहीं (No)]
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (!_boundaryMaintained) {
+                              HapticService.selectionClick();
+                              setState(() => _boundaryMaintained = true);
+                            }
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: _boundaryMaintained
+                                  ? AppColors.emeraldMuted
+                                  : AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _boundaryMaintained
+                                    ? AppColors.emeraldSuccess
+                                    : AppColors.borderSubtle,
+                                width: _boundaryMaintained ? 1.5 : 1.0,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_rounded,
+                                  size: 16,
+                                  color: _boundaryMaintained
+                                      ? AppColors.emeraldSuccess
+                                      : AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'हाँ (YES • मर्यादा बची)',
+                                  style: AppTextStyles.button.copyWith(
+                                    fontSize: 12,
+                                    color: _boundaryMaintained
+                                        ? AppColors.emeraldSuccess
+                                        : AppColors.textSecondary,
+                                    fontWeight: _boundaryMaintained
+                                        ? FontWeight.w700
+                                        : FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_boundaryMaintained) {
+                              HapticService.selectionClick();
+                              setState(() => _boundaryMaintained = false);
+                            }
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: !_boundaryMaintained
+                                  ? AppColors.roseMuted
+                                  : AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: !_boundaryMaintained
+                                    ? AppColors.roseDanger
+                                    : AppColors.borderSubtle,
+                                width: !_boundaryMaintained ? 1.5 : 1.0,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.cancel_rounded,
+                                  size: 16,
+                                  color: !_boundaryMaintained
+                                      ? AppColors.roseDanger
+                                      : AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'नहीं (NO • समझौता हुआ)',
+                                  style: AppTextStyles.button.copyWith(
+                                    fontSize: 12,
+                                    color: !_boundaryMaintained
+                                        ? AppColors.roseDanger
+                                        : AppColors.textSecondary,
+                                    fontWeight: !_boundaryMaintained
+                                        ? FontWeight.w700
+                                        : FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
-            // Index 3: Core Output (Single-line)
-            SingleLineOutputInput(
-              controller: _outputController,
-              onChanged: (text) => setState(() {}),
+            // -------------------------------------------------------------
+            // Index 3: Core Solid Output (Single-Line)
+            // Label: "आज का सबसे ठोस, मौलिक (Zero-AI) आउटपुट:"
+            // Placeholder: "उदा. कॉर्पोरेट टैक्स पर 800 शब्दों का एक्सक्लूसिव विश्लेषण"
+            // -------------------------------------------------------------
+            Container(
+              padding: const EdgeInsets.all(AppDimens.space16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.borderSubtle),
+                            ),
+                            child: Text(
+                              'INDEX 03',
+                              style: AppTextStyles.labelBadge.copyWith(
+                                color: AppColors.shieldPrimary,
+                                fontSize: 9.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'CORE SOLID OUTPUT',
+                            style: AppTextStyles.heading.copyWith(
+                              fontSize: 14.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'ZERO-AI • SINGLE-LINE',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          fontSize: 9.0,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'आज का सबसे ठोस, मौलिक (Zero-AI) आउटपुट:',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13.0,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _outputController,
+                    maxLines: 1,
+                    maxLength: 140,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'उदा. कॉर्पोरेट टैक्स पर 800 शब्दों का एक्सक्लूसिव विश्लेषण',
+                      hintStyle: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textMuted,
+                        fontSize: 12.5,
+                      ),
+                      counterStyle: AppTextStyles.metricSmall.copyWith(
+                        fontSize: 10,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.bolt_rounded,
+                        size: 18,
+                        color: AppColors.shieldPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Optional Strategic Reflection
+                  Text(
+                    'उकसावे का समाधान / रणनीतिक सीख (Optional 1-liner):',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: _provocationController,
+                    maxLines: 1,
+                    maxLength: 140,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'उदा. मीटिंग में 4 सेकंड पॉज देकर बात संभाली',
+                      hintStyle: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textMuted,
+                        fontSize: 12.5,
+                      ),
+                      counterStyle: AppTextStyles.metricSmall.copyWith(
+                        fontSize: 10,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.shield_outlined,
+                        size: 16,
+                        color: AppColors.amberWarning,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 
-            // Submit / Update Button
+            // -------------------------------------------------------------
+            // Action Button: "हिसाब बंद करें (Lock Day)"
+            // -------------------------------------------------------------
             SizedBox(
               width: double.infinity,
               height: AppDimens.buttonHeight,
               child: ElevatedButton(
-                onPressed: _isSaving ? null : _handleSaveDebrief,
+                onPressed: _isSaving ? null : _handleLockDay,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.textPrimary,
                   foregroundColor: AppColors.background,
@@ -281,12 +713,12 @@ class _JournalScreenState extends State<JournalScreen> {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.check_circle_rounded, size: 18),
+                          const Icon(Icons.lock_outline_rounded, size: 18),
                           const SizedBox(width: 8),
                           Text(
                             isAlreadyLogged
-                                ? 'UPDATE TODAY\'S DEBRIEF'
-                                : 'COMMIT EQUANIMITY AUDIT',
+                                ? 'हिसाब अपडेट करें (Update Lock)'
+                                : 'हिसाब बंद करें (Lock Day)',
                             style: AppTextStyles.button.copyWith(
                               color: AppColors.background,
                               fontWeight: FontWeight.w700,
@@ -298,7 +730,7 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Historical Debriefs Log
+            // Historical Audit Logs
             PastDebriefsList(
               entries: _historicalEntries,
               onDelete: _handleDelete,
