@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-/// NotificationItem represents a scheduled strategic stoic prompt
+import 'notifications_dataset_service.dart';
+
+/// NotificationTrigger represents a scheduled strategic stoic prompt
 class NotificationTrigger {
   final int id;
   final int hour;
@@ -35,41 +38,50 @@ class NotificationService {
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
-  // The 4 Daily Strategic Triggers mandated by Sthitaprajna
-  static const List<NotificationTrigger> dailyTriggers = [
+  /// Default fallback triggers if dataset is not yet loaded
+  static const List<NotificationTrigger> defaultTriggers = [
     NotificationTrigger(
       id: 101,
       hour: 5,
       minute: 45,
-      title: '05:45 AM • Morning Premeditatio Malorum',
-      body: 'You will face the arrogant, ungrateful, and deceitful today. They act from ignorance. Armor your mind; retain your calm.',
-      category: 'DAWN_ARMOR',
+      title: '05:45 AM • Morning Grounding (प्रातःकालीन लंगर)',
+      body: 'आज की घटनाओं पर आपका वश नहीं, अपनी प्रतिक्रिया पर शत-प्रतिशत नियंत्रण है।',
+      category: 'Morning Grounding',
     ),
     NotificationTrigger(
       id: 102,
       hour: 9,
-      minute: 30,
-      title: '09:30 AM • Pre-Battle Equanimity',
-      body: 'Dichotomy of Control: You do not control boardroom noise or passive aggression. You only control your pause and response.',
-      category: 'TACTICAL_SHIELD',
+      minute: 0,
+      title: '09:00 AM • Work Entry Shield (द 3-सेकंड पॉज)',
+      body: 'उकसावे पर रुकें। कोई सफाई नहीं, केवल तटस्थ अवलोकन।',
+      category: 'Work Entry Shield',
     ),
     NotificationTrigger(
       id: 103,
       hour: 14,
       minute: 0,
-      title: '02:00 PM • Physiological Cortisol Reset',
-      body: 'Drop your shoulders. Tongue on the roof of mouth. Deep breath. Do not absorb corporate panic.',
-      category: 'MIDDAY_RESET',
+      title: '02:00 PM • Mid-Day Audit (पारखी दृष्टि)',
+      body: 'आपके \'ना\' कहने पर लोगों का व्यवहार बदला? बिना प्रतिक्रिया के केवल नोट करें।',
+      category: 'Mid-Day Audit',
     ),
     NotificationTrigger(
       id: 104,
       hour: 21,
       minute: 30,
-      title: '09:30 PM • 60-Second Sthitaprajna Debrief',
-      body: 'Close the perimeter. Log your Reaction Control and Boundary Retained. Discharge today\'s residue.',
-      category: 'EVENING_DEBRIEF',
+      title: '09:30 PM • Night Closure (3-इंडेक्स डायरी)',
+      body: 'आज का हिसाब बंद करें। 60 सेकंड में 3-इंडेक्स एंट्री पूरी करें।',
+      category: 'Night Closure',
     ),
   ];
+
+  /// Returns today's active triggers from notifications_dataset.json
+  static List<NotificationTrigger> get dailyTriggers {
+    final datasetTriggers = NotificationsDatasetService().getTodayTriggers();
+    if (datasetTriggers.isNotEmpty) {
+      return datasetTriggers;
+    }
+    return defaultTriggers;
+  }
 
   /// Initialize notifications and schedule recurring daily triggers
   Future<void> init() async {
@@ -104,10 +116,10 @@ class NotificationService {
       _isInitialized = true;
       debugPrint('[NotificationService] Local notifications initialized.');
 
-      // Request permissions where necessary
+      // Request permissions
       await requestPermissions();
 
-      // Schedule all 4 daily notifications
+      // Schedule all 7-day recurring triggers from notifications_dataset.json
       await scheduleAllDailyTriggers();
     } catch (e, stack) {
       debugPrint('[NotificationService] Initialization error: $e\n$stack');
@@ -145,20 +157,48 @@ class NotificationService {
     return true;
   }
 
-  /// Schedules all 4 daily recurring stoic notifications
+  /// Schedules all 7-day stoic notifications from notifications_dataset.json
   Future<void> scheduleAllDailyTriggers() async {
-    for (final trigger in dailyTriggers) {
-      await scheduleDailyTrigger(trigger);
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+
+    for (int weekday = 1; weekday <= 7; weekday++) {
+      final dayName = days[weekday - 1];
+      final dayTriggers = NotificationsDatasetService().getTriggersForDay(
+        dayName,
+      );
+
+      for (int slotIdx = 0; slotIdx < dayTriggers.length; slotIdx++) {
+        final trigger = dayTriggers[slotIdx];
+        // Unique ID per weekday and slot (e.g., weekday 1: 101, 102; weekday 2: 201...)
+        final scheduleId = weekday * 100 + slotIdx + 1;
+        await _scheduleWeeklyTrigger(weekday, scheduleId, trigger);
+      }
     }
     debugPrint(
-      '[NotificationService] Scheduled all 4 strategic notifications.',
+      '[NotificationService] Successfully scheduled 7-day notification matrix.',
     );
   }
 
-  /// Schedules an individual recurring daily notification at its exact time
-  Future<void> scheduleDailyTrigger(NotificationTrigger trigger) async {
+  /// Schedules a weekly recurring trigger for a specific weekday and time
+  Future<void> _scheduleWeeklyTrigger(
+    int weekday,
+    int scheduleId,
+    NotificationTrigger trigger,
+  ) async {
     try {
-      final scheduledDate = _nextInstanceOfTime(trigger.hour, trigger.minute);
+      final scheduledDate = _nextInstanceOfDayAndTime(
+        weekday,
+        trigger.hour,
+        trigger.minute,
+      );
 
       const androidDetails = AndroidNotificationDetails(
         'sthitaprajna_scheduled_channel',
@@ -167,7 +207,7 @@ class NotificationService {
         importance: Importance.high,
         priority: Priority.high,
         enableVibration: true,
-        color: Color(0xFF09090B),
+        color: Color(0xFF090D16),
       );
 
       const iosDetails = DarwinNotificationDetails(
@@ -182,7 +222,7 @@ class NotificationService {
       );
 
       await _notificationsPlugin.zonedSchedule(
-        trigger.id,
+        scheduleId,
         trigger.title,
         trigger.body,
         scheduledDate,
@@ -190,14 +230,23 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
+        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         payload: trigger.category,
       );
     } catch (e) {
       debugPrint(
-        '[NotificationService] Failed to schedule trigger ${trigger.id}: $e',
+        '[NotificationService] Failed to schedule trigger $scheduleId: $e',
       );
     }
+  }
+
+  /// Calculates the next TZDateTime for a specific weekday, hour, and minute
+  tz.TZDateTime _nextInstanceOfDayAndTime(int weekday, int hour, int minute) {
+    tz.TZDateTime scheduledDate = _nextInstanceOfTime(hour, minute);
+    while (scheduledDate.weekday != weekday) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+    return scheduledDate;
   }
 
   /// Calculates the next TZDateTime for the given hour and minute
@@ -240,7 +289,7 @@ class NotificationService {
     );
 
     await _notificationsPlugin.show(
-      trigger.id + 1000,
+      trigger.id + 5000,
       '[TEST] ${trigger.title}',
       trigger.body,
       details,

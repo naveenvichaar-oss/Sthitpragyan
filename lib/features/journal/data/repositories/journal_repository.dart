@@ -96,7 +96,6 @@ class JournalRepository {
 
   Future<void> _updateStreakOnSubmission(String dateKey) async {
     final now = DateTime.now();
-    final todayKey = DateHelpers.toStorageKey(now);
     final yesterdayKey = DateHelpers.toStorageKey(
       now.subtract(const Duration(days: 1)),
     );

@@ -440,6 +440,34 @@ class _JournalScreenState extends State<JournalScreen> {
                   ),
                   const SizedBox(height: 12),
 
+                  // Slider 2: Boundary Integrity Slider (1 to 5)
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: _boundaryMaintained
+                          ? AppColors.emeraldSuccess
+                          : AppColors.roseDanger,
+                      thumbColor: AppColors.textPrimary,
+                      overlayColor:
+                          (_boundaryMaintained
+                                  ? AppColors.emeraldSuccess
+                                  : AppColors.roseDanger)
+                              .withOpacity(0.2),
+                    ),
+                    child: Slider(
+                      value: _boundaryMaintained ? 5.0 : 1.0,
+                      min: 1.0,
+                      max: 5.0,
+                      divisions: 4,
+                      onChanged: (newValue) {
+                        final val = newValue >= 3.0;
+                        if (val != _boundaryMaintained) {
+                          HapticService.lightImpact();
+                          setState(() => _boundaryMaintained = val);
+                        }
+                      },
+                    ),
+                  ),
+
                   // Interactive Toggle Pills [हाँ (Yes) / नहीं (No)]
                   Row(
                     children: [

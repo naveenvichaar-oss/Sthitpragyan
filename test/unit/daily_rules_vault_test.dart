@@ -24,7 +24,6 @@ void main() {
       final next = DailyRulesVault.getNextRule(0);
       expect(next.id, equals(2));
 
-      final last = DailyRulesVault.rules.last;
       final looped = DailyRulesVault.getNextRule(
         DailyRulesVault.rules.length - 1,
       );

@@ -56,6 +56,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
       DashboardScreen(
         key: _dashboardKey,
         onNavigateToJournal: _navigateToJournal,
+        onNavigateToVault: () => _onTabSelected(2),
       ),
       JournalScreen(onEntrySaved: _handleDebriefSaved),
       const CognitionVaultScreen(),

@@ -569,7 +569,20 @@ class _SOSModalSheetState extends State<SOSModalSheet>
   // STATE 3: DEFENSIVE SCRIPTS ACTIVE (Indefinite)
   // ---------------------------------------------------------------------------
   Widget _buildState3ScriptsCarousel() {
-    final scripts = DefensiveScriptsVault.getByCategory(_selectedCategory);
+    final List<String> availableCategories = [
+      'All',
+      if (_pinnedScriptIds.isNotEmpty) 'Pinned',
+      ...DefensiveScriptsVault.categories.where((c) => c != 'All'),
+    ];
+
+    final List<DefensiveScript> scripts;
+    if (_selectedCategory == 'Pinned') {
+      scripts = DefensiveScriptsVault.scripts
+          .where((s) => _pinnedScriptIds.contains(s.id))
+          .toList();
+    } else {
+      scripts = DefensiveScriptsVault.getByCategory(_selectedCategory);
+    }
 
     return Column(
       children: [
@@ -580,10 +593,10 @@ class _SOSModalSheetState extends State<SOSModalSheet>
             height: 34,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: DefensiveScriptsVault.categories.length,
+              itemCount: availableCategories.length,
               separatorBuilder: (context, index) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final cat = DefensiveScriptsVault.categories[index];
+                final cat = availableCategories[index];
                 final isSelected = cat == _selectedCategory;
                 return ChoiceChip(
                   label: Text(cat),
@@ -722,6 +735,31 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textMuted,
                       fontSize: 10.5,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () async {
+                      if (_storage.isInitialized) {
+                        await _storage.togglePinnedScript(script.id);
+                        setState(() {
+                          _pinnedScriptIds = _storage.getPinnedScriptIds();
+                        });
+                        HapticService.selectionClick();
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(4),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Icon(
+                        _pinnedScriptIds.contains(script.id)
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_outline_rounded,
+                        size: 16,
+                        color: _pinnedScriptIds.contains(script.id)
+                            ? AppColors.shieldPrimary
+                            : AppColors.textMuted,
+                      ),
                     ),
                   ),
                 ],

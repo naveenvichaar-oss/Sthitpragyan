@@ -4,6 +4,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/notifications/notification_service.dart';
+import '../../../../core/notifications/notifications_dataset_service.dart';
 import '../../../../shared/widgets/executive_notification_tester.dart';
 import '../../journal/data/models/journal_models.dart';
 import '../../journal/data/repositories/journal_repository.dart';
@@ -17,11 +19,20 @@ import '../widgets/sos_shield_button.dart';
 import '../widgets/streak_badge.dart';
 
 /// DashboardScreen serves as the command center for Sthitaprajna.
-/// Features the prominent central SOS Shield, Today's Core Rule, and Daily Streak tracker.
+/// Features:
+/// 1. Minimalist dark theme (Zinc-950/900)
+/// 2. Big floating "SOS Shield" button at the center
+/// 3. Daily quote/rule from notifications_dataset.json (and Stoic rules)
+/// 4. Direct navigation to 3-Index Journal and Cognition Vault
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onNavigateToJournal;
+  final VoidCallback? onNavigateToVault;
 
-  const DashboardScreen({super.key, required this.onNavigateToJournal});
+  const DashboardScreen({
+    super.key,
+    required this.onNavigateToJournal,
+    this.onNavigateToVault,
+  });
 
   @override
   State<DashboardScreen> createState() => DashboardScreenState();
@@ -33,6 +44,10 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   late DailyRule _currentRule;
   int _activeRuleIndex = 0;
+
+  List<NotificationTrigger> _todayTriggers = [];
+  int _activeTriggerIndex = 0;
+
   StreakData _streakData = const StreakData(
     currentStreak: 0,
     longestStreak: 0,
@@ -49,6 +64,12 @@ class DashboardScreenState extends State<DashboardScreen> {
   void _initDashboard() {
     _activeRuleIndex = _storage.getActiveRuleIndex();
     _currentRule = DailyRulesVault.getTodayRule(_activeRuleIndex);
+
+    _todayTriggers = NotificationsDatasetService().getTodayTriggers();
+    if (_todayTriggers.isEmpty) {
+      _todayTriggers = NotificationService.defaultTriggers;
+    }
+
     refreshData();
   }
 
@@ -58,6 +79,10 @@ class DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _streakData = _journalRepo.getStreakData();
       _todayEntry = _journalRepo.getTodayEntry();
+      _todayTriggers = NotificationsDatasetService().getTodayTriggers();
+      if (_todayTriggers.isEmpty) {
+        _todayTriggers = NotificationService.defaultTriggers;
+      }
     });
   }
 
@@ -68,6 +93,14 @@ class DashboardScreenState extends State<DashboardScreen> {
       _activeRuleIndex = nextRule.id - 1;
     });
     _storage.setActiveRuleIndex(_activeRuleIndex);
+  }
+
+  void _cycleNextDatasetTrigger() {
+    if (_todayTriggers.isNotEmpty) {
+      setState(() {
+        _activeTriggerIndex = (_activeTriggerIndex + 1) % _todayTriggers.length;
+      });
+    }
   }
 
   void _openSOSModal() {
@@ -81,6 +114,9 @@ class DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final isDebriefCompleted = _todayEntry != null;
+    final currentTrigger = _todayTriggers.isNotEmpty
+        ? _todayTriggers[_activeTriggerIndex % _todayTriggers.length]
+        : null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -107,14 +143,114 @@ class DashboardScreenState extends State<DashboardScreen> {
                   SOSShieldButton(onPressed: _openSOSModal),
                   const SizedBox(height: 20),
 
-                  // 4. Today's Core Stoic Rule Card
-                  CoreRuleCard(rule: _currentRule, onNextRule: _cycleNextRule),
+                  // 4. Daily Quote/Rule from notifications_dataset.json
+                  CoreRuleCard(
+                    datasetTrigger: currentTrigger,
+                    rule: _currentRule,
+                    onNextRule: _cycleNextRule,
+                    onNextDatasetTrigger: _cycleNextDatasetTrigger,
+                  ),
                   const SizedBox(height: 16),
 
-                  // 5. Evening Debrief Status Card
+                  // 5. Direct Quick Navigation Row: Journal Debrief & Cognition Vault
+                  Row(
+                    children: [
+                      // Navigation to 3-Index Journal Screen
+                      Expanded(
+                        child: _buildNavigationCard(
+                          icon: Icons.edit_note_rounded,
+                          accentColor: isDebriefCompleted
+                              ? AppColors.emeraldSuccess
+                              : AppColors.shieldPrimary,
+                          title: '3-INDEX DEBRIEF',
+                          subtitle: isDebriefCompleted
+                              ? 'Logged (${_todayEntry!.compositeScore}%)'
+                              : '60s Evening Audit',
+                          onTap: widget.onNavigateToJournal,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // Navigation to Cognition Vault Screen
+                      Expanded(
+                        child: _buildNavigationCard(
+                          icon: Icons.psychology_rounded,
+                          accentColor: const Color(0xFF818CF8),
+                          title: 'COGNITION VAULT',
+                          subtitle: 'Fallacies & Models',
+                          onTap: widget.onNavigateToVault,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 6. Evening Debrief Status Bar
                   _buildDebriefStatusCard(isDebriefCompleted),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavigationCard({
+    required IconData icon,
+    required Color accentColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(AppDimens.space12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: accentColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(icon, size: 18, color: accentColor),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.labelBadge.copyWith(
+                      color: AppColors.textPrimary,
+                      fontSize: 9.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: AppColors.textMuted,
             ),
           ],
         ),
@@ -162,7 +298,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   children: [
                     Text(
-                      'EVENING DEBRIEF (60s)',
+                      'दैनिक हिसाब (EVENING LOG)',
                       style: AppTextStyles.labelBadge.copyWith(
                         color: isCompleted
                             ? AppColors.emeraldSuccess
@@ -172,7 +308,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      isCompleted ? '• COMPLETED' : '• PENDING',
+                      isCompleted ? '• बंद (LOCKED)' : '• लंबित (PENDING)',
                       style: AppTextStyles.labelBadge.copyWith(
                         color: isCompleted
                             ? AppColors.emeraldSuccess
@@ -185,8 +321,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 2),
                 Text(
                   isCompleted
-                      ? 'Score: ${_todayEntry!.compositeScore}% • "${_todayEntry!.coreOutput}"'
-                      : 'Audit today\'s Reaction Control & Boundary Retained before bed.',
+                      ? 'स्कोर: ${_todayEntry!.compositeScore}% • "${_todayEntry!.coreOutputSummary}"'
+                      : 'उकसावे पर चित्त की स्थिरता व मर्यादा का 60-सेकंड ऑडिट करें।',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                     fontSize: 11.5,
