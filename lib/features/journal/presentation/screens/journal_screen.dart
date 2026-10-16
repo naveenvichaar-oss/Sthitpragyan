@@ -8,8 +8,10 @@ import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/journal_models.dart';
 import '../../data/repositories/journal_repository.dart';
 import '../../../../shared/widgets/voice_dictation_button.dart';
+import '../../data/services/media_vault_service.dart';
 import '../widgets/audio_memo_recorder_modal.dart';
 import '../widgets/video_reflection_drill_modal.dart';
+import '../widgets/media_recordings_vault_view.dart';
 import '../widgets/past_debriefs_list.dart';
 
 /// JournalScreen implements the official 60-Second Evening Debrief Mapping.
@@ -39,6 +41,7 @@ class _JournalScreenState extends State<JournalScreen> {
   DailyJournalEntry? _todayEntry;
   String? _audioMemoPath;
   String? _videoReflectionPath;
+  int _activeTab = 0; // 0 = 3-Index Debrief, 1 = Media Recordings Vault
 
   @override
   void initState() {
@@ -259,16 +262,107 @@ class _JournalScreenState extends State<JournalScreen> {
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            // -------------------------------------------------------------
-            // Index 1: Reaction Score Slider
-            // Label: "आज उकसावे पर चित्त कितना स्थिर रहा?"
-            // -------------------------------------------------------------
+            // Executive Segment Toggle: [ 3-INDEX DEBRIEF | MEDIA RECORDINGS VAULT ]
             Container(
-              padding: const EdgeInsets.all(AppDimens.space16),
+              margin: const EdgeInsets.only(bottom: AppDimens.space16),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                border: Border.all(color: AppColors.borderSubtle),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_activeTab != 0) {
+                          HapticService.selectionClick();
+                          setState(() => _activeTab = 0);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: _activeTab == 0
+                              ? AppColors.surfaceElevated
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                          border: _activeTab == 0
+                              ? Border.all(color: AppColors.shieldPrimary, width: 1.0)
+                              : null,
+                        ),
+                        child: Text(
+                          '3-INDEX DEBRIEF',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: _activeTab == 0 ? FontWeight.w700 : FontWeight.w500,
+                            color: _activeTab == 0 ? AppColors.shieldPrimary : AppColors.textMuted,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_activeTab != 1) {
+                          HapticService.selectionClick();
+                          setState(() => _activeTab = 1);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: _activeTab == 1
+                              ? AppColors.surfaceElevated
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                          border: _activeTab == 1
+                              ? Border.all(color: AppColors.shieldPrimary, width: 1.0)
+                              : null,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.shield_outlined, size: 13, color: AppColors.shieldPrimary),
+                            const SizedBox(width: 6),
+                            Text(
+                              'MEDIA VAULT',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: _activeTab == 1 ? FontWeight.w700 : FontWeight.w500,
+                                color: _activeTab == 1 ? AppColors.shieldPrimary : AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            if (_activeTab == 1) ...[
+              MediaRecordingsVaultView(
+                onMediaChanged: _loadData,
+              ),
+              const SizedBox(height: 40),
+            ] else ...[
+              // -------------------------------------------------------------
+              // Index 1: Reaction Score Slider
+              // Label: "आज उकसावे पर चित्त कितना स्थिर रहा?"
+              // -------------------------------------------------------------
+              Container(
+                padding: const EdgeInsets.all(AppDimens.space16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
                 border: Border.all(color: AppColors.borderSubtle, width: 1.0),
               ),
@@ -868,6 +962,12 @@ class _JournalScreenState extends State<JournalScreen> {
                             );
                             if (result != null) {
                               setState(() => _audioMemoPath = result);
+                              final dateKey = _todayEntry?.entryDate ?? DateHelpers.toStorageKey(DateTime.now());
+                              await MediaVaultService().registerMedia(
+                                filePath: result,
+                                mediaType: 'audio',
+                                parentJournalDateKey: dateKey,
+                              );
                             }
                           },
                           style: OutlinedButton.styleFrom(
@@ -981,6 +1081,12 @@ class _JournalScreenState extends State<JournalScreen> {
                             );
                             if (result != null) {
                               setState(() => _videoReflectionPath = result);
+                              final dateKey = _todayEntry?.entryDate ?? DateHelpers.toStorageKey(DateTime.now());
+                              await MediaVaultService().registerMedia(
+                                filePath: result,
+                                mediaType: 'video',
+                                parentJournalDateKey: dateKey,
+                              );
                             }
                           },
                           style: OutlinedButton.styleFrom(
@@ -1007,6 +1113,43 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Shortcut to switch to Media Recordings & Stealth Vault
+                  InkWell(
+                    onTap: () {
+                      HapticService.selectionClick();
+                      setState(() => _activeTab = 1);
+                    },
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceElevated,
+                        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                        border: Border.all(
+                          color: AppColors.shieldPrimary.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.shield_outlined, size: 14, color: AppColors.shieldPrimary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'OPEN FULL MEDIA VAULT & STEALTH REPOSITORY',
+                            style: AppTextStyles.labelBadge.copyWith(
+                              color: AppColors.shieldPrimary,
+                              letterSpacing: 0.8,
+                              fontSize: 10,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.arrow_forward_rounded, size: 13, color: AppColors.shieldPrimary),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -1066,8 +1209,9 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
             const SizedBox(height: 40),
           ],
-        ),
+        ],
       ),
-    );
+    ),
+  );
   }
 }

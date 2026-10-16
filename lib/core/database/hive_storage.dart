@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/journal/data/models/journal_models.dart';
+import '../../features/journal/data/models/media_record_log.dart';
 import '../../features/recovery/data/models/incident_slip_up_log.dart';
 import '../../features/settings/data/models/notification_slot_config.dart';
 import '../../features/wisdom/data/models/resource_link.dart';
@@ -25,6 +26,7 @@ class HiveStorage {
   late Box<Map> _incidentLogsBox;
   late Box<Map> _resourceVaultBox;
   late Box _affirmationsBox;
+  late Box<Map> _mediaVaultBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -40,6 +42,9 @@ class HiveStorage {
       if (!Hive.isAdapterRegistered(2)) {
         Hive.registerAdapter(SosIncidentLogAdapter());
       }
+      if (!Hive.isAdapterRegistered(3)) {
+        Hive.registerAdapter(MediaRecordLogAdapter());
+      }
 
       _journalBox = await Hive.openBox<Map>(HiveBoxes.journalEntries);
       _streakBox = await Hive.openBox(HiveBoxes.streak);
@@ -49,6 +54,7 @@ class HiveStorage {
       _incidentLogsBox = await Hive.openBox<Map>(HiveBoxes.incidentLogs);
       _resourceVaultBox = await Hive.openBox<Map>(HiveBoxes.resourceVault);
       _affirmationsBox = await Hive.openBox(HiveBoxes.affirmations);
+      _mediaVaultBox = await Hive.openBox<Map>(HiveBoxes.mediaVault);
 
       // Pre-seed verified public-domain resources on first launch
       if (_resourceVaultBox.isEmpty) {
@@ -388,5 +394,44 @@ class HiveStorage {
     await _affirmationsBox.delete('active_affirmation_title');
     await _affirmationsBox.delete('active_affirmation_text');
     await _affirmationsBox.delete('active_affirmation_source');
+  }
+
+  // ---------------------------------------------------------
+  // Media Vault & Stealth Media Operations (MediaRecordLog)
+  // ---------------------------------------------------------
+
+  Future<void> saveMediaRecord(MediaRecordLog record) async {
+    await _mediaVaultBox.put(record.id, record.toMap());
+  }
+
+  MediaRecordLog? getMediaRecord(String id) {
+    final raw = _mediaVaultBox.get(id);
+    if (raw == null) return null;
+    return MediaRecordLog.fromMap(Map<String, dynamic>.from(raw));
+  }
+
+  List<MediaRecordLog> getAllMediaRecords() {
+    final list = <MediaRecordLog>[];
+    for (final raw in _mediaVaultBox.values) {
+      list.add(MediaRecordLog.fromMap(Map<String, dynamic>.from(raw)));
+    }
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
+  }
+
+  Future<void> deleteMediaRecord(String id) async {
+    await _mediaVaultBox.delete(id);
+  }
+
+  // ---------------------------------------------------------
+  // Stealth Vault Security & PIN Settings
+  // ---------------------------------------------------------
+
+  String getStealthPin() {
+    return _settingsBox.get('stealth_vault_pin', defaultValue: '0000') as String;
+  }
+
+  Future<void> setStealthPin(String pin) async {
+    await _settingsBox.put('stealth_vault_pin', pin);
   }
 }

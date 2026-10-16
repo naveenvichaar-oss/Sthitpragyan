@@ -7,6 +7,7 @@ import 'core/database/hive_storage.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/notifications/notifications_dataset_service.dart';
 import 'features/journal/data/repositories/journal_repository.dart';
+import 'features/journal/data/services/media_vault_service.dart';
 import 'features/wisdom/data/services/wisdom_vault_service.dart';
 
 void main() async {
@@ -32,6 +33,9 @@ void main() async {
 
   // Initialize offline-first zero-telemetry local storage
   await HiveStorage().init();
+
+  // Initialize stealth media vault and .nomedia folder security
+  await MediaVaultService().init();
 
   // Populate initial demonstration/onboarding data if cold start
   await JournalRepository().seedInitialDataIfEmpty();

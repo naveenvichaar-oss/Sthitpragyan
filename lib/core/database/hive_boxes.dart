@@ -23,4 +23,7 @@ abstract class HiveBoxes {
 
   /// Box containing user's daily affirmations and active wisdom selections
   static const String affirmations = 'sthitaprajna_affirmations';
+
+  /// Box containing audio memos and video reflection recordings with stealth metadata
+  static const String mediaVault = 'sthitaprajna_media_vault';
 }
