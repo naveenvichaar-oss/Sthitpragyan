@@ -114,12 +114,44 @@ class ResourceLink {
     required this.createdAt,
   });
 
+  /// Automatically infers the ResourceMediaType from common URL patterns
+  static ResourceMediaType detectMediaTypeFromUrl(String url) {
+    final lower = url.trim().toLowerCase();
+    if (lower.isEmpty) return ResourceMediaType.webLink;
+    if (lower.contains('youtube.com') ||
+        lower.contains('youtu.be') ||
+        lower.contains('m.youtube.com')) {
+      return ResourceMediaType.youTube;
+    }
+    if (lower.contains('drive.google.com') ||
+        lower.contains('docs.google.com') ||
+        lower.endsWith('.pdf')) {
+      return ResourceMediaType.drivePdf;
+    }
+    if (lower.contains('keep.google.com')) {
+      return ResourceMediaType.googleKeep;
+    }
+    return ResourceMediaType.webLink;
+  }
+
+  /// Returns the effective media type, resolving webLink to youTube / drivePdf / googleKeep
+  /// if the underlying URL matches those services.
+  ResourceMediaType get effectiveMediaType {
+    if (mediaType == ResourceMediaType.webLink) {
+      final detected = detectMediaTypeFromUrl(url);
+      if (detected != ResourceMediaType.webLink) {
+        return detected;
+      }
+    }
+    return mediaType;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
       'category': category,
-      'mediaType': mediaType.toStorageString(),
+      'mediaType': effectiveMediaType.toStorageString(),
       'url': url,
       'isUserAdded': isUserAdded,
       'notes': notes,
@@ -128,12 +160,23 @@ class ResourceLink {
   }
 
   factory ResourceLink.fromMap(Map<String, dynamic> map) {
+    final rawMediaType = map['mediaType'] as String?;
+    final url = map['url'] as String? ?? '';
+
+    var type = ResourceMediaType.fromString(rawMediaType);
+    if (type == ResourceMediaType.webLink) {
+      final detected = detectMediaTypeFromUrl(url);
+      if (detected != ResourceMediaType.webLink) {
+        type = detected;
+      }
+    }
+
     return ResourceLink(
       id: map['id'] as String? ?? '',
       title: map['title'] as String? ?? 'Untitled Resource',
       category: map['category'] as String? ?? 'General Stoicism',
-      mediaType: ResourceMediaType.fromString(map['mediaType'] as String?),
-      url: map['url'] as String? ?? '',
+      mediaType: type,
+      url: url,
       isUserAdded: map['isUserAdded'] as bool? ?? false,
       notes: map['notes'] as String?,
       createdAt: map['createdAt'] != null

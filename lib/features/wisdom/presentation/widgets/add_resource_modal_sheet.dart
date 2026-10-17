@@ -43,6 +43,8 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
 
   ResourceMediaType _selectedMediaType = ResourceMediaType.webLink;
   String _selectedCategory = 'Gita & Sthitaprajna';
+  bool _userExplicitlySelectedMediaType = false;
+  String? _autoDetectionBadge;
 
   final List<String> _categories = [
     'Gita & Sthitaprajna',
@@ -53,7 +55,48 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _urlController.addListener(_onUrlChanged);
+  }
+
+  void _onUrlChanged() {
+    final text = _urlController.text.trim();
+    if (text.isEmpty) {
+      if (!_userExplicitlySelectedMediaType && _autoDetectionBadge != null) {
+        setState(() {
+          _autoDetectionBadge = null;
+          _selectedMediaType = ResourceMediaType.webLink;
+        });
+      }
+      return;
+    }
+
+    final detected = ResourceLink.detectMediaTypeFromUrl(text);
+    if (!_userExplicitlySelectedMediaType) {
+      if (_selectedMediaType != detected) {
+        setState(() {
+          _selectedMediaType = detected;
+          _autoDetectionBadge = detected != ResourceMediaType.webLink
+              ? 'Auto-detected: ${detected.displayName}'
+              : null;
+        });
+      }
+    } else {
+      // User picked a chip manually, but if it now matches detected, we can still show badge
+      if (detected != ResourceMediaType.webLink && _selectedMediaType == detected) {
+        if (_autoDetectionBadge == null) {
+          setState(() {
+            _autoDetectionBadge = 'Auto-detected: ${detected.displayName}';
+          });
+        }
+      }
+    }
+  }
+
+  @override
   void dispose() {
+    _urlController.removeListener(_onUrlChanged);
     _titleController.dispose();
     _urlController.dispose();
     _notesController.dispose();
@@ -66,13 +109,23 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
       return;
     }
 
+    final rawUrl = _urlController.text.trim();
+    // Auto-customize media type if left as default webLink or if matching YouTube/Drive/Keep
+    var finalMediaType = _selectedMediaType;
+    if (finalMediaType == ResourceMediaType.webLink || !_userExplicitlySelectedMediaType) {
+      final detected = ResourceLink.detectMediaTypeFromUrl(rawUrl);
+      if (detected != ResourceMediaType.webLink) {
+        finalMediaType = detected;
+      }
+    }
+
     HapticService.success();
     final newResource = ResourceLink(
       id: 'res_${DateTime.now().millisecondsSinceEpoch}',
       title: _titleController.text.trim(),
       category: _selectedCategory,
-      mediaType: _selectedMediaType,
-      url: _urlController.text.trim(),
+      mediaType: finalMediaType,
+      url: rawUrl,
       isUserAdded: true,
       notes: _notesController.text.trim().isEmpty
           ? null
@@ -86,8 +139,8 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
     if (mounted) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
+        const SnackBar(
+          content: Row(
             children: [
               Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
               SizedBox(width: 8),
@@ -95,7 +148,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
             ],
           ),
           backgroundColor: AppColors.surfaceElevated,
-          duration: const Duration(seconds: 2),
+          duration: Duration(seconds: 2),
         ),
       );
     }
@@ -181,10 +234,14 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
                     onSelected: (val) {
                       if (val) {
                         HapticService.selectionClick();
-                        setState(() => _selectedMediaType = type);
+                        setState(() {
+                          _selectedMediaType = type;
+                          _userExplicitlySelectedMediaType = true;
+                          _autoDetectionBadge = null;
+                        });
                       }
                     },
-                    selectedColor: color.withOpacity(0.15),
+                    selectedColor: color.withValues(alpha: 0.15),
                     backgroundColor: AppColors.surfaceElevated,
                     side: BorderSide(
                       color: isSelected ? color : AppColors.borderSubtle,
@@ -198,6 +255,34 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
                   );
                 }).toList(),
               ),
+              if (_autoDetectionBadge != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: _selectedMediaType.accentColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                    border: Border.all(
+                      color: _selectedMediaType.accentColor.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.auto_awesome_rounded, size: 13, color: _selectedMediaType.accentColor),
+                      const SizedBox(width: 6),
+                      Text(
+                        _autoDetectionBadge!,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: _selectedMediaType.accentColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 14),
 
               // Title Field

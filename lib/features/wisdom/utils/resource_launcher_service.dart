@@ -78,7 +78,7 @@ class ResourceLauncherService {
       title: resource.title,
       category: resource.category,
       notes: resource.notes,
-      mediaType: resource.mediaType,
+      mediaType: resource.effectiveMediaType,
     );
   }
 

@@ -412,10 +412,19 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
     var displayList = _resources;
     if (_selectedResourceFilter != 'all') {
       displayList = displayList.where((r) {
-        return r.mediaType.toStorageString().toLowerCase() ==
+        return r.effectiveMediaType.toStorageString().toLowerCase() ==
             _selectedResourceFilter.toLowerCase();
       }).toList();
     }
+
+    final ytCount =
+        _resources.where((r) => r.effectiveMediaType == ResourceMediaType.youTube).length;
+    final driveCount =
+        _resources.where((r) => r.effectiveMediaType == ResourceMediaType.drivePdf).length;
+    final keepCount =
+        _resources.where((r) => r.effectiveMediaType == ResourceMediaType.googleKeep).length;
+    final webCount =
+        _resources.where((r) => r.effectiveMediaType == ResourceMediaType.webLink).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,13 +436,13 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             children: [
               _buildResourceFilterChip('all', 'ALL RESOURCES (${_resources.length})'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('YouTube', 'YOUTUBE'),
+              _buildResourceFilterChip('YouTube', 'YOUTUBE ($ytCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('DrivePDF', 'DRIVE PDF'),
+              _buildResourceFilterChip('DrivePDF', 'DRIVE PDF ($driveCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('GoogleKeep', 'GOOGLE KEEP'),
+              _buildResourceFilterChip('GoogleKeep', 'GOOGLE KEEP ($keepCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('WebLink', 'WEB ARCHIVE'),
+              _buildResourceFilterChip('WebLink', 'WEB ARCHIVE ($webCount)'),
             ],
           ),
         ),

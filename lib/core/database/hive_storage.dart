@@ -345,7 +345,15 @@ class HiveStorage {
     final list = <ResourceLink>[];
     for (final raw in _resourceVaultBox.values) {
       try {
-        list.add(ResourceLink.fromMap(Map<String, dynamic>.from(raw)));
+        final map = Map<String, dynamic>.from(raw);
+        final link = ResourceLink.fromMap(map);
+        // Self-heal: If stored mediaType was 'WebLink' or inconsistent with the URL, auto-migrate record in Hive
+        final effectiveTypeString = link.effectiveMediaType.toStorageString();
+        if (map['mediaType'] != effectiveTypeString) {
+          map['mediaType'] = effectiveTypeString;
+          _resourceVaultBox.put(link.id, map);
+        }
+        list.add(link);
       } catch (e) {
         debugPrint('[HiveStorage] Error parsing resource: $e');
       }

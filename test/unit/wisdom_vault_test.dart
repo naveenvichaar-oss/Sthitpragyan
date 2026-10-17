@@ -90,6 +90,59 @@ void main() {
       expect(reconstituted.isUserAdded, true);
       expect(reconstituted.notes, original.notes);
     });
+
+    test('detectMediaTypeFromUrl accurately detects YouTube, Drive, and Keep', () {
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://www.youtube.com/watch?v=ha7dSOotgsaA&list=PL123'),
+        ResourceMediaType.youTube,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://youtu.be/ha7dSOotgsaA'),
+        ResourceMediaType.youTube,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://m.youtube.com/watch?v=xyz'),
+        ResourceMediaType.youTube,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://drive.google.com/file/d/test/view'),
+        ResourceMediaType.drivePdf,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://docs.google.com/document/d/test/edit'),
+        ResourceMediaType.drivePdf,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://keep.google.com/#NOTE/123'),
+        ResourceMediaType.googleKeep,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://classics.mit.edu/Antoninus/meditations.html'),
+        ResourceMediaType.webLink,
+      );
+    });
+
+    test('effectiveMediaType and fromMap automatically upgrades YouTube links saved as WebLink', () {
+      final legacySavedMap = {
+        'id': 'res_user_yt_1',
+        'title': 'Exercises for Mastering the Laws of Human Nature',
+        'category': 'Psychology & Models',
+        'mediaType': 'WebLink', // user saved without manually changing chip
+        'url': 'https://www.youtube.com/watch?v=ha7dSOotgsaA&list=PL456',
+        'isUserAdded': true,
+        'notes': 'Detachment practice',
+        'createdAt': DateTime(2026, 10, 17).toIso8601String(),
+      };
+
+      final link = ResourceLink.fromMap(legacySavedMap);
+      // fromMap auto-detects and upgrades mediaType
+      expect(link.mediaType, ResourceMediaType.youTube);
+      expect(link.effectiveMediaType, ResourceMediaType.youTube);
+
+      // Serializing back writes 'YouTube'
+      final upgradedMap = link.toMap();
+      expect(upgradedMap['mediaType'], 'YouTube');
+    });
   });
 
   group('WisdomVaultService In-Memory Tests', () {

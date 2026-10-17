@@ -21,7 +21,8 @@ class ResourceHubCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaColor = resource.mediaType.accentColor;
+    final effectiveType = resource.effectiveMediaType;
+    final mediaColor = effectiveType.accentColor;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -49,7 +50,7 @@ class ResourceHubCard extends StatelessWidget {
                     border: Border.all(color: mediaColor.withValues(alpha: 0.25)),
                   ),
                   child: Icon(
-                    resource.mediaType.iconData,
+                    effectiveType.iconData,
                     size: 22,
                     color: mediaColor,
                   ),
@@ -74,7 +75,7 @@ class ResourceHubCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              resource.mediaType.badgeLabel,
+                              effectiveType.badgeLabel,
                               style: AppTextStyles.labelBadge.copyWith(
                                 fontSize: 8.0,
                                 color: mediaColor,
