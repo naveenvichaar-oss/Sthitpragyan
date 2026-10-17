@@ -14,6 +14,9 @@ import 'package:sthitaprajna/features/dashboard/presentation/widgets/core_rule_c
 import 'package:sthitaprajna/features/dashboard/presentation/widgets/executive_header.dart';
 import 'package:sthitaprajna/features/dashboard/presentation/widgets/sos_shield_button.dart';
 import 'package:sthitaprajna/features/dashboard/presentation/widgets/streak_badge.dart';
+import 'package:sthitaprajna/features/character_ledger/presentation/screens/character_ledger_screen.dart';
+import 'package:sthitaprajna/features/execution_trigger/presentation/screens/execution_trigger_screen.dart';
+import 'package:sthitaprajna/features/execution_trigger/presentation/widgets/micro_ignition_timer_dialog.dart';
 import 'package:sthitaprajna/features/journal/data/models/journal_models.dart';
 import 'package:sthitaprajna/features/journal/data/repositories/journal_repository.dart';
 import 'package:sthitaprajna/features/joy_reservoir/presentation/screens/joy_reservoir_screen.dart';
@@ -243,9 +246,17 @@ class DashboardScreenState extends State<DashboardScreen> {
 
                   // 7. Joy Reservoir (Soul Sanctuary / आनंद कोष) Card
                   _buildJoyReservoirCard(),
+                  const SizedBox(height: 12),
+
+                  // 8. Action-Trigger (Commitment Chime & Micro-Ignition)
+                  _buildExecutionTriggerCard(),
+                  const SizedBox(height: 12),
+
+                  // 9. Character Ledger (Virtue & Trait Notepad)
+                  _buildCharacterLedgerCard(),
                   const SizedBox(height: 16),
 
-                  // 8. Evening Debrief Status Bar
+                  // 10. Evening Debrief Status Bar
                   _buildDebriefStatusCard(isDebriefCompleted),
                 ],
               ),
@@ -313,6 +324,200 @@ class DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 2),
                   Text(
                     'Personal serene music, visual anchors & comfort words to recalibrate your mind.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: AppColors.textMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExecutionTriggerCard() {
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        ExecutionTriggerScreen.open(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(AppDimens.space12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          border: Border.all(
+            color: const Color(0xFF10B981).withValues(alpha: 0.35),
+            width: 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.notifications_active_outlined,
+                size: 20,
+                color: Color(0xFF10B981),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'ACTION-TRIGGER • प्रतिबद्धता ध्वनि',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: const Color(0xFF10B981),
+                          fontSize: 8.5,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'EXECUTION CHIME',
+                    style: AppTextStyles.heading,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Zero-snooze commitment blocks & 5-min micro-ignition friction breaker.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                HapticService.selectionClick();
+                MicroIgnitionTimerDialog.show(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.bolt_rounded,
+                      size: 13,
+                      color: Color(0xFFF59E0B),
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      '5-MIN IGNITION',
+                      style: TextStyle(
+                        color: Color(0xFFF59E0B),
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: AppColors.textMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCharacterLedgerCard() {
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        CharacterLedgerScreen.open(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(AppDimens.space12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          border: Border.all(
+            color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+            width: 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.anchor_rounded,
+                size: 20,
+                color: Color(0xFFF59E0B),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'SOVEREIGN VIRTUES • चरित्र कोष',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: const Color(0xFFF59E0B),
+                          fontSize: 8.5,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'CHARACTER LEDGER',
+                    style: AppTextStyles.heading,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Structured notepad: Magnanimity, Gravitas, Joy & Tactical Restraint.',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 11,

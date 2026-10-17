@@ -7,6 +7,8 @@ import '../../../../core/database/hive_storage.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/notification_slot_config.dart';
+import 'package:sthitaprajna/features/character_ledger/presentation/screens/character_ledger_screen.dart';
+import 'package:sthitaprajna/features/execution_trigger/presentation/screens/execution_trigger_screen.dart';
 import 'package:sthitaprajna/features/sharing/presentation/widgets/incoming_share_modal_sheet.dart';
 import '../widgets/slot_edit_modal_sheet.dart';
 
@@ -344,6 +346,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Share Sheet Interceptor Preview
           _buildShareSheetSimulatorCard(),
+          const SizedBox(height: 16),
+
+          // Action-Trigger & Character Ledger Settings Card
+          _buildExecutionAndCharacterLedgerCard(),
           const SizedBox(height: 20),
 
           // Zero Telemetry Privacy Card
@@ -415,6 +421,96 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExecutionAndCharacterLedgerCard() {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.space14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(
+                  Icons.notifications_active_outlined,
+                  size: 18,
+                  color: Color(0xFF10B981),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'EXECUTION & CHARACTER LEDGER',
+                      style: AppTextStyles.labelBadge.copyWith(
+                        color: const Color(0xFF10B981),
+                        fontSize: 8.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text('Action-Triggers & Virtue Journal', style: AppTextStyles.heading),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Replace standard snooze-prone alarms with non-negotiable Execution Chimes (calm 108Hz gong), 5-minute micro-ignitions, and sovereign trait logs (Magnanimity, Gravitas, Joy, Restraint).',
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    HapticService.selectionClick();
+                    ExecutionTriggerScreen.open(context);
+                  },
+                  icon: const Icon(Icons.bolt_rounded, size: 14),
+                  label: const Text('EXECUTION CHIME', style: TextStyle(fontSize: 10.5)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF10B981),
+                    side: const BorderSide(color: Color(0xFF10B981)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    HapticService.selectionClick();
+                    CharacterLedgerScreen.open(context);
+                  },
+                  icon: const Icon(Icons.anchor_rounded, size: 14),
+                  label: const Text('CHARACTER LEDGER', style: TextStyle(fontSize: 10.5)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFF59E0B),
+                    side: const BorderSide(color: Color(0xFFF59E0B)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

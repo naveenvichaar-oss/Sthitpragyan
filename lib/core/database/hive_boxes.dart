@@ -29,4 +29,10 @@ abstract class HiveBoxes {
 
   /// Box containing personal anchors, serene music, visual reflections, and comfort words
   static const String joyReservoir = 'sthitaprajna_joy_reservoir';
+
+  /// Box containing structured virtue & magnetic trait notes for personal gravitas
+  static const String characterLedger = 'sthitaprajna_character_ledger';
+
+  /// Box containing execution commitment blocks and action trigger configurations
+  static const String executionTriggers = 'sthitaprajna_execution_triggers';
 }

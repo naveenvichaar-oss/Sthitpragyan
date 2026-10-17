@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../features/character_ledger/data/models/character_trait_entry.dart';
+import '../../features/execution_trigger/data/models/execution_trigger.dart';
 import '../../features/journal/data/models/journal_models.dart';
 import '../../features/journal/data/models/media_record_log.dart';
 import '../../features/joy_reservoir/data/models/joy_item.dart';
@@ -29,6 +31,8 @@ class HiveStorage {
   late Box _affirmationsBox;
   late Box<Map> _mediaVaultBox;
   late Box<Map> _joyReservoirBox;
+  late Box<Map> _characterLedgerBox;
+  late Box<Map> _executionTriggersBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -57,12 +61,28 @@ class HiveStorage {
       _resourceVaultBox = await Hive.openBox<Map>(HiveBoxes.resourceVault);
       _affirmationsBox = await Hive.openBox(HiveBoxes.affirmations);
       _mediaVaultBox = await Hive.openBox<Map>(HiveBoxes.mediaVault);
-      _joyReservoirBox = await Hive.openBox<Map>(HiveBoxes.joyReservoir);
+       _joyReservoirBox = await Hive.openBox<Map>(HiveBoxes.joyReservoir);
+      _characterLedgerBox = await Hive.openBox<Map>(HiveBoxes.characterLedger);
+      _executionTriggersBox = await Hive.openBox<Map>(HiveBoxes.executionTriggers);
 
       // Pre-seed starter anchors for Joy Reservoir if empty
       if (_joyReservoirBox.isEmpty) {
         for (final item in JoyItem.starterAnchors()) {
           await _joyReservoirBox.put(item.id, item.toMap());
+        }
+      }
+
+      // Pre-seed starter virtue entries for Character Ledger if empty
+      if (_characterLedgerBox.isEmpty) {
+        for (final item in CharacterTraitEntry.starterEntries()) {
+          await _characterLedgerBox.put(item.id, item.toMap());
+        }
+      }
+
+      // Pre-seed non-negotiable blocks for Execution Triggers if empty
+      if (_executionTriggersBox.isEmpty) {
+        for (final item in ExecutionTrigger.defaultTriggers()) {
+          await _executionTriggersBox.put(item.id, item.toMap());
         }
       }
 
@@ -498,5 +518,86 @@ class HiveStorage {
       await _joyReservoirBox.put(item.id, item.toMap());
     }
   }
+
+  // ---------------------------------------------------------
+  // Character Ledger Operations (CharacterTraitEntry - चरित्र कोष)
+  // ---------------------------------------------------------
+
+  List<CharacterTraitEntry> getAllCharacterTraits() {
+    final list = <CharacterTraitEntry>[];
+    for (final raw in _characterLedgerBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        list.add(CharacterTraitEntry.fromMap(map));
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing CharacterTraitEntry: $e');
+      }
+    }
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list;
+  }
+
+  Future<void> saveCharacterTrait(CharacterTraitEntry entry) async {
+    await _characterLedgerBox.put(entry.id, entry.toMap());
+  }
+
+  Future<void> deleteCharacterTrait(String id) async {
+    await _characterLedgerBox.delete(id);
+  }
+
+  Future<void> resetCharacterTraitsToDefault() async {
+    await _characterLedgerBox.clear();
+    for (final item in CharacterTraitEntry.starterEntries()) {
+      await _characterLedgerBox.put(item.id, item.toMap());
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Execution Triggers & Micro-Ignition Operations
+  // ---------------------------------------------------------
+
+  List<ExecutionTrigger> getAllExecutionTriggers() {
+    final list = <ExecutionTrigger>[];
+    for (final raw in _executionTriggersBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        list.add(ExecutionTrigger.fromMap(map));
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing ExecutionTrigger: $e');
+      }
+    }
+    list.sort((a, b) => a.timeOfDay.compareTo(b.timeOfDay));
+    return list;
+  }
+
+  Future<void> saveExecutionTrigger(ExecutionTrigger trigger) async {
+    await _executionTriggersBox.put(trigger.id, trigger.toMap());
+  }
+
+  Future<void> deleteExecutionTrigger(String id) async {
+    await _executionTriggersBox.delete(id);
+  }
+
+  Future<void> recordExecutionCompletion(String id) async {
+    final raw = _executionTriggersBox.get(id);
+    if (raw != null) {
+      final current = ExecutionTrigger.fromMap(Map<String, dynamic>.from(raw));
+      final updated = current.copyWith(
+        lastExecutedAt: DateTime.now(),
+        streakCount: current.streakCount + 1,
+      );
+      await _executionTriggersBox.put(id, updated.toMap());
+    }
+  }
+
+  int getMicroIgnitionCount() {
+    return _settingsBox.get('micro_ignition_completed_count', defaultValue: 0) as int;
+  }
+
+  Future<void> incrementMicroIgnitionCount() async {
+    final current = getMicroIgnitionCount();
+    await _settingsBox.put('micro_ignition_completed_count', current + 1);
+  }
 }
+
 
