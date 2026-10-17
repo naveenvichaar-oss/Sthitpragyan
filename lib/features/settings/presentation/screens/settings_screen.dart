@@ -7,6 +7,7 @@ import '../../../../core/database/hive_storage.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/notification_slot_config.dart';
+import 'package:sthitaprajna/features/sharing/presentation/widgets/incoming_share_modal_sheet.dart';
 import '../widgets/slot_edit_modal_sheet.dart';
 
 /// SettingsScreen provides 100% customizable reminder slot management,
@@ -341,9 +342,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 20),
 
+          // Share Sheet Interceptor Preview
+          _buildShareSheetSimulatorCard(),
+          const SizedBox(height: 20),
+
           // Zero Telemetry Privacy Card
           _buildPrivacyCard(),
           const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShareSheetSimulatorCard() {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.space14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.shieldPrimary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.share_rounded, size: 18, color: AppColors.shieldPrimary),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'SYSTEM SHARE SHEET (RECEIVE INTENT)',
+                      style: AppTextStyles.labelBadge.copyWith(fontSize: 8.5),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text('Save from Browser, YouTube & Notes', style: AppTextStyles.heading),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Sthitaprajna appears directly in your system Share menu. You can share links, classical articles, or calming music and save them with personal trigger notes.',
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                HapticService.selectionClick();
+                IncomingShareModalSheet.show(
+                  context,
+                  rawContent: 'https://youtube.com/watch?v=R9OCA6UFE-0',
+                );
+              },
+              icon: const Icon(Icons.open_in_browser_rounded, size: 14),
+              label: const Text('TEST SHARE INTERCEPTOR MODAL', style: TextStyle(fontSize: 11)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.shieldPrimary,
+                side: const BorderSide(color: AppColors.shieldPrimary),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+            ),
+          ),
         ],
       ),
     );

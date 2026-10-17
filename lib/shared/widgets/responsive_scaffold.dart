@@ -8,6 +8,7 @@ import '../../features/cognition_vault/presentation/screens/cognition_vault_scre
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/journal/presentation/screens/journal_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/sharing/services/sharing_intent_service.dart';
 import '../../features/sos/presentation/screens/sos_modal_sheet.dart';
 
 /// ResponsiveScaffold provides adaptive layout for both Mobile and Tablet screens.
@@ -23,6 +24,20 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   int _currentIndex = 0;
   final GlobalKey<DashboardScreenState> _dashboardKey =
       GlobalKey<DashboardScreenState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SharingIntentService().init(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    SharingIntentService().dispose();
+    super.dispose();
+  }
 
   void _onTabSelected(int index) {
     if (index != _currentIndex) {
