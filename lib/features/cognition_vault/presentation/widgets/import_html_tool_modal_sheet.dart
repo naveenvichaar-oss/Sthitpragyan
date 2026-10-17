@@ -84,24 +84,15 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
   Future<void> _pickHtmlFile() async {
     setState(() => _isPicking = true);
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['html', 'htm'],
-        withData: true,
       );
 
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        Uint8List? bytes = file.bytes;
-        if (bytes == null && file.path != null && !kIsWeb) {
-          bytes = await File(file.path!).readAsBytes();
-        }
-
-        if (bytes == null) {
-          throw Exception('Unable to read selected file contents.');
-        }
-
-        final size = file.size > 0 ? file.size : bytes.length;
+      if (files.isNotEmpty) {
+        final file = files.first;
+        final bytes = await file.readAsBytes();
+        final size = await file.length() ?? bytes.length;
         String? content;
 
         try {
