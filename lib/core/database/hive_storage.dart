@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/character_ledger/data/models/character_trait_entry.dart';
+import '../../features/cognition_vault/data/models/local_html_tool.dart';
 import '../../features/execution_trigger/data/models/execution_trigger.dart';
 import '../../features/journal/data/models/journal_models.dart';
 import '../../features/journal/data/models/media_record_log.dart';
@@ -33,6 +34,7 @@ class HiveStorage {
   late Box<Map> _joyReservoirBox;
   late Box<Map> _characterLedgerBox;
   late Box<Map> _executionTriggersBox;
+  late Box<Map> _htmlToolsBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -64,6 +66,7 @@ class HiveStorage {
        _joyReservoirBox = await Hive.openBox<Map>(HiveBoxes.joyReservoir);
       _characterLedgerBox = await Hive.openBox<Map>(HiveBoxes.characterLedger);
       _executionTriggersBox = await Hive.openBox<Map>(HiveBoxes.executionTriggers);
+      _htmlToolsBox = await Hive.openBox<Map>(HiveBoxes.htmlTools);
 
       // Pre-seed starter anchors for Joy Reservoir if empty
       if (_joyReservoirBox.isEmpty) {
@@ -84,6 +87,12 @@ class HiveStorage {
         for (final item in ExecutionTrigger.defaultTriggers()) {
           await _executionTriggersBox.put(item.id, item.toMap());
         }
+      }
+
+      // Pre-seed starter interactive HTML dashboard if empty
+      if (_htmlToolsBox.isEmpty) {
+        final starter = LocalHtmlTool.starterDashboard();
+        await _htmlToolsBox.put(starter.id, starter.toMap());
       }
 
       // Pre-seed or sync verified public-domain resources
@@ -598,6 +607,39 @@ class HiveStorage {
     final current = getMicroIgnitionCount();
     await _settingsBox.put('micro_ignition_completed_count', current + 1);
   }
+
+  // ---------------------------------------------------------
+  // Offline HTML Tools & Dashboards Operations (LocalHtmlTool)
+  // ---------------------------------------------------------
+
+  List<LocalHtmlTool> getAllHtmlTools() {
+    final list = <LocalHtmlTool>[];
+    for (final raw in _htmlToolsBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        list.add(LocalHtmlTool.fromMap(map));
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing LocalHtmlTool: $e');
+      }
+    }
+    list.sort((a, b) => b.addedDate.compareTo(a.addedDate));
+    return list;
+  }
+
+  Future<void> saveHtmlTool(LocalHtmlTool tool) async {
+    await _htmlToolsBox.put(tool.id, tool.toMap());
+  }
+
+  Future<void> deleteHtmlTool(String id) async {
+    await _htmlToolsBox.delete(id);
+  }
+
+  Future<void> resetHtmlToolsToDefault() async {
+    await _htmlToolsBox.clear();
+    final starter = LocalHtmlTool.starterDashboard();
+    await _htmlToolsBox.put(starter.id, starter.toMap());
+  }
 }
+
 
 

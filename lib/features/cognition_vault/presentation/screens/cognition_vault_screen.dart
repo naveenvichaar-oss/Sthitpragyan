@@ -15,8 +15,11 @@ import '../../../wisdom/presentation/widgets/resource_hub_card.dart';
 import '../../../wisdom/presentation/widgets/wisdom_card.dart';
 import '../../data/cognition_data_source.dart';
 import '../../data/models/fallacy_and_model.dart';
+import '../../data/models/local_html_tool.dart';
 import '../widgets/cognition_search_bar.dart';
 import '../widgets/expandable_micro_card.dart';
+import '../widgets/html_tool_card.dart';
+import '../widgets/import_html_tool_modal_sheet.dart';
 
 /// CognitionVaultScreen hosts the unified Wisdom Vault & Resource Sanctuary:
 /// 1. Wisdom Cards: Gita & Sthitaprajna, Western Stoicism, Behavioral Psychology.
@@ -58,6 +61,10 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   int _selectedModelFilterIndex = 0; // 0: All, 1: Fallacies, 2: Stoic Models
   List<CognitionItem> _filteredModels = [];
 
+  // Offline HTML Tools State
+  List<LocalHtmlTool> _htmlTools = [];
+  String _selectedHtmlCategoryFilter = 'all';
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +82,25 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
 
     // 3. Mental models
     _applyModelFilters();
+
+    // 4. Offline HTML Tools
+    _loadHtmlTools();
+  }
+
+  void _loadHtmlTools() {
+    setState(() {
+      _htmlTools = _storage.getAllHtmlTools();
+    });
+  }
+
+  void _openImportHtmlSheet() {
+    HapticService.selectionClick();
+    ImportHtmlToolModalSheet.show(
+      context,
+      onImported: (tool) {
+        _loadHtmlTools();
+      },
+    );
   }
 
   void _loadResources() {
@@ -178,7 +204,22 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                     ),
                   ),
                 )
-              : null,
+              : _selectedMainSegment == 4
+                  ? FloatingActionButton.extended(
+                      onPressed: _openImportHtmlSheet,
+                      backgroundColor: const Color(0xFF10B981),
+                      foregroundColor: Colors.black,
+                      icon: const Icon(Icons.add_rounded, size: 20),
+                      label: const Text(
+                        'IMPORT HTML',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    )
+                  : null,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -230,6 +271,16 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                       size: 24,
                     ),
                     tooltip: 'Add Personal Anchor',
+                  )
+                else if (_selectedMainSegment == 4)
+                  IconButton(
+                    onPressed: _openImportHtmlSheet,
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: Color(0xFF10B981),
+                      size: 24,
+                    ),
+                    tooltip: 'Import Offline HTML Tool',
                   ),
               ],
             ),
@@ -241,7 +292,9 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                       ? 'Curated public-domain literature, audio/video breakdowns, and your personal Google Drive & Keep notes.'
                       : _selectedMainSegment == 2
                           ? 'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.'
-                          : 'Your personal soul sanctuary (आनंद कोष): uplifting music, visual anchors, serene memories, and comfort words.',
+                          : _selectedMainSegment == 3
+                              ? 'Your personal soul sanctuary (आनंद कोष): uplifting music, visual anchors, serene memories, and comfort words.'
+                              : 'Personal standalone HTML dashboards, decision calculators, and interactive tools rendered with full local JavaScript.',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -249,7 +302,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Top Segmented Switcher (Wisdom Cards / Resource Hub / Mental Models / Joy Reservoir)
+            // Top Segmented Switcher (Wisdom Cards / Resource Hub / Mental Models / Joy Reservoir / HTML Tools)
             _buildMainSegmentBar(),
             const SizedBox(height: 16),
 
@@ -260,8 +313,10 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               _buildResourceHubView()
             else if (_selectedMainSegment == 2)
               _buildMentalModelsView()
+            else if (_selectedMainSegment == 3)
+              const JoyReservoirScreen(isEmbedded: true)
             else
-              const JoyReservoirScreen(isEmbedded: true),
+              _buildHtmlToolsView(),
 
             const SizedBox(height: 60),
           ],
@@ -271,7 +326,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   }
 
   // ---------------------------------------------------------
-  // Main Segment Bar (Wisdom Cards / Resource Hub / Models / Joy)
+  // Main Segment Bar (Wisdom Cards / Resource Hub / Models / Joy / HTML Tools)
   // ---------------------------------------------------------
   Widget _buildMainSegmentBar() {
     return Container(
@@ -292,6 +347,8 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             _buildSegmentButton(2, 'MENTAL MODELS', Icons.psychology_rounded),
             const SizedBox(width: 4),
             _buildSegmentButton(3, 'JOY RESERVOIR', Icons.spa_rounded),
+            const SizedBox(width: 4),
+            _buildSegmentButton(4, 'HTML TOOLS', Icons.html_rounded),
           ],
         ),
       ),
@@ -690,6 +747,182 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // ---------------------------------------------------------
+  // HTML Tools & Dashboards Tab (Segment 4)
+  // ---------------------------------------------------------
+  Widget _buildHtmlToolsView() {
+    final categories = <String>{'all'};
+    for (final t in _htmlTools) {
+      categories.add(t.category);
+    }
+
+    final filtered = _selectedHtmlCategoryFilter == 'all'
+        ? _htmlTools
+        : _htmlTools.where((t) => t.category == _selectedHtmlCategoryFilter).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 1. Sandbox Info Card
+        Container(
+          padding: const EdgeInsets.all(AppDimens.space14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+            border: Border.all(
+              color: const Color(0xFF10B981).withValues(alpha: 0.35),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(
+                          Icons.html_rounded,
+                          size: 18,
+                          color: Color(0xFF10B981),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'OFFLINE SOVEREIGN SANDBOX',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: const Color(0xFF10B981),
+                          fontSize: 9,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '${_htmlTools.length} TOOLS',
+                    style: AppTextStyles.labelBadge.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 9.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Personal HTML Tools & Dashboards',
+                style: AppTextStyles.heading,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Import your private single-page tools, calculators, and interactive decision matrices. Stored 100% offline with zero cloud telemetry and full JavaScript execution.',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _openImportHtmlSheet,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: const Text(
+                    'IMPORT HTML FILE (+)',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 2. Category Filter Chips
+        if (categories.length > 1) ...[
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: categories.map((cat) {
+                final isSelected = _selectedHtmlCategoryFilter == cat;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    selected: isSelected,
+                    label: Text(cat.toUpperCase()),
+                    selectedColor: const Color(0xFF10B981).withValues(alpha: 0.2),
+                    backgroundColor: AppColors.surfaceElevated,
+                    side: BorderSide(
+                      color: isSelected
+                          ? const Color(0xFF10B981)
+                          : AppColors.borderSubtle,
+                    ),
+                    labelStyle: TextStyle(
+                      fontSize: 10,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected
+                          ? const Color(0xFF10B981)
+                          : AppColors.textSecondary,
+                    ),
+                    onSelected: (val) {
+                      if (val) {
+                        HapticService.selectionClick();
+                        setState(() => _selectedHtmlCategoryFilter = cat);
+                      }
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
+
+        // 3. Tool Cards List
+        if (filtered.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(AppDimens.space24),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                const Icon(Icons.code_off_rounded, size: 36, color: AppColors.textMuted),
+                const SizedBox(height: 8),
+                const Text('No HTML tools found in this category', style: AppTextStyles.bodyMedium),
+              ],
+            ),
+          )
+        else
+          ...filtered.map((tool) {
+            return HtmlToolCard(
+              tool: tool,
+              onDelete: () async {
+                await _storage.deleteHtmlTool(tool.id);
+                _loadHtmlTools();
+              },
+              onUpdated: (_) => _loadHtmlTools(),
+            );
+          }),
+      ],
     );
   }
 }

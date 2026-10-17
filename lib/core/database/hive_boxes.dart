@@ -35,4 +35,7 @@ abstract class HiveBoxes {
 
   /// Box containing execution commitment blocks and action trigger configurations
   static const String executionTriggers = 'sthitaprajna_execution_triggers';
+
+  /// Box containing imported offline HTML tools, interactive dashboards, and standalone calculators
+  static const String htmlTools = 'sthitaprajna_html_tools';
 }
