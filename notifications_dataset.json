@@ -6,25 +6,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "प्रातःकालीन लंगर",
-        "body": "आज की घटनाओं पर आपका वश नहीं, अपनी प्रतिक्रिया पर शत-प्रतिशत नियंत्रण है।"
+        "body": "आज की घटनाओं पर आपका वश नहीं, अपनी प्रतिक्रिया पर शत-प्रतिशत नियंत्रण है।",
+        "title_en": "Morning Anchor",
+        "body_en": "External events are outside your control; your internal composure is one hundred percent yours."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "द 3-सेकंड पॉज",
-        "body": "उकसावे पर रुकें। कोई सफाई नहीं, केवल तटस्थ अवलोकन।"
+        "body": "उकसावे पर रुकें। कोई सफाई नहीं, केवल तटस्थ अवलोकन।",
+        "title_en": "The 3-Second Pause",
+        "body_en": "Pause when provoked. Offer zero defense, only neutral, unshakable observation."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "पारखी दृष्टि",
-        "body": "आपके 'ना' कहने पर लोगों का व्यवहार बदला? बिना प्रतिक्रिया के केवल नोट करें।"
+        "body": "आपके 'ना' कहने पर लोगों का व्यवहार बदला? बिना प्रतिक्रिया के केवल नोट करें।",
+        "title_en": "Perceptive Audit",
+        "body_en": "Did their demeanor shift when you established boundaries? Note without emotional reaction."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "3-इंडेक्स डायरी",
-        "body": "आज का हिसाब बंद करें। 60 सेकंड में 3-इंडेक्स एंट्री पूरी करें।"
+        "body": "आज का हिसाब बंद करें। 60 सेकंड में 3-इंडेक्स एंट्री पूरी करें।",
+        "title_en": "3-Index Debrief",
+        "body_en": "Close today's mental ledger. Complete your 60-second 3-index entry."
       }
     ]
   },
@@ -35,25 +43,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "पूर्व-दृश्यीकरण",
-        "body": "संभावित उकसावे की पहले ही कल्पना कर लें। जब वह घटे, तो चौंकना शून्य।"
+        "body": "संभावित उकसावे की पहले ही कल्पना कर लें। जब वह घटे, तो चौंकना शून्य।",
+        "title_en": "Premeditation of Adversity",
+        "body_en": "Pre-visualize friction beforehand. When it arrives, your shock is zero."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "सफाई रहित 'ना'",
-        "body": "यह अभी संभव नहीं होगा। बिना हिचक, बिना बहाने के बात समाप्त।"
+        "body": "यह अभी संभव नहीं होगा। बिना हिचक, बिना बहाने के बात समाप्त।",
+        "title_en": "Unapologetic Refusal",
+        "body_en": "'That will not be possible at this time.' Zero excuses, zero over-explaining."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "टोन स्कैनर",
-        "body": "शब्दों पर नहीं, बदलते टोन और असुरक्षा के संकेतों पर ध्यान रखें।"
+        "body": "शब्दों पर नहीं, बदलते टोन और असुरक्षा के संकेतों पर ध्यान रखें।",
+        "title_en": "Tone Scanner",
+        "body_en": "Look past surface words; observe tonal shifts and insecurity cues with calm discernment."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "मानसिक शटडाउन",
-        "body": "जो नियंत्रण में था किया, जो नहीं था उसे छोड़ दिया। गहरी नींद की तैयारी।"
+        "body": "जो नियंत्रण में था किया, जो नहीं था उसे छोड़ दिया। गहरी नींद की तैयारी।",
+        "title_en": "Cognitive Shutdown",
+        "body_en": "What was in your control was handled; release the rest. Prepare for deep, restorative sleep."
       }
     ]
   },
@@ -64,25 +80,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "शांत संकल्प",
-        "body": "आज कोई शिकायत नहीं, कोई अपेक्षा नहीं, कोई व्यर्थ डिमांड नहीं।"
+        "body": "आज कोई शिकायत नहीं, कोई अपेक्षा नहीं, कोई व्यर्थ डिमांड नहीं।",
+        "title_en": "Serene Resolve",
+        "body_en": "Zero complaints today, zero idle expectations, zero unnecessary demands."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "ग्रे रॉक पोस्चर",
-        "body": "तटस्थ चेहरा, सपाट आवाज। किसी को कोई भावनात्मक रस न दें।"
+        "body": "तटस्थ चेहरा, सपाट आवाज। किसी को कोई भावनात्मक रस न दें।",
+        "title_en": "Gray Rock Demeanor",
+        "body_en": "Neutral posture, flat tone. Deny any emotional payoff to provocation."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "विक्टिम कार्ड शील्ड",
-        "body": "विक्टिम कार्ड पर कोई बहस नहीं—केवल नियमों, तथ्यों और फॉर्मल क्लोजर पर टिकें।"
+        "body": "विक्टिम कार्ड पर कोई बहस नहीं—केवल नियमों, तथ्यों और फॉर्मल क्लोजर पर टिकें।",
+        "title_en": "Victim Card Shield",
+        "body_en": "Never debate grievance drama. Ground yourself strictly in facts, metrics, and formal closure."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "दैनिक ऑडिट",
-        "body": "आज कहाँ सफाई दी? कहाँ प्रतिक्रिया दी? निर्मम आत्म-समीक्षा।"
+        "body": "आज कहाँ सफाई दी? कहाँ प्रतिक्रिया दी? निर्मम आत्म-समीक्षा।",
+        "title_en": "Daily Audit",
+        "body_en": "Where did you justify yourself? Where did you react impulsively? Ruthless, compassionate self-review."
       }
     ]
   },
@@ -93,25 +117,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "स्मार्ट दायित्व",
-        "body": "आज हर दायित्व का निर्वहन पूरी शक्ति और शांति से होगा।"
+        "body": "आज हर दायित्व का निर्वहन पूरी शक्ति और शांति से होगा।",
+        "title_en": "Dignified Duty",
+        "body_en": "Fulfill every commitment today with absolute precision, quiet vigor, and stillness."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "ऑब्जर्वर मोड",
-        "body": "उकसाने वाले को केस स्टडी समझें। आप प्रतिभागी नहीं, दर्शक हैं।"
+        "body": "उकसाने वाले को केस स्टडी समझें। आप प्रतिभागी नहीं, दर्शक हैं।",
+        "title_en": "Observer Stance",
+        "body_en": "Treat the instigator as a case study. You are not a combatant; you are the sovereign observer."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "विकल्प और नीयत की परख",
-        "body": "असली नीयत जानने के लिए विकल्प दें—प्राथमिकताएं चरित्र को उजागर करती हैं (Offer choices—preferences expose character)।"
+        "body": "असली नीयत जानने के लिए विकल्प दें—प्राथमिकताएं चरित्र को उजागर करती हैं (Offer choices—preferences expose character)।",
+        "title_en": "Character & Intent Probe",
+        "body_en": "Offer clear choices to uncover real intent—preferences expose true character."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "3-इंडेक्स एंट्री",
-        "body": "स्लाइडर सेट करें, आज का सबसे ठोस आउटपुट दर्ज करें।"
+        "body": "स्लाइडर सेट करें, आज का सबसे ठोस आउटपुट दर्ज करें।",
+        "title_en": "3-Index Ledger",
+        "body_en": "Calibrate your equanimity sliders and record today's most solid accomplishment."
       }
     ]
   },
@@ -122,25 +154,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "प्रातः स्मरण",
-        "body": "दिन मेरे सुविचारों से शुरू होता है, दूसरों की कहानियों से नहीं।"
+        "body": "दिन मेरे सुविचारों से शुरू होता है, दूसरों की कहानियों से नहीं।",
+        "title_en": "Morning Alignment",
+        "body_en": "My day begins with self-governed stillness, not other people's chaotic narratives."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "द क्लोजर स्टेटमेंट",
-        "body": "अमूर्त आलोचना पर हमेशा ऑब्जेक्टिव स्पेसिफिक्स मांगें, फिर रणनीतिक मौन साध लें।"
+        "body": "अमूर्त आलोचना पर हमेशा ऑब्जेक्टिव स्पेसिफिक्स मांगें, फिर रणनीतिक मौन साध लें।",
+        "title_en": "The Closure Statement",
+        "body_en": "Demand concrete specifics when faced with vague critique, then hold strategic silence."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "झूठी दयालुता फ़िल्टर",
-        "body": "टकराव के बाद अचानक दिखाई गई चिकनी-चुपड़ी बातों से अप्रभावित रहें।"
+        "body": "टकराव के बाद अचानक दिखाई गई चिकनी-चुपड़ी बातों से अप्रभावित रहें।",
+        "title_en": "False Courtesy Filter",
+        "body_en": "Remain unaffected by sudden appeasement or superficial sweetness following friction."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "हफ्ते का क्लोजर",
-        "body": "कार्यक्षेत्र का तनाव दफ्तर में ही छूटा। सप्ताहांत में मानसिक शांति सर्वोच्च है।"
+        "body": "कार्यक्षेत्र का तनाव दफ्तर में ही छूटा। सप्ताहांत में मानसिक शांति सर्वोच्च है।",
+        "title_en": "Weekly Closure",
+        "body_en": "Workplace tension stays at the office. Over the weekend, mental tranquility reigns supreme."
       }
     ]
   },
@@ -151,25 +191,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "सप्ताहांत स्थिरता",
-        "body": "प्रकृति के साथ समय, अपनों के साथ उपस्थिति। मन पूर्ण शांत।"
+        "body": "प्रकृति के साथ समय, अपनों के साथ उपस्थिति। मन पूर्ण शांत।",
+        "title_en": "Weekend Equanimity",
+        "body_en": "Time in nature, pure presence with loved ones. Mind in complete stillness."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "पैसिव अलर्टनेस",
-        "body": "स्क्रीन से दूरी। कोई तात्कालिक प्रतिक्रिया नहीं, पूर्ण डिटैचमेंट।"
+        "body": "स्क्रीन से दूरी। कोई तात्कालिक प्रतिक्रिया नहीं, पूर्ण डिटैचमेंट।",
+        "title_en": "Passive Alertness",
+        "body_en": "Distance from screens. Zero hurried reactions, complete emotional detachment."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "स्वाध्याय और चिंतन",
-        "body": "बिना पढ़े, बिना लिखे एक दिन भी नहीं। बौद्धिक ऊर्जा का संचय।"
+        "body": "बिना पढ़े, बिना लिखे एक दिन भी नहीं। बौद्धिक ऊर्जा का संचय।",
+        "title_en": "Deep Contemplation",
+        "body_en": "Never a day without reading or reflective writing. Conserve intellectual vigor."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "शांति और कृतज्ञता",
-        "body": "आज के दिन की शांति का अनुभव करें और विश्राम में जाएं।"
+        "body": "आज के दिन की शांति का अनुभव करें और विश्राम में जाएं।",
+        "title_en": "Stillness & Gratitude",
+        "body_en": "Anchor yourself in today's quiet serenity and transition into restorative rest."
       }
     ]
   },
@@ -180,25 +228,33 @@
         "time": "05:45",
         "slot_name": "Morning Grounding",
         "title": "मानसिक नवीकरण",
-        "body": "नए सप्ताह की मानसिक तैयारी। अजेय संकल्प, अडिग संतुलन।"
+        "body": "नए सप्ताह की मानसिक तैयारी। अजेय संकल्प, अडिग संतुलन।",
+        "title_en": "Mental Renewal",
+        "body_en": "Psychological preparation for the coming week. Invincible resolve, unshakable balance."
       },
       {
         "time": "09:00",
         "slot_name": "Work Entry Shield",
         "title": "स्ट्रेटेजिक फोकस",
-        "body": "अपने लक्ष्यों को गुप्त रखें, केवल परिणामों से बात होगी।"
+        "body": "अपने लक्ष्यों को गुप्त रखें, केवल परिणामों से बात होगी।",
+        "title_en": "Strategic Focus",
+        "body_en": "Keep your tactical objectives discreet; let tangible outcomes speak for themselves."
       },
       {
         "time": "14:00",
         "slot_name": "Mid-Day Audit",
         "title": "आदतों का परीक्षण",
-        "body": "बुरी आदतों को 15 मिनट टालने का अभ्यास जारी रखें।"
+        "body": "बुरी आदतों को 15 मिनट टालने का अभ्यास जारी रखें।",
+        "title_en": "Habit Calibration",
+        "body_en": "Practice the 15-minute delay impulse against unproductive urges."
       },
       {
         "time": "21:30",
         "slot_name": "Night Closure",
         "title": "युद्ध की पूर्व-संध्या",
-        "body": "कल के लिए पूरी तरह तैयार। 10:30 बजे तक गहरी निद्रा।"
+        "body": "कल के लिए पूरी तरह तैयार। 10:30 बजे तक गहरी निद्रा।",
+        "title_en": "Eve of Battle",
+        "body_en": "Fully equipped for tomorrow. Enter restorative sleep by 10:30 PM."
       }
     ]
   }

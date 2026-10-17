@@ -300,6 +300,7 @@ class HiveStorage {
   }
 
   String getLanguageCode() {
+    if (!_initialized) return 'en';
     return _settingsBox.get('language_code', defaultValue: 'en') as String;
   }
 

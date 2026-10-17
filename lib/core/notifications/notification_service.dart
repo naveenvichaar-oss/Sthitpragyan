@@ -15,6 +15,8 @@ class NotificationTrigger {
   final String title;
   final String body;
   final String category;
+  final String? titleEn;
+  final String? bodyEn;
 
   const NotificationTrigger({
     required this.id,
@@ -23,7 +25,35 @@ class NotificationTrigger {
     required this.title,
     required this.body,
     required this.category,
+    this.titleEn,
+    this.bodyEn,
   });
+
+  String localizedTitle(bool isHindi) {
+    if (isHindi) return title;
+    return (titleEn != null && titleEn!.isNotEmpty) ? titleEn! : title;
+  }
+
+  String localizedBody(bool isHindi) {
+    if (isHindi) return body;
+    return (bodyEn != null && bodyEn!.isNotEmpty) ? bodyEn! : body;
+  }
+
+  String localizedCategory(bool isHindi) {
+    if (!isHindi) return category.toUpperCase();
+    switch (category.toLowerCase().trim()) {
+      case 'morning grounding':
+        return 'प्रातःकालीन लंगर';
+      case 'work entry shield':
+        return 'कार्य-प्रवेश कवच';
+      case 'mid-day audit':
+        return 'मध्याह्न आत्म-समीक्षा';
+      case 'night closure':
+        return 'रात्रि विश्राम व समापन';
+      default:
+        return category;
+    }
+  }
 }
 
 /// NotificationService coordinates local scheduled notifications at 4 executive checkpoints.
@@ -48,6 +78,8 @@ class NotificationService {
       title: '05:45 AM • Morning Grounding (प्रातःकालीन लंगर)',
       body: 'आज की घटनाओं पर आपका वश नहीं, अपनी प्रतिक्रिया पर शत-प्रतिशत नियंत्रण है।',
       category: 'Morning Grounding',
+      titleEn: '05:45 AM • Morning Grounding (Morning Anchor)',
+      bodyEn: 'External events are outside your control; your internal composure is one hundred percent yours.',
     ),
     NotificationTrigger(
       id: 102,
@@ -56,6 +88,8 @@ class NotificationService {
       title: '09:00 AM • Work Entry Shield (द 3-सेकंड पॉज)',
       body: 'उकसावे पर रुकें। कोई सफाई नहीं, केवल तटस्थ अवलोकन।',
       category: 'Work Entry Shield',
+      titleEn: '09:00 AM • Work Entry Shield (The 3-Second Pause)',
+      bodyEn: 'Pause when provoked. Offer zero defense, only neutral, unshakable observation.',
     ),
     NotificationTrigger(
       id: 103,
@@ -64,6 +98,8 @@ class NotificationService {
       title: '02:00 PM • Mid-Day Audit (पारखी दृष्टि)',
       body: 'आपके \'ना\' कहने पर लोगों का व्यवहार बदला? बिना प्रतिक्रिया के केवल नोट करें।',
       category: 'Mid-Day Audit',
+      titleEn: '02:00 PM • Mid-Day Audit (Perceptive Audit)',
+      bodyEn: 'Did their demeanor shift when you established boundaries? Note without emotional reaction.',
     ),
     NotificationTrigger(
       id: 104,
@@ -72,6 +108,8 @@ class NotificationService {
       title: '09:30 PM • Night Closure (3-इंडेक्स डायरी)',
       body: 'आज का हिसाब बंद करें। 60 सेकंड में 3-इंडेक्स एंट्री पूरी करें।',
       category: 'Night Closure',
+      titleEn: '09:30 PM • Night Closure (3-Index Debrief)',
+      bodyEn: 'Close today\'s mental ledger. Complete your 60-second 3-index entry.',
     ),
   ];
 
@@ -197,11 +235,13 @@ class NotificationService {
         if (weekday < 1 || weekday > 7) continue;
         final dayName = days[weekday - 1];
 
+        final isHindi = HiveStorage().getLanguageCode() == 'hi';
+
         // Determine title & body
         String notificationTitle = slot.title;
         String notificationBody = slot.body;
 
-        // If it's a standard/base slot, pull rich day-specific Devanagari text from dataset!
+        // If it's a standard/base slot, pull rich day-specific Devanagari or English text from dataset!
         if (!slot.isCustom) {
           final dayTriggers = NotificationsDatasetService().getTriggersForDay(
             dayName,
@@ -213,15 +253,20 @@ class NotificationService {
             final nameB = slot.slotName.toLowerCase().replaceAll(' ', '');
             if (catA == catB ||
                 catA == nameB ||
-                t.title.toLowerCase().contains(slot.category.toLowerCase())) {
+                t.title.toLowerCase().contains(slot.category.toLowerCase()) ||
+                (t.titleEn != null &&
+                    t.titleEn!
+                        .toLowerCase()
+                        .contains(slot.category.toLowerCase()))) {
               match = t;
               break;
             }
           }
 
           if (match != null) {
-            notificationTitle = '${slot.formattedTime} • ${match.title}';
-            notificationBody = match.body;
+            notificationTitle =
+                '${slot.formattedTime} • ${match.localizedTitle(isHindi)}';
+            notificationBody = match.localizedBody(isHindi);
           }
         }
 

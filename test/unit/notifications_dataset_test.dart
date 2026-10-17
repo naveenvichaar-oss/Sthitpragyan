@@ -39,14 +39,65 @@ void main() {
       },
     );
 
-    test('getTodayTriggers returns 4 slots for any given DateTime anchor', () {
-      final service = NotificationsDatasetService();
-      // Monday anchor
-      final mondayDate = DateTime(2026, 10, 19); // Oct 19, 2026 is Monday
-      final triggers = service.getTodayTriggers(mondayDate);
+    test(
+      'getTriggersForDay returns bilingual English and Hindi strings for Saturday slot',
+      () {
+        final service = NotificationsDatasetService();
+        final saturdaySlots = service.getTriggersForDay('Saturday');
 
-      expect(triggers.length, equals(4));
-      expect(triggers[0].title, contains('प्रातःकालीन लंगर'));
+        expect(saturdaySlots.length, equals(4));
+
+        final morningSlot = saturdaySlots[0];
+        // Hindi mode
+        expect(morningSlot.localizedTitle(true), equals('सप्ताहांत स्थिरता'));
+        expect(
+          morningSlot.localizedBody(true),
+          contains('प्रकृति के साथ समय, अपनों के साथ उपस्थिति। मन पूर्ण शांत।'),
+        );
+        expect(morningSlot.localizedCategory(true), equals('प्रातःकालीन लंगर'));
+
+        // English mode
+        expect(morningSlot.localizedTitle(false), equals('Weekend Equanimity'));
+        expect(
+          morningSlot.localizedBody(false),
+          contains(
+            'Time in nature, pure presence with loved ones. Mind in complete stillness.',
+          ),
+        );
+        expect(morningSlot.localizedCategory(false), equals('MORNING GROUNDING'));
+      },
+    );
+
+    test('All 7 days have non-empty bilingual English and Hindi content for all 4 slots', () {
+      final service = NotificationsDatasetService();
+      const days = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ];
+
+      for (final day in days) {
+        final slots = service.getTriggersForDay(day);
+        expect(slots.length, equals(4), reason: 'Day $day must have 4 slots');
+        for (final slot in slots) {
+          expect(slot.title.trim().isNotEmpty, isTrue);
+          expect(slot.body.trim().isNotEmpty, isTrue);
+          expect(slot.localizedTitle(true).trim().isNotEmpty, isTrue);
+          expect(slot.localizedBody(true).trim().isNotEmpty, isTrue);
+          expect(slot.localizedTitle(false).trim().isNotEmpty, isTrue);
+          expect(slot.localizedBody(false).trim().isNotEmpty, isTrue);
+          // In English mode, title should not be Devanagari
+          expect(
+            slot.localizedTitle(false),
+            isNot(equals(slot.localizedTitle(true))),
+            reason: 'Slot ${slot.category} on $day should have distinct English title',
+          );
+        }
+      }
     });
   });
 }

@@ -137,7 +137,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                   children: [
                     VoiceTtsButton(
                       textToSpeak: _showDataset && trigger != null
-                          ? '${trigger.title}. ${trigger.body}'
+                          ? '${trigger.localizedTitle(context.loc.isHindi)}. ${trigger.localizedBody(context.loc.isHindi)}'
                           : '${context.loc.getRuleTitle(widget.rule.id, widget.rule.title)}. ${context.loc.getRuleAphorism(widget.rule.id, widget.rule.aphorism)}. ${context.loc.isHindi ? "रणनीतिक निर्देश:" : "Tactical Directive:"} ${context.loc.getRuleTacticalAction(widget.rule.id, widget.rule.tacticalAction)}',
                       audioTopicKey: _showDataset && trigger != null
                           ? 'trigger_${trigger.id}'
@@ -157,8 +157,12 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                       icon: const Icon(Icons.sync_rounded, size: 18),
                       color: AppColors.textSecondary,
                       tooltip: _showDataset
-                          ? 'Cycle through today\'s 4 dataset slots'
-                          : 'Cycle to next Stoic rule',
+                          ? (context.loc.isHindi
+                              ? 'आज के ४ डेटासेट स्लॉट में बदलें'
+                              : 'Cycle through today\'s 4 dataset slots')
+                          : (context.loc.isHindi
+                              ? 'अगले स्थितप्रज्ञ नियम पर जाएं'
+                              : 'Cycle to next Stoic rule'),
                       splashRadius: 18,
                     ),
                   ],
@@ -195,7 +199,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    trigger.category.toUpperCase(),
+                    trigger.localizedCategory(context.loc.isHindi),
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 9.5,
@@ -207,13 +211,13 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
             ),
             const SizedBox(height: 8),
 
-            // Devanagari Title (e.g. "प्रातःकालीन लंगर")
+            // Localized Title (English in EN mode, Hindi in HI mode)
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppDimens.space16,
               ),
               child: Text(
-                trigger.title,
+                trigger.localizedTitle(context.loc.isHindi),
                 style: AppTextStyles.heading.copyWith(
                   fontSize: 19,
                   fontWeight: FontWeight.w700,
@@ -223,13 +227,13 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
             ),
             const SizedBox(height: 8),
 
-            // Devanagari Stoic Quote / Body
+            // Localized Stoic Quote / Body
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppDimens.space16,
               ),
               child: Text(
-                '"${trigger.body}"',
+                '"${trigger.localizedBody(context.loc.isHindi)}"',
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.textPrimary,
                   fontSize: 15.5,
@@ -260,7 +264,9 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Scheduled daily trigger from notifications_dataset.json',
+                      context.loc.isHindi
+                          ? 'डेटासेट से निर्धारित दैनिक स्मरण (notifications_dataset.json)'
+                          : 'Scheduled daily trigger from notifications_dataset.json',
                       style: AppTextStyles.bodySmall.copyWith(
                         fontSize: 11,
                         color: AppColors.textMuted,

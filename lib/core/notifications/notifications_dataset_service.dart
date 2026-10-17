@@ -54,6 +54,8 @@ class NotificationsDatasetService {
         title: slot['title'] as String? ?? '',
         body: slot['body'] as String? ?? '',
         category: slot['slot_name'] as String? ?? 'DEFENSIVE_SLOT',
+        titleEn: slot['title_en'] as String?,
+        bodyEn: slot['body_en'] as String?,
       );
     }).toList();
   }
@@ -83,18 +85,24 @@ class NotificationsDatasetService {
           "slot_name": "Morning Grounding",
           "title": "प्रातःकालीन लंगर",
           "body": "आज की घटनाओं पर आपका वश नहीं, अपनी प्रतिक्रिया पर शत-प्रतिशत नियंत्रण है।",
+          "title_en": "Morning Anchor",
+          "body_en": "External events are outside your control; your internal composure is one hundred percent yours.",
         },
         {
           "time": "09:00",
           "slot_name": "Work Entry Shield",
           "title": "द 3-सेकंड पॉज",
           "body": "उकसावे पर रुकें। कोई सफाई नहीं, केवल तटस्थ अवलोकन।",
+          "title_en": "The 3-Second Pause",
+          "body_en": "Pause when provoked. Offer zero defense, only neutral, unshakable observation.",
         },
         {
           "time": "14:00",
           "slot_name": "Mid-Day Audit",
           "title": "पारखी दृष्टि",
           "body": "आपके 'ना' कहने पर लोगों का व्यवहार बदला? बिना प्रतिक्रिया के केवल नोट करें।",
+          "title_en": "Perceptive Audit",
+          "body_en": "Did their demeanor shift when you established boundaries? Note without emotional reaction.",
         },
         {
           "time": "21:30",
@@ -102,6 +110,8 @@ class NotificationsDatasetService {
           "title": "3-इंडेक्स डायरी",
           "body":
               "आज का हिसाब बंद करें। 60 सेकंड में 3-इंडेक्स एंट्री पूरी करें।",
+          "title_en": "3-Index Debrief",
+          "body_en": "Close today's mental ledger. Complete your 60-second 3-index entry.",
         },
       ],
     },
