@@ -63,7 +63,8 @@ void main() {
 
       final gitaBreakdown =
           preSeeded.firstWhere((r) => r.id == 'seed_gita_ch2_breakdown');
-      expect(gitaBreakdown.mediaType, ResourceMediaType.youTube);
+      expect(gitaBreakdown.url, equals('https://gitaseva.org/'));
+      expect(gitaBreakdown.mediaType, ResourceMediaType.webLink);
     });
 
     test('ResourceLink serialization toMap and fromMap preserves data', () {

@@ -169,10 +169,10 @@ class ResourceLink {
         id: 'seed_gita_ch2_breakdown',
         title: 'Bhagavad Gita Chapter 2 Analytical Breakdown',
         category: 'Gita & Sthitaprajna',
-        mediaType: ResourceMediaType.youTube,
-        url: 'https://www.youtube.com/watch?v=2B_E4r_J2cE',
+        mediaType: ResourceMediaType.webLink,
+        url: 'https://gitaseva.org/',
         isUserAdded: false,
-        notes: 'In-depth breakdown of Sthitaprajna lakshana (qualities of the steady-minded executive).',
+        notes: 'In-depth breakdown of Sthitaprajna lakshana (qualities of the steady-minded executive) via GitaSeva.',
         createdAt: DateTime(2026, 1, 1),
       ),
       ResourceLink(

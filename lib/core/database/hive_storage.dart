@@ -56,10 +56,23 @@ class HiveStorage {
       _affirmationsBox = await Hive.openBox(HiveBoxes.affirmations);
       _mediaVaultBox = await Hive.openBox<Map>(HiveBoxes.mediaVault);
 
-      // Pre-seed verified public-domain resources on first launch
+      // Pre-seed or sync verified public-domain resources
       if (_resourceVaultBox.isEmpty) {
         for (final item in ResourceLink.preSeededResources()) {
           await _resourceVaultBox.put(item.id, item.toMap());
+        }
+      } else {
+        // Automatically sync updated default system links (without modifying custom user entries)
+        for (final item in ResourceLink.preSeededResources()) {
+          final existing = _resourceVaultBox.get(item.id);
+          if (existing == null) {
+            await _resourceVaultBox.put(item.id, item.toMap());
+          } else {
+            final isUserAdded = existing['isUserAdded'] as bool? ?? false;
+            if (!isUserAdded && existing['url'] != item.url) {
+              await _resourceVaultBox.put(item.id, item.toMap());
+            }
+          }
         }
       }
 
