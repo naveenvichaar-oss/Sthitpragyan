@@ -26,4 +26,7 @@ abstract class HiveBoxes {
 
   /// Box containing audio memos and video reflection recordings with stealth metadata
   static const String mediaVault = 'sthitaprajna_media_vault';
+
+  /// Box containing personal anchors, serene music, visual reflections, and comfort words
+  static const String joyReservoir = 'sthitaprajna_joy_reservoir';
 }

@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/journal/data/models/journal_models.dart';
 import '../../features/journal/data/models/media_record_log.dart';
+import '../../features/joy_reservoir/data/models/joy_item.dart';
 import '../../features/recovery/data/models/incident_slip_up_log.dart';
 import '../../features/settings/data/models/notification_slot_config.dart';
 import '../../features/wisdom/data/models/resource_link.dart';
@@ -27,6 +28,7 @@ class HiveStorage {
   late Box<Map> _resourceVaultBox;
   late Box _affirmationsBox;
   late Box<Map> _mediaVaultBox;
+  late Box<Map> _joyReservoirBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -55,6 +57,14 @@ class HiveStorage {
       _resourceVaultBox = await Hive.openBox<Map>(HiveBoxes.resourceVault);
       _affirmationsBox = await Hive.openBox(HiveBoxes.affirmations);
       _mediaVaultBox = await Hive.openBox<Map>(HiveBoxes.mediaVault);
+      _joyReservoirBox = await Hive.openBox<Map>(HiveBoxes.joyReservoir);
+
+      // Pre-seed starter anchors for Joy Reservoir if empty
+      if (_joyReservoirBox.isEmpty) {
+        for (final item in JoyItem.starterAnchors()) {
+          await _joyReservoirBox.put(item.id, item.toMap());
+        }
+      }
 
       // Pre-seed or sync verified public-domain resources
       if (_resourceVaultBox.isEmpty) {
@@ -455,4 +465,38 @@ class HiveStorage {
   Future<void> setStealthPin(String pin) async {
     await _settingsBox.put('stealth_vault_pin', pin);
   }
+
+  // ---------------------------------------------------------
+  // Joy Reservoir Operations (JoyItem - आनंद कोष)
+  // ---------------------------------------------------------
+
+  List<JoyItem> getAllJoyItems() {
+    final list = <JoyItem>[];
+    for (final raw in _joyReservoirBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        list.add(JoyItem.fromMap(map));
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing JoyItem: $e');
+      }
+    }
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list;
+  }
+
+  Future<void> saveJoyItem(JoyItem item) async {
+    await _joyReservoirBox.put(item.id, item.toMap());
+  }
+
+  Future<void> deleteJoyItem(String id) async {
+    await _joyReservoirBox.delete(id);
+  }
+
+  Future<void> resetJoyItemsToDefault() async {
+    await _joyReservoirBox.clear();
+    for (final item in JoyItem.starterAnchors()) {
+      await _joyReservoirBox.put(item.id, item.toMap());
+    }
+  }
 }
+

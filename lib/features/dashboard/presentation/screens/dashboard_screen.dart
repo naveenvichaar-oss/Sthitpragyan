@@ -16,6 +16,7 @@ import 'package:sthitaprajna/features/dashboard/presentation/widgets/sos_shield_
 import 'package:sthitaprajna/features/dashboard/presentation/widgets/streak_badge.dart';
 import 'package:sthitaprajna/features/journal/data/models/journal_models.dart';
 import 'package:sthitaprajna/features/journal/data/repositories/journal_repository.dart';
+import 'package:sthitaprajna/features/joy_reservoir/presentation/screens/joy_reservoir_screen.dart';
 import 'package:sthitaprajna/features/recovery/presentation/screens/post_incident_recovery_screen.dart';
 import 'package:sthitaprajna/features/settings/presentation/screens/settings_screen.dart';
 import 'package:sthitaprajna/features/sos/presentation/screens/sos_modal_sheet.dart';
@@ -238,12 +239,94 @@ class DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+
+                  // 7. Joy Reservoir (Soul Sanctuary / आनंद कोष) Card
+                  _buildJoyReservoirCard(),
                   const SizedBox(height: 16),
 
-                  // 6. Evening Debrief Status Bar
+                  // 8. Evening Debrief Status Bar
                   _buildDebriefStatusCard(isDebriefCompleted),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJoyReservoirCard() {
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        JoyReservoirScreen.open(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(AppDimens.space12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          border: Border.all(
+            color: const Color(0xFFF43F5E).withValues(alpha: 0.35),
+            width: 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF43F5E).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.spa_rounded,
+                size: 20,
+                color: Color(0xFFF43F5E),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'SOUL SANCTUARY • आनंद कोष',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: const Color(0xFFF43F5E),
+                          fontSize: 8.5,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'JOY RESERVOIR',
+                    style: AppTextStyles.heading,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Personal serene music, visual anchors & comfort words to recalibrate your mind.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: AppColors.textMuted,
             ),
           ],
         ),

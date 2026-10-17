@@ -5,6 +5,8 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../joy_reservoir/presentation/screens/joy_reservoir_screen.dart';
+import '../../../joy_reservoir/presentation/widgets/add_joy_item_modal_sheet.dart';
 import '../../../wisdom/data/models/resource_link.dart';
 import '../../../wisdom/data/models/wisdom_entry.dart';
 import '../../../wisdom/data/services/wisdom_vault_service.dart';
@@ -158,7 +160,25 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                 ),
               ),
             )
-          : null,
+          : _selectedMainSegment == 3
+              ? FloatingActionButton.extended(
+                  onPressed: () => AddJoyItemModalSheet.show(
+                    context,
+                    onSaved: () => setState(() {}),
+                  ),
+                  backgroundColor: AppColors.shieldPrimary,
+                  foregroundColor: AppColors.background,
+                  icon: const Icon(Icons.favorite_rounded, size: 20),
+                  label: Text(
+                    'ADD ANCHOR',
+                    style: AppTextStyles.labelBadge.copyWith(
+                      color: AppColors.background,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                  ),
+                )
+              : null,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -197,6 +217,19 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                       size: 24,
                     ),
                     tooltip: 'Add Custom Resource',
+                  )
+                else if (_selectedMainSegment == 3)
+                  IconButton(
+                    onPressed: () => AddJoyItemModalSheet.show(
+                      context,
+                      onSaved: () => setState(() {}),
+                    ),
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: AppColors.shieldPrimary,
+                      size: 24,
+                    ),
+                    tooltip: 'Add Personal Anchor',
                   ),
               ],
             ),
@@ -206,7 +239,9 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                   ? 'Classic Sthitaprajna shlokas, Western Stoicism, and Behavioral Psychology for unflinching executive composure.'
                   : _selectedMainSegment == 1
                       ? 'Curated public-domain literature, audio/video breakdowns, and your personal Google Drive & Keep notes.'
-                      : 'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.',
+                      : _selectedMainSegment == 2
+                          ? 'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.'
+                          : 'Your personal soul sanctuary (आनंद कोष): uplifting music, visual anchors, serene memories, and comfort words.',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -214,7 +249,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Top Segmented Switcher (Wisdom Cards / Resource Hub / Mental Models)
+            // Top Segmented Switcher (Wisdom Cards / Resource Hub / Mental Models / Joy Reservoir)
             _buildMainSegmentBar(),
             const SizedBox(height: 16),
 
@@ -223,8 +258,10 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               _buildWisdomCardsView()
             else if (_selectedMainSegment == 1)
               _buildResourceHubView()
+            else if (_selectedMainSegment == 2)
+              _buildMentalModelsView()
             else
-              _buildMentalModelsView(),
+              const JoyReservoirScreen(isEmbedded: true),
 
             const SizedBox(height: 60),
           ],
@@ -234,7 +271,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   }
 
   // ---------------------------------------------------------
-  // Main Segment Bar (Wisdom Cards / Resource Hub / Models)
+  // Main Segment Bar (Wisdom Cards / Resource Hub / Models / Joy)
   // ---------------------------------------------------------
   Widget _buildMainSegmentBar() {
     return Container(
@@ -244,63 +281,63 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
         border: Border.all(color: AppColors.borderSubtle),
       ),
-      child: Row(
-        children: [
-          _buildSegmentButton(0, 'WISDOM CARDS', Icons.auto_stories_rounded),
-          const SizedBox(width: 4),
-          _buildSegmentButton(1, 'RESOURCE HUB', Icons.hub_rounded),
-          const SizedBox(width: 4),
-          _buildSegmentButton(2, 'MENTAL MODELS', Icons.psychology_rounded),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildSegmentButton(0, 'WISDOM CARDS', Icons.auto_stories_rounded),
+            const SizedBox(width: 4),
+            _buildSegmentButton(1, 'RESOURCE HUB', Icons.hub_rounded),
+            const SizedBox(width: 4),
+            _buildSegmentButton(2, 'MENTAL MODELS', Icons.psychology_rounded),
+            const SizedBox(width: 4),
+            _buildSegmentButton(3, 'JOY RESERVOIR', Icons.spa_rounded),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildSegmentButton(int index, String label, IconData icon) {
     final isSelected = _selectedMainSegment == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          HapticService.selectionClick();
-          setState(() {
-            _selectedMainSegment = index;
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: isSelected ? AppColors.shieldPrimary : Colors.transparent,
-              width: 1.0,
+    return GestureDetector(
+      onTap: () {
+        HapticService.selectionClick();
+        setState(() {
+          _selectedMainSegment = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isSelected ? AppColors.shieldPrimary : Colors.transparent,
+            width: 1.0,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 13,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.textMuted,
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 13,
-                color: isSelected ? AppColors.shieldPrimary : AppColors.textMuted,
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: AppTextStyles.labelBadge.copyWith(
+                fontSize: 9.0,
+                color: isSelected
+                    ? AppColors.shieldPrimary
+                    : AppColors.textSecondary,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
-              const SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  label,
-                  style: AppTextStyles.labelBadge.copyWith(
-                    fontSize: 9.0,
-                    color: isSelected
-                        ? AppColors.shieldPrimary
-                        : AppColors.textSecondary,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+              maxLines: 1,
+            ),
+          ],
         ),
       ),
     );
