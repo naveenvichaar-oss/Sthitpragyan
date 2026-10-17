@@ -5,6 +5,8 @@ enum ResourceMediaType {
   youTube,
   drivePdf,
   googleKeep,
+  substack,
+  socialMedia,
   webLink;
 
   String get displayName {
@@ -15,6 +17,10 @@ enum ResourceMediaType {
         return 'Google Drive PDF';
       case ResourceMediaType.googleKeep:
         return 'Google Keep';
+      case ResourceMediaType.substack:
+        return 'Substack Publication';
+      case ResourceMediaType.socialMedia:
+        return 'Social Media Post';
       case ResourceMediaType.webLink:
         return 'Web Article / Archive';
     }
@@ -28,6 +34,10 @@ enum ResourceMediaType {
         return 'DRIVE PDF';
       case ResourceMediaType.googleKeep:
         return 'KEEP NOTE';
+      case ResourceMediaType.substack:
+        return 'SUBSTACK';
+      case ResourceMediaType.socialMedia:
+        return 'SOCIAL';
       case ResourceMediaType.webLink:
         return 'WEB LINK';
     }
@@ -41,6 +51,10 @@ enum ResourceMediaType {
         return Icons.picture_as_pdf_rounded;
       case ResourceMediaType.googleKeep:
         return Icons.note_alt_rounded;
+      case ResourceMediaType.substack:
+        return Icons.newspaper_rounded;
+      case ResourceMediaType.socialMedia:
+        return Icons.public_rounded;
       case ResourceMediaType.webLink:
         return Icons.language_rounded;
     }
@@ -54,6 +68,10 @@ enum ResourceMediaType {
         return const Color(0xFF3B82F6); // Blue
       case ResourceMediaType.googleKeep:
         return const Color(0xFFF59E0B); // Amber / Yellow
+      case ResourceMediaType.substack:
+        return const Color(0xFFFF6719); // Substack iconic Orange
+      case ResourceMediaType.socialMedia:
+        return const Color(0xFF8B5CF6); // Violet / Purple
       case ResourceMediaType.webLink:
         return const Color(0xFF10B981); // Emerald / Green
     }
@@ -72,6 +90,12 @@ enum ResourceMediaType {
       case 'google_keep':
       case 'keep':
         return ResourceMediaType.googleKeep;
+      case 'substack':
+        return ResourceMediaType.substack;
+      case 'socialmedia':
+      case 'social_media':
+      case 'social':
+        return ResourceMediaType.socialMedia;
       default:
         return ResourceMediaType.webLink;
     }
@@ -85,6 +109,10 @@ enum ResourceMediaType {
         return 'DrivePDF';
       case ResourceMediaType.googleKeep:
         return 'GoogleKeep';
+      case ResourceMediaType.substack:
+        return 'Substack';
+      case ResourceMediaType.socialMedia:
+        return 'SocialMedia';
       case ResourceMediaType.webLink:
         return 'WebLink';
     }
@@ -130,6 +158,19 @@ class ResourceLink {
     }
     if (lower.contains('keep.google.com')) {
       return ResourceMediaType.googleKeep;
+    }
+    if (lower.contains('substack.com')) {
+      return ResourceMediaType.substack;
+    }
+    if (lower.contains('x.com') ||
+        lower.contains('twitter.com') ||
+        lower.contains('linkedin.com') ||
+        lower.contains('reddit.com') ||
+        lower.contains('instagram.com') ||
+        lower.contains('threads.net') ||
+        lower.contains('facebook.com') ||
+        lower.contains('bsky.app')) {
+      return ResourceMediaType.socialMedia;
     }
     return ResourceMediaType.webLink;
   }

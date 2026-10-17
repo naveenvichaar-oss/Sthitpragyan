@@ -40,11 +40,16 @@ void main() {
       expect(ResourceMediaType.fromString('youtube'), ResourceMediaType.youTube);
       expect(ResourceMediaType.fromString('DrivePDF'), ResourceMediaType.drivePdf);
       expect(ResourceMediaType.fromString('googlekeep'), ResourceMediaType.googleKeep);
+      expect(ResourceMediaType.fromString('substack'), ResourceMediaType.substack);
+      expect(ResourceMediaType.fromString('socialmedia'), ResourceMediaType.socialMedia);
+      expect(ResourceMediaType.fromString('social'), ResourceMediaType.socialMedia);
       expect(ResourceMediaType.fromString('unknown'), ResourceMediaType.webLink);
 
       expect(ResourceMediaType.youTube.badgeLabel, 'YOUTUBE');
       expect(ResourceMediaType.drivePdf.badgeLabel, 'DRIVE PDF');
       expect(ResourceMediaType.googleKeep.badgeLabel, 'KEEP NOTE');
+      expect(ResourceMediaType.substack.badgeLabel, 'SUBSTACK');
+      expect(ResourceMediaType.socialMedia.badgeLabel, 'SOCIAL');
       expect(ResourceMediaType.webLink.badgeLabel, 'WEB LINK');
     });
 
@@ -91,7 +96,7 @@ void main() {
       expect(reconstituted.notes, original.notes);
     });
 
-    test('detectMediaTypeFromUrl accurately detects YouTube, Drive, and Keep', () {
+    test('detectMediaTypeFromUrl accurately detects YouTube, Drive, Keep, Substack, and Social Media', () {
       expect(
         ResourceLink.detectMediaTypeFromUrl('https://www.youtube.com/watch?v=ha7dSOotgsaA&list=PL123'),
         ResourceMediaType.youTube,
@@ -117,12 +122,28 @@ void main() {
         ResourceMediaType.googleKeep,
       );
       expect(
+        ResourceLink.detectMediaTypeFromUrl('https://thestoic.substack.com/p/detachment'),
+        ResourceMediaType.substack,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://x.com/naval/status/123456'),
+        ResourceMediaType.socialMedia,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://twitter.com/naval/status/123456'),
+        ResourceMediaType.socialMedia,
+      );
+      expect(
+        ResourceLink.detectMediaTypeFromUrl('https://www.linkedin.com/posts/executive-stoicism'),
+        ResourceMediaType.socialMedia,
+      );
+      expect(
         ResourceLink.detectMediaTypeFromUrl('https://classics.mit.edu/Antoninus/meditations.html'),
         ResourceMediaType.webLink,
       );
     });
 
-    test('effectiveMediaType and fromMap automatically upgrades YouTube links saved as WebLink', () {
+    test('effectiveMediaType and fromMap automatically upgrades YouTube, Substack, and Social links saved as WebLink', () {
       final legacySavedMap = {
         'id': 'res_user_yt_1',
         'title': 'Exercises for Mastering the Laws of Human Nature',
@@ -142,6 +163,36 @@ void main() {
       // Serializing back writes 'YouTube'
       final upgradedMap = link.toMap();
       expect(upgradedMap['mediaType'], 'YouTube');
+
+      // Substack auto-upgrade
+      final substackMap = {
+        'id': 'res_user_sub_1',
+        'title': 'The Daily Stoic Letter',
+        'category': 'Western Stoicism',
+        'mediaType': 'WebLink',
+        'url': 'https://ryanholiday.substack.com/p/stillness-rules',
+        'isUserAdded': true,
+        'createdAt': DateTime(2026, 10, 17).toIso8601String(),
+      };
+      final substackLink = ResourceLink.fromMap(substackMap);
+      expect(substackLink.mediaType, ResourceMediaType.substack);
+      expect(substackLink.effectiveMediaType, ResourceMediaType.substack);
+      expect(substackLink.toMap()['mediaType'], 'Substack');
+
+      // Social Media auto-upgrade
+      final socialMap = {
+        'id': 'res_user_soc_1',
+        'title': 'Naval on Judgment',
+        'category': 'Executive Protocols',
+        'mediaType': 'WebLink',
+        'url': 'https://x.com/naval/status/1005307921200138240',
+        'isUserAdded': true,
+        'createdAt': DateTime(2026, 10, 17).toIso8601String(),
+      };
+      final socialLink = ResourceLink.fromMap(socialMap);
+      expect(socialLink.mediaType, ResourceMediaType.socialMedia);
+      expect(socialLink.effectiveMediaType, ResourceMediaType.socialMedia);
+      expect(socialLink.toMap()['mediaType'], 'SocialMedia');
     });
   });
 

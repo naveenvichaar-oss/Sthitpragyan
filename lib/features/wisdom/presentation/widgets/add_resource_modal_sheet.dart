@@ -323,7 +323,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
                 style: AppTextStyles.bodyMedium,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(
-                  hintText: 'https://youtube.com/... or https://drive.google.com/...',
+                  hintText: 'https://youtube.com/..., substack.com/..., or x.com/...',
                   hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                   filled: true,
                   fillColor: AppColors.surfaceElevated,

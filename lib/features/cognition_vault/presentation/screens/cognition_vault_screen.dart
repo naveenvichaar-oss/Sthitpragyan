@@ -423,6 +423,10 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         _resources.where((r) => r.effectiveMediaType == ResourceMediaType.drivePdf).length;
     final keepCount =
         _resources.where((r) => r.effectiveMediaType == ResourceMediaType.googleKeep).length;
+    final substackCount =
+        _resources.where((r) => r.effectiveMediaType == ResourceMediaType.substack).length;
+    final socialCount =
+        _resources.where((r) => r.effectiveMediaType == ResourceMediaType.socialMedia).length;
     final webCount =
         _resources.where((r) => r.effectiveMediaType == ResourceMediaType.webLink).length;
 
@@ -441,6 +445,10 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               _buildResourceFilterChip('DrivePDF', 'DRIVE PDF ($driveCount)'),
               const SizedBox(width: 6),
               _buildResourceFilterChip('GoogleKeep', 'GOOGLE KEEP ($keepCount)'),
+              const SizedBox(width: 6),
+              _buildResourceFilterChip('Substack', 'SUBSTACK ($substackCount)'),
+              const SizedBox(width: 6),
+              _buildResourceFilterChip('SocialMedia', 'SOCIAL MEDIA ($socialCount)'),
               const SizedBox(width: 6),
               _buildResourceFilterChip('WebLink', 'WEB ARCHIVE ($webCount)'),
             ],
