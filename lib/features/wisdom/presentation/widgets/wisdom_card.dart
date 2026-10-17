@@ -143,6 +143,7 @@ class _WisdomCardState extends State<WisdomCard> {
                           ),
                         VoiceTtsButton(
                           textToSpeak: '${widget.entry.title}. ${widget.entry.originalText}. ${widget.entry.translation}. Executive Takeaway: ${widget.entry.executiveTakeaway}',
+                          audioTopicKey: 'wisdom_${widget.entry.id}',
                           size: 16,
                           tooltip: 'Listen to passage in calm voice',
                         ),

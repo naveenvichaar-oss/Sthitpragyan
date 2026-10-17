@@ -171,6 +171,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                 children: [
                   VoiceTtsButton(
                     textToSpeak: '${_currentWisdom.title}. ${_currentWisdom.originalText}. ${_currentWisdom.translation}. Executive Takeaway: ${_currentWisdom.executiveTakeaway}',
+                    audioTopicKey: 'wisdom_${_currentWisdom.id}',
                     tooltip: 'Listen to wisdom readout',
                   ),
                   const SizedBox(width: 4),

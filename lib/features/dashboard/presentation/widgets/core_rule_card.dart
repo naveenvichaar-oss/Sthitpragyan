@@ -139,6 +139,9 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                       textToSpeak: _showDataset && trigger != null
                           ? '${trigger.title}. ${trigger.body}'
                           : '${context.loc.getRuleTitle(widget.rule.id, widget.rule.title)}. ${context.loc.getRuleAphorism(widget.rule.id, widget.rule.aphorism)}. ${context.loc.isHindi ? "रणनीतिक निर्देश:" : "Tactical Directive:"} ${context.loc.getRuleTacticalAction(widget.rule.id, widget.rule.tacticalAction)}',
+                      audioTopicKey: _showDataset && trigger != null
+                          ? 'trigger_${trigger.id}'
+                          : 'rule_${widget.rule.id}',
                       tooltip: context.loc.listenWithCalmVoice,
                     ),
                     const SizedBox(width: 4),

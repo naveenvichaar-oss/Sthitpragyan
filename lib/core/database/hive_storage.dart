@@ -308,6 +308,27 @@ class HiveStorage {
   }
 
   // ---------------------------------------------------------
+  // Custom Audio Recording Overrides (Voice Memos)
+  // ---------------------------------------------------------
+
+  String? getCustomAudioOverride(String topicKey) {
+    final path = _settingsBox.get('custom_audio_$topicKey') as String?;
+    return (path != null && path.trim().isNotEmpty) ? path : null;
+  }
+
+  Future<void> setCustomAudioOverride(String topicKey, String? audioFilePath) async {
+    if (audioFilePath == null || audioFilePath.isEmpty) {
+      await _settingsBox.delete('custom_audio_$topicKey');
+    } else {
+      await _settingsBox.put('custom_audio_$topicKey', audioFilePath);
+    }
+  }
+
+  bool hasCustomAudioOverride(String topicKey) {
+    return getCustomAudioOverride(topicKey) != null;
+  }
+
+  // ---------------------------------------------------------
   // Custom Dynamic Notification Slots
   // ---------------------------------------------------------
 

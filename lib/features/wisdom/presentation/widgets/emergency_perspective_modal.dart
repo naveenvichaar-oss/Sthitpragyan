@@ -139,6 +139,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                   VoiceTtsButton(
                     textToSpeak:
                         '${entry.title}. ${entry.originalText}. ${entry.translation}. Takeaway: ${entry.executiveTakeaway}',
+                    audioTopicKey: 'wisdom_${entry.id}',
                     size: 20,
                     tooltip: 'Listen to emergency perspective',
                   ),

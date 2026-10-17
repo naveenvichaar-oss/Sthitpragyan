@@ -110,6 +110,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                   children: [
                     VoiceTtsButton(
                       textToSpeak: widget.script.executiveScript,
+                      audioTopicKey: 'sos_script_${widget.script.id}',
                       size: 19,
                       color: AppColors.textMuted,
                       tooltip: 'Listen to deflection script',
