@@ -282,7 +282,7 @@ class AppLocalizations {
       : 'Reset to Factory Blueprints';
 
   // -------------------------------------------------------------
-  // Daily Journal & Evening Audit
+  // Daily Journal & Evening Audit (3-Index Debrief)
   // -------------------------------------------------------------
   String get dailyJournalTitle => isHindi
       ? 'त्रिसूत्री दैनिक समीक्षा'
@@ -296,6 +296,145 @@ class AppLocalizations {
   String get debriefLoggedScore => isHindi
       ? 'दर्ज समत्व'
       : 'Logged Score';
+  String get eveningLogBadge => isHindi
+      ? '६०-सेकंड संध्या समीक्षा'
+      : '60-SECOND EVENING LOG';
+  String get dailyClosureTitle => isHindi
+      ? 'दैनिक हिसाब (Daily Closure)'
+      : 'Daily Closure (Evening Audit)';
+  String get debriefLockedBadge => isHindi
+      ? 'हिसाब बंद (LOCKED)'
+      : 'LOCKED (DEBRIEF COMPLETED)';
+  String get debriefPendingBadge => isHindi
+      ? 'लंबित (PENDING)'
+      : 'PENDING';
+  String get dailyClosureDesc => isHindi
+      ? '60 सेकंड में मानसिक शटडाउन। उकसावे पर चित्त की स्थिरता, मर्यादा की जाँच और आज का ठोस आउटपुट दर्ज करें।'
+      : '60-second mental shutdown. Record reaction composure under provocation, boundary integrity, and core solid output.';
+  String get tab3IndexDebrief => isHindi
+      ? '३-सूत्री समीक्षा'
+      : '3-INDEX DEBRIEF';
+  String get tabMediaVault => isHindi
+      ? 'मीडिया कोष'
+      : 'MEDIA VAULT';
+
+  // Index 01: Reaction Score
+  String get index01Badge => isHindi ? 'सूचकांक ०१' : 'INDEX 01';
+  String get index01Title => isHindi ? 'प्रतिक्रिया समत्व' : 'REACTION SCORE';
+  String get index01Question => isHindi
+      ? 'आज उकसावे पर चित्त कितना स्थिर रहा?'
+      : 'How composed was your mind under provocation today?';
+  String reactionScoreLabel(int score) {
+    if (isHindi) {
+      switch (score) {
+        case 1:
+          return '१: नियंत्रण खोया (भड़का)';
+        case 2:
+          return '२: तनाव में बोला (उद्विग्न)';
+        case 3:
+          return '३: तटस्थ व सामान्य';
+        case 4:
+          return '४: पूर्ण नियंत्रण (स्थिर चित्त)';
+        case 5:
+          return '५: स्थितप्रज्ञ (अचल समत्व)';
+        default:
+          return '३: तटस्थ व सामान्य';
+      }
+    } else {
+      switch (score) {
+        case 1:
+          return '1: Lost Control (Agitated)';
+        case 2:
+          return '2: Under Strain (Reactive)';
+        case 3:
+          return '3: Neutral / Composed';
+        case 4:
+          return '4: High Poise (Controlled)';
+        case 5:
+          return '5: Absolute Stoic Poise';
+        default:
+          return '3: Neutral / Composed';
+      }
+    }
+  }
+
+  // Index 02: Boundary Integrity
+  String get index02Badge => isHindi ? 'सूचकांक ०२' : 'INDEX 02';
+  String get index02Title => isHindi ? 'मर्यादा व सीमा रक्षा' : 'BOUNDARY INTEGRITY';
+  String get boundaryMaintainedBadge => isHindi ? 'मर्यादा सुरक्षित' : 'BOUNDARY PRESERVED';
+  String get boundaryCompromisedBadge => isHindi ? 'सीमा खंडित' : 'BOUNDARY COMPROMISED';
+  String get index02Question => isHindi
+      ? 'क्या आज बिना सफाई दिए \'ना\' कहने की मर्यादा बची रही?'
+      : 'Did you preserve dignity by saying \'No\' without over-explaining?';
+  String get boundaryYesButton => isHindi
+      ? 'हाँ (मर्यादा सुरक्षित)'
+      : 'YES (Boundary Preserved)';
+  String get boundaryNoButton => isHindi
+      ? 'नहीं (समझौता हुआ)'
+      : 'NO (Compromised)';
+
+  // Index 03: Core Solid Output
+  String get index03Badge => isHindi ? 'सूचकांक ०३' : 'INDEX 03';
+  String get index03Title => isHindi ? 'ठोस मौलिक आउटपुट' : 'CORE SOLID OUTPUT';
+  String get index03Tag => isHindi ? 'मौलिक • एक पंक्ति' : 'ZERO-AI • SINGLE-LINE';
+  String get index03OutputQuestion => isHindi
+      ? 'आज का सबसे ठोस, मौलिक (Zero-AI) आउटपुट:'
+      : 'Today\'s single most solid, original (Zero-AI) output:';
+  String get index03OutputHint => isHindi
+      ? 'उदा. कॉर्पोरेट टैक्स पर 800 शब्दों का एक्सक्लूसिव विश्लेषण'
+      : 'e.g. 800-word deep analytical breakdown on corporate policy';
+  String get index03ProvocationQuestion => isHindi
+      ? 'उकसावे का समाधान / रणनीतिक सीख (Optional 1-liner):'
+      : 'Provocation resolution / Tactical insight (Optional 1-liner):';
+  String get index03ProvocationHint => isHindi
+      ? 'उदा. मीटिंग में 4 सेकंड पॉज देकर बात संभाली'
+      : 'e.g. Took a 4-second pause before answering in the team sync';
+
+  // Media Audit Section
+  String get mediaAuditBadge => isHindi ? 'मीडिया समीक्षा' : 'MEDIA AUDIT';
+  String get mediaAuditTitle => isHindi ? 'चिंतनशील मीडिया (वैकल्पिक)' : 'REFLECTIVE MEDIA (OPTIONAL)';
+  String get onDeviceBadge => isHindi ? 'शत-प्रतिशत डिवाइस पर' : '100% ON-DEVICE';
+  String get mediaAuditDesc => isHindi
+      ? 'त्वरित मौखिक ऑडियो मेमो या 60-सेकंड का शांत भाव मुद्रा वीडियो दर्ज करें।'
+      : 'Capture a discreet verbal audio memo or a 60-second front-camera composure review.';
+  String get verbalMemoAttached => isHindi ? 'ऑडियो मेमो संलग्न' : 'VERBAL MEMO ATTACHED';
+  String get quickAudioMemo => isHindi ? 'त्वरित ऑडियो मेमो' : 'QUICK AUDIO MEMO';
+  String get audioMemoSavedSub => isHindi
+      ? 'समीक्षा के साथ ऑफ़लाइन ऑडियो सुरक्षित'
+      : 'Local audio note saved with audit';
+  String get audioMemoRecordSub => isHindi
+      ? 'शांत स्वर में आत्म-चिंतन रिकॉर्ड करें'
+      : 'Record discrete spoken reflections';
+  String get videoDrillSaved => isHindi ? 'वीडियो समीक्षा सुरक्षित' : 'VIDEO DRILL SAVED';
+  String get videoDrillTitle => isHindi ? '६०-से. मुद्रा समीक्षा' : '60S VIDEO DRILL';
+  String get videoDrillSavedSub => isHindi
+      ? 'चेहरे व मुद्रा की शांत समीक्षा दर्ज'
+      : 'Front-lens posture review recorded';
+  String get videoDrillRecordSub => isHindi
+      ? 'शारीरिक स्थिरता व जबड़े का तनाव जांचें'
+      : 'Review jaw poise and physical calmness';
+  String get openFullMediaVault => isHindi
+      ? 'सम्पूर्ण मीडिया कोष एवं सुरक्षित संग्रह खोलें'
+      : 'OPEN FULL MEDIA VAULT & STEALTH REPOSITORY';
+
+  // Bottom Buttons
+  String get lockDayButton => isHindi
+      ? 'हिसाब बंद करें (Lock Day)'
+      : 'Lock Daily Debrief';
+  String get updateDayButton => isHindi
+      ? 'हिसाब अपडेट करें (Update Lock)'
+      : 'Update Daily Debrief';
+
+  // Past Debriefs List
+  String pastDebriefsCount(int count) => isHindi
+      ? 'दैनिक हिसाब इतिहास ($count)'
+      : 'Daily Debrief History ($count)';
+  String get noPastDebriefsMsg => isHindi
+      ? 'कोई पूर्व दैनिक हिसाब उपलब्ध नहीं'
+      : 'No past debrief logs available yet';
+  String get noPastDebriefsSub => isHindi
+      ? 'आज का 60-सेकंड हिसाब ऊपर पूरा करें।'
+      : 'Complete today\'s 60-second audit above to start your streak.';
 
   // -------------------------------------------------------------
   // Settings Screen & Notification Controls

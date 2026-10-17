@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/date_helpers.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/journal_models.dart';
@@ -72,20 +73,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   String _getReactionScoreLabel(int score) {
-    switch (score) {
-      case 1:
-        return '1: भड़का (Lost Control)';
-      case 2:
-        return '2: तनाव में बोला (Under Strain)';
-      case 3:
-        return '3: न्यूट्रल रहा (Neutral)';
-      case 4:
-        return '4: पूर्ण नियंत्रण (High Poise)';
-      case 5:
-        return '5: स्थितप्रज्ञ (Absolute Stoic)';
-      default:
-        return '3: न्यूट्रल रहा';
-    }
+    return context.loc.reactionScoreLabel(score);
   }
 
   Color _getReactionColor(int score) {
@@ -112,7 +100,9 @@ class _JournalScreenState extends State<JournalScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'आउटपुट अनिवार्य है: आज का कोई एक ठोस deliverable या सीख दर्ज करें।',
+            context.loc.isHindi
+                ? 'आउटपुट अनिवार्य है: आज का कोई एक ठोस deliverable या सीख दर्ज करें।'
+                : 'Output required: Please enter today\'s primary deliverable or strategic insight.',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.background,
             ),
@@ -168,7 +158,9 @@ class _JournalScreenState extends State<JournalScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'आज का हिसाब पूरा हुआ। तनाव यहीं विसर्जित है। (Equanimity: ${entry.compositeScore}%)',
+                  context.loc.isHindi
+                      ? 'आज का हिसाब पूरा हुआ। तनाव यहीं विसर्जित है। (Equanimity: ${entry.compositeScore}%)'
+                      : 'Daily closure complete. Mental detachment secured. (Equanimity: ${entry.compositeScore}%)',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.background,
                     fontWeight: FontWeight.w600,
@@ -205,7 +197,7 @@ class _JournalScreenState extends State<JournalScreen> {
             vertical: AppDimens.space16,
           ),
           children: [
-            // Screen Header: "दैनिक हिसाब (Daily Closure)"
+            // Screen Header: Daily Closure (Evening Audit)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -213,15 +205,15 @@ class _JournalScreenState extends State<JournalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '60-SECOND EVENING LOG',
+                      context.loc.eveningLogBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
                         letterSpacing: 2.0,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text(
-                      'दैनिक हिसाब (Daily Closure)',
+                    Text(
+                      context.loc.dailyClosureTitle,
                       style: AppTextStyles.displayMedium,
                     ),
                   ],
@@ -243,7 +235,9 @@ class _JournalScreenState extends State<JournalScreen> {
                     ),
                   ),
                   child: Text(
-                    isAlreadyLogged ? 'हिसाब बंद (LOCKED)' : 'लंबित (PENDING)',
+                    isAlreadyLogged
+                        ? context.loc.debriefLockedBadge
+                        : context.loc.debriefPendingBadge,
                     style: AppTextStyles.labelBadge.copyWith(
                       color: isAlreadyLogged
                           ? AppColors.emeraldSuccess
@@ -256,7 +250,7 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              '60 सेकंड में मानसिक शटडाउन। उकसावे पर चित्त की स्थिरता, मर्यादा की जाँच और आज का ठोस आउटपुट दर्ज करें।',
+              context.loc.dailyClosureDesc,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -296,7 +290,7 @@ class _JournalScreenState extends State<JournalScreen> {
                               : null,
                         ),
                         child: Text(
-                          '3-INDEX DEBRIEF',
+                          context.loc.tab3IndexDebrief,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: _activeTab == 0 ? FontWeight.w700 : FontWeight.w500,
@@ -333,7 +327,7 @@ class _JournalScreenState extends State<JournalScreen> {
                             const Icon(Icons.shield_outlined, size: 13, color: AppColors.shieldPrimary),
                             const SizedBox(width: 6),
                             Text(
-                              'MEDIA VAULT',
+                              context.loc.tabMediaVault,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: _activeTab == 1 ? FontWeight.w700 : FontWeight.w500,
@@ -385,7 +379,7 @@ class _JournalScreenState extends State<JournalScreen> {
                               border: Border.all(color: AppColors.borderSubtle),
                             ),
                             child: Text(
-                              'INDEX 01',
+                              context.loc.index01Badge,
                               style: AppTextStyles.labelBadge.copyWith(
                                 color: AppColors.shieldPrimary,
                                 fontSize: 9.5,
@@ -394,7 +388,7 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'REACTION SCORE',
+                            context.loc.index01Title,
                             style: AppTextStyles.heading.copyWith(
                               fontSize: 14.5,
                             ),
@@ -412,7 +406,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'आज उकसावे पर चित्त कितना स्थिर रहा?',
+                    context.loc.index01Question,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
@@ -505,7 +499,7 @@ class _JournalScreenState extends State<JournalScreen> {
                               border: Border.all(color: AppColors.borderSubtle),
                             ),
                             child: Text(
-                              'INDEX 02',
+                              context.loc.index02Badge,
                               style: AppTextStyles.labelBadge.copyWith(
                                 color: AppColors.shieldPrimary,
                                 fontSize: 9.5,
@@ -514,7 +508,7 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'BOUNDARY INTEGRITY',
+                            context.loc.index02Title,
                             style: AppTextStyles.heading.copyWith(
                               fontSize: 14.5,
                             ),
@@ -522,7 +516,9 @@ class _JournalScreenState extends State<JournalScreen> {
                         ],
                       ),
                       Text(
-                        _boundaryMaintained ? 'मर्यादा सुरक्षित' : 'सीमा खंडित',
+                        _boundaryMaintained
+                            ? context.loc.boundaryMaintainedBadge
+                            : context.loc.boundaryCompromisedBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: _boundaryMaintained
                               ? AppColors.emeraldSuccess
@@ -534,7 +530,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'क्या आज बिना सफाई दिए \'ना\' कहने की मर्यादा बची रही?',
+                    context.loc.index02Question,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
@@ -610,7 +606,7 @@ class _JournalScreenState extends State<JournalScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'हाँ (YES • मर्यादा बची)',
+                                  context.loc.boundaryYesButton,
                                   style: AppTextStyles.button.copyWith(
                                     fontSize: 12,
                                     color: _boundaryMaintained
@@ -663,7 +659,7 @@ class _JournalScreenState extends State<JournalScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'नहीं (NO • समझौता हुआ)',
+                                  context.loc.boundaryNoButton,
                                   style: AppTextStyles.button.copyWith(
                                     fontSize: 12,
                                     color: !_boundaryMaintained
@@ -717,7 +713,7 @@ class _JournalScreenState extends State<JournalScreen> {
                               border: Border.all(color: AppColors.borderSubtle),
                             ),
                             child: Text(
-                              'INDEX 03',
+                              context.loc.index03Badge,
                               style: AppTextStyles.labelBadge.copyWith(
                                 color: AppColors.shieldPrimary,
                                 fontSize: 9.5,
@@ -726,7 +722,7 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'CORE SOLID OUTPUT',
+                            context.loc.index03Title,
                             style: AppTextStyles.heading.copyWith(
                               fontSize: 14.5,
                             ),
@@ -734,7 +730,7 @@ class _JournalScreenState extends State<JournalScreen> {
                         ],
                       ),
                       Text(
-                        'ZERO-AI • SINGLE-LINE',
+                        context.loc.index03Tag,
                         style: AppTextStyles.labelBadge.copyWith(
                           fontSize: 9.0,
                           color: AppColors.textMuted,
@@ -744,7 +740,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'आज का सबसे ठोस, मौलिक (Zero-AI) आउटपुट:',
+                    context.loc.index03OutputQuestion,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
@@ -761,7 +757,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'उदा. कॉर्पोरेट टैक्स पर 800 शब्दों का एक्सक्लूसिव विश्लेषण',
+                      hintText: context.loc.index03OutputHint,
                       hintStyle: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textMuted,
                         fontSize: 12.5,
@@ -781,7 +777,7 @@ class _JournalScreenState extends State<JournalScreen> {
 
                   // Optional Strategic Reflection
                   Text(
-                    'उकसावे का समाधान / रणनीतिक सीख (Optional 1-liner):',
+                    context.loc.index03ProvocationQuestion,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 12.0,
@@ -797,7 +793,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       fontWeight: FontWeight.w400,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'उदा. मीटिंग में 4 सेकंड पॉज देकर बात संभाली',
+                      hintText: context.loc.index03ProvocationHint,
                       hintStyle: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textMuted,
                         fontSize: 12.5,
@@ -847,7 +843,7 @@ class _JournalScreenState extends State<JournalScreen> {
                               border: Border.all(color: AppColors.borderSubtle),
                             ),
                             child: Text(
-                              'MEDIA AUDIT',
+                              context.loc.mediaAuditBadge,
                               style: AppTextStyles.labelBadge.copyWith(
                                 color: AppColors.shieldPrimary,
                                 fontSize: 9.5,
@@ -856,13 +852,13 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'REFLECTIVE MEDIA (OPTIONAL)',
+                            context.loc.mediaAuditTitle,
                             style: AppTextStyles.heading.copyWith(fontSize: 14.0),
                           ),
                         ],
                       ),
                       Text(
-                        '100% ON-DEVICE',
+                        context.loc.onDeviceBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           fontSize: 9.0,
                           color: AppColors.textMuted,
@@ -872,7 +868,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Capture a discreet verbal audio memo or a 60-second front-camera composure review.',
+                    context.loc.mediaAuditDesc,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 12.0,
@@ -919,8 +915,8 @@ class _JournalScreenState extends State<JournalScreen> {
                             children: [
                               Text(
                                 _audioMemoPath != null
-                                    ? 'VERBAL MEMO ATTACHED'
-                                    : 'QUICK AUDIO MEMO',
+                                    ? context.loc.verbalMemoAttached
+                                    : context.loc.quickAudioMemo,
                                 style: AppTextStyles.labelBadge.copyWith(
                                   color: _audioMemoPath != null
                                       ? AppColors.emeraldSuccess
@@ -931,8 +927,8 @@ class _JournalScreenState extends State<JournalScreen> {
                               const SizedBox(height: 2),
                               Text(
                                 _audioMemoPath != null
-                                    ? 'Local audio note saved with audit'
-                                    : 'Record discrete spoken reflections',
+                                    ? context.loc.audioMemoSavedSub
+                                    : context.loc.audioMemoRecordSub,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.textMuted,
                                   fontSize: 11,
@@ -986,7 +982,9 @@ class _JournalScreenState extends State<JournalScreen> {
                             visualDensity: VisualDensity.compact,
                           ),
                           child: Text(
-                            _audioMemoPath != null ? 'UPDATE' : 'RECORD',
+                            _audioMemoPath != null
+                                ? (context.loc.isHindi ? 'बदलें' : 'UPDATE')
+                                : (context.loc.isHindi ? 'रिकॉर्ड' : 'RECORD'),
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -1037,8 +1035,8 @@ class _JournalScreenState extends State<JournalScreen> {
                             children: [
                               Text(
                                 _videoReflectionPath != null
-                                    ? 'COMPOSURE DRILL ATTACHED'
-                                    : '60-SECOND COMPOSURE DRILL',
+                                    ? context.loc.videoDrillSaved
+                                    : context.loc.videoDrillTitle,
                                 style: AppTextStyles.labelBadge.copyWith(
                                   color: _videoReflectionPath != null
                                       ? AppColors.emeraldSuccess
@@ -1049,8 +1047,8 @@ class _JournalScreenState extends State<JournalScreen> {
                               const SizedBox(height: 2),
                               Text(
                                 _videoReflectionPath != null
-                                    ? 'Front-lens posture review recorded'
-                                    : 'Review jaw poise and physical calmness',
+                                    ? context.loc.videoDrillSavedSub
+                                    : context.loc.videoDrillRecordSub,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.textMuted,
                                   fontSize: 11,
@@ -1105,7 +1103,9 @@ class _JournalScreenState extends State<JournalScreen> {
                             visualDensity: VisualDensity.compact,
                           ),
                           child: Text(
-                            _videoReflectionPath != null ? 'RETAKE' : 'REVIEW',
+                            _videoReflectionPath != null
+                                ? (context.loc.isHindi ? 'पुनः लें' : 'RETAKE')
+                                : (context.loc.isHindi ? 'समीक्षा' : 'REVIEW'),
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -1139,7 +1139,7 @@ class _JournalScreenState extends State<JournalScreen> {
                           const Icon(Icons.shield_outlined, size: 14, color: AppColors.shieldPrimary),
                           const SizedBox(width: 8),
                           Text(
-                            'OPEN FULL MEDIA VAULT & STEALTH REPOSITORY',
+                            context.loc.openFullMediaVault,
                             style: AppTextStyles.labelBadge.copyWith(
                               color: AppColors.shieldPrimary,
                               letterSpacing: 0.8,
@@ -1158,7 +1158,7 @@ class _JournalScreenState extends State<JournalScreen> {
             const SizedBox(height: 20),
 
             // -------------------------------------------------------------
-            // Action Button: "हिसाब बंद करें (Lock Day)"
+            // Action Button: Lock Daily Debrief
             // -------------------------------------------------------------
             SizedBox(
               width: double.infinity,
@@ -1189,8 +1189,8 @@ class _JournalScreenState extends State<JournalScreen> {
                           const SizedBox(width: 8),
                           Text(
                             isAlreadyLogged
-                                ? 'हिसाब अपडेट करें (Update Lock)'
-                                : 'हिसाब बंद करें (Lock Day)',
+                                ? context.loc.updateDayButton
+                                : context.loc.lockDayButton,
                             style: AppTextStyles.button.copyWith(
                               color: AppColors.background,
                               fontWeight: FontWeight.w700,

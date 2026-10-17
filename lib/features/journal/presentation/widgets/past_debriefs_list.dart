@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/date_helpers.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/journal_models.dart';
@@ -37,12 +38,12 @@ class PastDebriefsList extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'कोई पूर्व दैनिक हिसाब उपलब्ध नहीं (NO LOGS YET)',
+              context.loc.noPastDebriefsMsg.toUpperCase(),
               style: AppTextStyles.labelBadge.copyWith(letterSpacing: 1.5),
             ),
             const SizedBox(height: 4),
             Text(
-              'आज का 60-सेकंड हिसाब ऊपर पूरा करें।',
+              context.loc.noPastDebriefsSub,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textMuted,
               ),
@@ -60,7 +61,7 @@ class PastDebriefsList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'दैनिक हिसाब इतिहास (${entries.length})',
+              context.loc.pastDebriefsCount(entries.length),
               style: AppTextStyles.labelBadge.copyWith(letterSpacing: 1.5),
             ),
             Text(
@@ -191,7 +192,7 @@ class PastDebriefsList extends StatelessWidget {
                           ),
                           Flexible(
                             child: Text(
-                              entry.reactionLabel,
+                              context.loc.reactionScoreLabel(entry.reactionControlScore),
                               style: AppTextStyles.bodySmall.copyWith(
                                 fontSize: 9.5,
                                 color: AppColors.textSecondary,
@@ -229,8 +230,8 @@ class PastDebriefsList extends StatelessWidget {
                         children: [
                           Text(
                             entry.boundaryMaintained
-                                ? 'हाँ (YES)'
-                                : 'नहीं (NO)',
+                                ? (context.loc.isHindi ? 'हाँ (YES)' : 'YES')
+                                : (context.loc.isHindi ? 'नहीं (NO)' : 'NO'),
                             style: AppTextStyles.metricSmall.copyWith(
                               color: entry.boundaryMaintained
                                   ? AppColors.emeraldSuccess
@@ -240,7 +241,9 @@ class PastDebriefsList extends StatelessWidget {
                           ),
                           Flexible(
                             child: Text(
-                              entry.boundaryLabel,
+                              entry.boundaryMaintained
+                                  ? context.loc.boundaryMaintainedBadge
+                                  : context.loc.boundaryCompromisedBadge,
                               style: AppTextStyles.bodySmall.copyWith(
                                 fontSize: 9.5,
                                 color: AppColors.textSecondary,
@@ -279,7 +282,7 @@ class PastDebriefsList extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'ठोस मौलिक आउटपुट (CORE DELIVERABLE)',
+                      context.loc.index03Title.toUpperCase(),
                       style: AppTextStyles.labelBadge.copyWith(
                         fontSize: 8.5,
                         color: AppColors.shieldPrimary,
@@ -311,7 +314,7 @@ class PastDebriefsList extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          'रणनीतिक सीख: ${entry.provocationHandled}',
+                          '${context.loc.isHindi ? "रणनीतिक सीख" : "Tactical Insight"}: ${entry.provocationHandled}',
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                             fontSize: 11,

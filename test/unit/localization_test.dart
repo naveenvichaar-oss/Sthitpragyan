@@ -70,6 +70,32 @@ void main() {
       expect(locHi.getRuleAphorism(8, 'Fallback'), contains('दुःखेष्वनुद्विग्नमनाः'));
     });
 
+    test('Daily Debrief & Evening Audit bilingual terms provide distinct English and Hindi strings', () {
+      final locEn = AppLocalizations(const Locale('en'));
+      final locHi = AppLocalizations(const Locale('hi'));
+
+      expect(locEn.eveningLogBadge, equals('60-SECOND EVENING LOG'));
+      expect(locHi.eveningLogBadge, equals('६०-सेकंड संध्या समीक्षा'));
+
+      expect(locEn.dailyClosureTitle, equals('Daily Closure (Evening Audit)'));
+      expect(locHi.dailyClosureTitle, equals('दैनिक हिसाब (Daily Closure)'));
+
+      expect(locEn.index01Question, equals('How composed was your mind under provocation today?'));
+      expect(locHi.index01Question, equals('आज उकसावे पर चित्त कितना स्थिर रहा?'));
+
+      expect(locEn.reactionScoreLabel(4), contains('High Poise'));
+      expect(locHi.reactionScoreLabel(4), contains('पूर्ण नियंत्रण'));
+
+      expect(locEn.boundaryYesButton, contains('YES'));
+      expect(locHi.boundaryYesButton, contains('हाँ'));
+
+      expect(locEn.index03OutputQuestion, contains('Today\'s single most solid'));
+      expect(locHi.index03OutputQuestion, contains('आज का सबसे ठोस'));
+
+      expect(locEn.lockDayButton, equals('Lock Daily Debrief'));
+      expect(locHi.lockDayButton, contains('हिसाब बंद करें'));
+    });
+
     test('Delegate supports en and hi locales', () {
       const delegate = AppLocalizationsDelegate();
       expect(delegate.isSupported(const Locale('en')), isTrue);
