@@ -259,9 +259,9 @@ class _PostIncidentRecoveryScreenState
               ),
               child: Row(
                 children: [
-                  _buildTabButton(0, 'POST-MORTEM & DRILLS', Icons.assignment_outlined),
+                  _buildTabButton(0, context.loc.postMortemAndDrills, Icons.assignment_outlined),
                   const SizedBox(width: 4),
-                  _buildTabButton(1, 'EMERGENCY PERSPECTIVE (60s)', Icons.auto_stories_rounded),
+                  _buildTabButton(1, context.loc.emergencyPerspectiveTab, Icons.auto_stories_rounded),
                 ],
               ),
             ),
@@ -414,7 +414,7 @@ class _PostIncidentRecoveryScreenState
           // STEP 1: 30-SECOND POST-MORTEM
           // -----------------------------------------------------------
           Text(
-            '1. 30-SECOND POST-MORTEM',
+            context.loc.thirtySecondPostMortem,
             style: AppTextStyles.labelBadge.copyWith(
               color: AppColors.shieldPrimary,
               fontSize: 10.5,
@@ -658,7 +658,7 @@ class _PostIncidentRecoveryScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '2-MINUTE BOX BREATHING DRILL',
+                        context.loc.twoMinuteBoxBreathing,
                         style: AppTextStyles.labelBadge.copyWith(
                           fontSize: 9.5,
                           color: _boxBreathingCompleted
@@ -751,7 +751,7 @@ class _PostIncidentRecoveryScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'DAMAGE CONTROL SCRIPTS (OPTIONAL)',
+                context.loc.damageControlScriptsOptional,
                 style: AppTextStyles.labelBadge.copyWith(fontSize: 9.5),
               ),
               Text(
@@ -894,7 +894,7 @@ class _PostIncidentRecoveryScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '60-SECOND EMERGENCY PERSPECTIVE',
+                      context.loc.emergencyPerspectiveBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.amberWarning,
                         fontSize: 8.5,
@@ -902,7 +902,7 @@ class _PostIncidentRecoveryScreenState
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Detach your ego from praise and blame. Ground yourself in timeless stoic sovereignty before taking action.',
+                      context.loc.detachEgoDescription,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                         fontSize: 11,
@@ -918,7 +918,7 @@ class _PostIncidentRecoveryScreenState
 
         // Perspective Selection Chips
         Text(
-          'SELECT EMERGENCY PROTOCOL',
+          context.loc.selectEmergencyProtocol,
           style: AppTextStyles.labelBadge.copyWith(fontSize: 9),
         ),
         const SizedBox(height: 8),
@@ -931,7 +931,7 @@ class _PostIncidentRecoveryScreenState
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: ChoiceChip(
-                  label: Text(item.title),
+                  label: Text(item.getTitle(context.loc.isHindi)),
                   selected: isSelected,
                   onSelected: (val) {
                     if (val) {
@@ -1009,7 +1009,7 @@ class _PostIncidentRecoveryScreenState
 
               // Title & Source
               Text(
-                activePerspective.title,
+                activePerspective.getTitle(context.loc.isHindi),
                 style: AppTextStyles.heading.copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -1017,7 +1017,7 @@ class _PostIncidentRecoveryScreenState
               ),
               const SizedBox(height: 2),
               Text(
-                activePerspective.source,
+                activePerspective.getSubtitle(context.loc.isHindi),
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textMuted,
                   fontSize: 11,
@@ -1059,7 +1059,7 @@ class _PostIncidentRecoveryScreenState
               ),
               const SizedBox(height: 4),
               Text(
-                activePerspective.translation,
+                activePerspective.getTranslation(context.loc.isHindi),
                 style: AppTextStyles.bodySmall.copyWith(
                   fontSize: 12,
                   height: 1.45,
@@ -1088,7 +1088,7 @@ class _PostIncidentRecoveryScreenState
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'EXECUTIVE TAKEAWAY • EGO DETACHMENT',
+                          context.loc.executiveTakeawayEgoDetachment,
                           style: AppTextStyles.labelBadge.copyWith(
                             color: AppColors.shieldPrimary,
                             fontSize: 8.5,
@@ -1098,7 +1098,7 @@ class _PostIncidentRecoveryScreenState
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      activePerspective.executiveTakeaway,
+                      activePerspective.getExecutiveTakeaway(context.loc.isHindi),
                       style: AppTextStyles.bodySmall.copyWith(
                         fontSize: 11.5,
                         color: AppColors.textPrimary,
@@ -1120,7 +1120,7 @@ class _PostIncidentRecoveryScreenState
               child: OutlinedButton.icon(
                 onPressed: _openBoxBreathingDrill,
                 icon: const Icon(Icons.air_rounded, size: 16),
-                label: const Text('BOX BREATHING (2M)'),
+                label: Text(context.loc.boxBreathing2M),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.shieldPrimary,
                   side: const BorderSide(color: AppColors.shieldPrimary),
@@ -1141,7 +1141,7 @@ class _PostIncidentRecoveryScreenState
                   });
                 },
                 icon: const Icon(Icons.edit_note_rounded, size: 16),
-                label: const Text('DAMAGE CONTROL'),
+                label: Text(context.loc.damageControl),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.amberWarning,
                   foregroundColor: AppColors.background,

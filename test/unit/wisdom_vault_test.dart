@@ -33,6 +33,49 @@ void main() {
       expect(serialized['source'], 'Bhagavad Gita 2.47');
       expect(serialized['isEmergencyPerspective'], true);
     });
+
+    test('WisdomEntry parses localized maps and returns localized getters', () {
+      final json = {
+        'id': 'gita_2_56',
+        'category': 'gita',
+        'categoryName': 'Gita & Sthitaprajna',
+        'title': {
+          'en': 'Equanimity in Turmoil',
+          'hi': 'दुःखेष्वनुद्विग्नमनाः (विपत्ति में स्थिरता)',
+        },
+        'subtitle': {
+          'en': 'Bhagavad Gita 2.56',
+          'hi': 'श्रीमद्भगवद्गीता २.५६',
+        },
+        'source': 'Bhagavad Gita 2.56',
+        'shlokaText':
+            'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
+        'originalText':
+            'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
+        'translation': {
+          'en': 'One whose mind is undisturbed in distress...',
+          'hi': 'जिसका मन दुखों की प्राप्ति पर उद्वेग रहित रहता है...',
+        },
+        'executiveTakeaway': {
+          'en': 'When deadlines implode and toxic stakeholders posture...',
+          'hi': 'जब कार्य का दबाव चरम पर हो या परिस्थितियाँ प्रतिकूल हों...',
+        },
+        'tags': ['Equanimity', 'Crisis Composure'],
+        'isEmergencyPerspective': true,
+      };
+
+      final entry = WisdomEntry.fromJson(json);
+      expect(entry.id, 'gita_2_56');
+      expect(entry.getTitle(false), 'Equanimity in Turmoil');
+      expect(entry.getTitle(true), 'दुःखेष्वनुद्विग्नमनाः (विपत्ति में स्थिरता)');
+      expect(entry.getSubtitle(false), 'Bhagavad Gita 2.56');
+      expect(entry.getSubtitle(true), 'श्रीमद्भगवद्गीता २.५६');
+      expect(entry.shlokaText, contains('स्थितधीर्मुनि रुच्यते॥'));
+      expect(entry.shlokaText, isNot(contains('Nichols')));
+      expect(entry.getTranslation(true), startsWith('जिसका मन'));
+      expect(entry.getExecutiveTakeaway(true), startsWith('जब कार्य का दबाव'));
+      expect(entry.isEmergencyPerspective, true);
+    });
   });
 
   group('ResourceLink & ResourceMediaType Tests', () {

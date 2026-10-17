@@ -106,23 +106,41 @@ class WisdomVaultService {
         id: 'fallback_1',
         category: 'gita',
         categoryName: 'Gita & Sthitaprajna',
-        title: 'कर्मण्येवाधिकारस्ते (Karmanye Vadhikaraste)',
-        source: 'Bhagavad Gita 2.47',
-        originalText: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥',
-        translation: 'You have a right only to work, never to its fruits.',
-        executiveTakeaway: 'Focus on your immediate execution with calm detachment from stakeholder praise or blame.',
-        tags: ['Detachment', 'Focus'],
+        title: 'Equanimity in Turmoil',
+        titleHi: 'दुःखेष्वनुद्विग्नमनाः (विपत्ति में स्थिरता)',
+        source: 'Bhagavad Gita 2.56',
+        sourceHi: 'श्रीमद्भगवद्गीता २.५६',
+        originalText:
+            'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
+        translation:
+            'One whose mind is undisturbed in distress, who does not crave worldly pleasure, and who is free from attachment, fear, and anger, is called a sage of steady intellect.',
+        translationHi:
+            'जिसका मन दुखों की प्राप्ति पर उद्वेग रहित रहता है, जो सुखों की प्राप्ति में सर्वथा निष्पृह है, तथा जिसके राग, भय और क्रोध नष्ट हो चुके हैं, ऐसा मुनि स्थिरबुद्धि (स्थितप्रज्ञ) कहलाता है।',
+        executiveTakeaway:
+            'When deadlines implode and toxic stakeholders posture, maintain a flat pulse. Distress cannot pierce an intellect that has systematically excised the need for approval, dread of conflict, and retaliatory impulse.',
+        executiveTakeawayHi:
+            'जब कार्य का दबाव चरम पर हो या परिस्थितियाँ प्रतिकूल हों, तब अपनी मानसिक धड़कन शांत रखें। संकट उस बुद्धि को विचलित नहीं कर सकता जिसने अनुमोदन की अपेक्षा, टकराव के भय और प्रतिशोध की भावना को समूल त्याग दिया है।',
+        tags: ['Equanimity', 'Emotional Flatline', 'Crisis Composure'],
         isEmergencyPerspective: true,
       ),
       WisdomEntry(
         id: 'fallback_2',
         category: 'western_stoicism',
         categoryName: 'Western Stoicism & Classics',
-        title: 'Neutralizing Insults',
+        title: 'Neutralizing Insults & Public Put-Downs',
+        titleHi: 'अपमान व प्रहार का निष्प्रभावीकरण',
         source: 'Epictetus • Enchiridion 20',
-        originalText: 'Remember that what insults you is not the person who abuses you, but your judgment that these things are insulting.',
-        translation: 'याद रखें कि जो आपको आहत करता है वह अपमान करने वाला व्यक्ति नहीं, आपकी अपनी धारणा है।',
-        executiveTakeaway: 'Do not consent to being insulted. Without your mental permission, external words are harmless vibrations.',
+        sourceHi: 'एपिक्टेटस • एनकिरीडियन २०',
+        originalText:
+            'Remember that what insults you is not the person who abuses you, but your judgment that these things are insulting.',
+        translation:
+            'Remember that what insults you is not the person who abuses you, but your judgment that these things are insulting.',
+        translationHi:
+            'स्मरण रखें कि जो आपको आहत करता है वह अपमान करने वाला व्यक्ति नहीं, बल्कि आपकी यह धारणा है कि आपका अपमान हुआ है।',
+        executiveTakeaway:
+            'Do not consent to being insulted. Without your mental permission, external words are harmless vibrations.',
+        executiveTakeawayHi:
+            'अपमान को अपनी आंतरिक स्वीकृति कभी न दें। आपकी मानसिक अनुमति के बिना बाहरी शब्द केवल हानिरहित कंपन हैं।',
         tags: ['Insults', 'Frame Control'],
         isEmergencyPerspective: true,
       ),

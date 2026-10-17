@@ -32,16 +32,17 @@ class _WisdomCardState extends State<WisdomCard> {
 
   void _copyToClipboard(BuildContext context) {
     HapticService.selectionClick();
+    final isHi = context.loc.isHindi;
     final text =
-        '${widget.entry.title}\n${widget.entry.source}\n\n"${widget.entry.originalText}"\n\nTranslation: ${widget.entry.translation}\n\nExecutive Takeaway: ${widget.entry.executiveTakeaway}';
+        '${widget.entry.getTitle(isHi)}\n${widget.entry.getSubtitle(isHi)}\n\n"${widget.entry.originalText}"\n\n${context.loc.essenceTranslation}: ${widget.entry.getTranslation(isHi)}\n\n${context.loc.executiveActionTakeaway}: ${widget.entry.getExecutiveTakeaway(isHi)}';
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
-            SizedBox(width: 8),
-            Text('Copied wisdom to clipboard', style: TextStyle(fontSize: 12)),
+            const Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
+            const SizedBox(width: 8),
+            Text(isHi ? 'प्रज्ञा क्लिपबोर्ड पर कॉपी की गई' : 'Copied wisdom to clipboard', style: const TextStyle(fontSize: 12)),
           ],
         ),
         backgroundColor: AppColors.surfaceElevated,
@@ -143,10 +144,11 @@ class _WisdomCardState extends State<WisdomCard> {
                             ),
                           ),
                         VoiceTtsButton(
-                          textToSpeak: '${widget.entry.title}. ${widget.entry.originalText}. ${widget.entry.translation}. Executive Takeaway: ${widget.entry.executiveTakeaway}',
+                          textToSpeak:
+                              '${widget.entry.getTitle(context.loc.isHindi)}. ${widget.entry.originalText}. ${widget.entry.getTranslation(context.loc.isHindi)}. ${widget.entry.getExecutiveTakeaway(context.loc.isHindi)}',
                           audioTopicKey: 'wisdom_${widget.entry.id}',
                           size: 16,
-                          tooltip: 'Listen to passage in calm voice',
+                          tooltip: context.loc.listenWisdomReadout,
                         ),
                         const SizedBox(width: 8),
                         IconButton(
@@ -175,7 +177,7 @@ class _WisdomCardState extends State<WisdomCard> {
 
                 // Title & Source
                 Text(
-                  widget.entry.title,
+                  widget.entry.getTitle(context.loc.isHindi),
                   style: AppTextStyles.titleSmall.copyWith(
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
@@ -183,7 +185,7 @@ class _WisdomCardState extends State<WisdomCard> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  widget.entry.source,
+                  widget.entry.getSubtitle(context.loc.isHindi),
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 11,
@@ -215,7 +217,7 @@ class _WisdomCardState extends State<WisdomCard> {
 
                 // Executive Takeaway Preview / Full
                 Text(
-                  widget.entry.executiveTakeaway,
+                  widget.entry.getExecutiveTakeaway(context.loc.isHindi),
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.4,
@@ -236,7 +238,7 @@ class _WisdomCardState extends State<WisdomCard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    widget.entry.translation,
+                    widget.entry.getTranslation(context.loc.isHindi),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textPrimary,
                       height: 1.4,

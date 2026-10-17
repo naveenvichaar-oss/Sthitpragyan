@@ -281,6 +281,57 @@ class AppLocalizations {
       ? 'मूल फ़ैक्टरी सूत्रों पर रीसेट करें'
       : 'Reset to Factory Blueprints';
 
+  String get postMortemAndDrills => isHindi
+      ? 'घटना-समीक्षा व अभ्यास'
+      : 'POST-MORTEM & DRILLS';
+  String get emergencyPerspectiveTab => isHindi
+      ? 'आपातकालीन दृष्टिकोण (६० से.)'
+      : 'EMERGENCY PERSPECTIVE (60s)';
+  String get emergencyPerspectiveBadge => isHindi
+      ? '६०-सेकंड आपातकालीन दृष्टिकोण'
+      : '60-SECOND EMERGENCY PERSPECTIVE';
+  String get detachEgoRegainFrame => isHindi
+      ? 'अहंकार-मुक्ति • मानसिक संतुलन'
+      : 'DETACH EGO • REGAIN FRAME';
+  String get detachEgoDescription => isHindi
+      ? 'प्रशंसा व निंदा से अपने अहंकार को विलग करें। कोई भी कदम उठाने से पूर्व कालातीत प्रज्ञा में स्वयं को स्थिर करें।'
+      : 'Detach your ego from praise and blame. Ground yourself in timeless stoic sovereignty before taking action.';
+  String get selectEmergencyProtocol => isHindi
+      ? 'आपातकालीन सूत्र चुनें'
+      : 'SELECT EMERGENCY PROTOCOL';
+  String get executiveTakeawayEgoDetachment => isHindi
+      ? 'कार्यकारी निष्कर्ष • अहंकार-मुक्ति'
+      : 'EXECUTIVE TAKEAWAY • EGO DETACHMENT';
+  String get executiveActionTakeaway => isHindi
+      ? 'कार्यकारी क्रियात्मक निष्कर्ष'
+      : 'EXECUTIVE ACTION TAKEAWAY';
+  String get boxBreathingAction => isHindi
+      ? 'बॉक्स ब्रीदिंग'
+      : 'BOX BREATHING';
+  String get boxBreathing2M => isHindi
+      ? 'बॉक्स ब्रीदिंग (२ मिनट)'
+      : 'BOX BREATHING (2M)';
+  String get twoMinuteBoxBreathing => isHindi
+      ? '२-मिनट बॉक्स ब्रीदिंग अभ्यास'
+      : '2-MINUTE BOX BREATHING DRILL';
+  String get damageControl => isHindi
+      ? 'संकट नियंत्रण'
+      : 'DAMAGE CONTROL';
+  String get damageControlScriptsOptional => isHindi
+      ? 'रणनीतिक संकट निवारण सूत्र (वैकल्पिक)'
+      : 'DAMAGE CONTROL SCRIPTS (OPTIONAL)';
+  String get frameRestoredAction => isHindi
+      ? 'संतुलन पुनर्स्थापित'
+      : 'FRAME RESTORED';
+  String get thirtySecondPostMortem => isHindi
+      ? '१. ३०-सेकंड घटना-समीक्षा'
+      : '1. 30-SECOND POST-MORTEM';
+  String get prevAction => isHindi ? 'पिछला' : 'PREV';
+  String get nextAction => isHindi ? 'अगला' : 'NEXT';
+  String get listenToEmergencyPerspective => isHindi
+      ? 'आपातकालीन दृष्टिकोण सुनें'
+      : 'Listen to emergency perspective';
+
   // -------------------------------------------------------------
   // Daily Journal & Evening Audit (3-Index Debrief)
   // -------------------------------------------------------------

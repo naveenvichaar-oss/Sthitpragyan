@@ -116,7 +116,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '60-SECOND EMERGENCY PERSPECTIVE',
+                        context.loc.emergencyPerspectiveBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: AppColors.amberWarning,
                           letterSpacing: 1.5,
@@ -124,7 +124,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                         ),
                       ),
                       Text(
-                        'DETACH EGO • REGAIN FRAME',
+                        context.loc.detachEgoRegainFrame,
                         style: AppTextStyles.titleSmall.copyWith(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
@@ -139,10 +139,10 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                 children: [
                   VoiceTtsButton(
                     textToSpeak:
-                        '${entry.title}. ${entry.originalText}. ${entry.translation}. Takeaway: ${entry.executiveTakeaway}',
+                        '${entry.getTitle(context.loc.isHindi)}. ${entry.originalText}. ${entry.getTranslation(context.loc.isHindi)}. ${entry.getExecutiveTakeaway(context.loc.isHindi)}',
                     audioTopicKey: 'wisdom_${entry.id}',
                     size: 20,
-                    tooltip: 'Listen to emergency perspective',
+                    tooltip: context.loc.listenToEmergencyPerspective,
                   ),
                   const SizedBox(width: 4),
                   IconButton(
@@ -225,7 +225,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
 
                   // Title
                   Text(
-                    entry.title,
+                    entry.getTitle(context.loc.isHindi),
                     style: AppTextStyles.heading.copyWith(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -233,7 +233,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    entry.source,
+                    entry.getSubtitle(context.loc.isHindi),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textMuted,
                       fontSize: 11,
@@ -274,7 +274,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    entry.translation,
+                    entry.getTranslation(context.loc.isHindi),
                     style: AppTextStyles.bodySmall.copyWith(
                       fontSize: 12.5,
                       height: 1.45,
@@ -303,7 +303,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'EXECUTIVE ACTION TAKEAWAY',
+                              context.loc.executiveActionTakeaway,
                               style: AppTextStyles.labelBadge.copyWith(
                                 color: AppColors.shieldPrimary,
                                 fontSize: 8.5,
@@ -313,7 +313,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          entry.executiveTakeaway,
+                          entry.getExecutiveTakeaway(context.loc.isHindi),
                           style: AppTextStyles.bodySmall.copyWith(
                             fontSize: 12,
                             color: AppColors.textPrimary,
@@ -335,7 +335,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
               OutlinedButton.icon(
                 onPressed: _previous,
                 icon: const Icon(Icons.arrow_back_rounded, size: 14),
-                label: const Text('PREV'),
+                label: Text(context.loc.prevAction),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.textSecondary,
                   side: const BorderSide(color: AppColors.borderSubtle),
@@ -346,7 +346,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
               OutlinedButton.icon(
                 onPressed: _next,
                 icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-                label: const Text('NEXT'),
+                label: Text(context.loc.nextAction),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.textSecondary,
                   side: const BorderSide(color: AppColors.borderSubtle),
@@ -361,7 +361,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                     Navigator.of(context).pop();
                   },
                   icon: const Icon(Icons.check_rounded, size: 16),
-                  label: const Text('FRAME RESTORED'),
+                  label: Text(context.loc.frameRestoredAction),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.amberWarning,
                     foregroundColor: AppColors.background,

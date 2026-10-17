@@ -5,10 +5,14 @@ class WisdomEntry {
   final String category; // 'gita', 'western_stoicism', 'psychology_behavioral'
   final String categoryName;
   final String title;
+  final String? titleHi;
   final String source;
+  final String? sourceHi;
   final String originalText;
   final String translation;
+  final String? translationHi;
   final String executiveTakeaway;
+  final String? executiveTakeawayHi;
   final List<String> tags;
   final bool isEmergencyPerspective;
 
@@ -17,24 +21,110 @@ class WisdomEntry {
     required this.category,
     required this.categoryName,
     required this.title,
+    this.titleHi,
     required this.source,
+    this.sourceHi,
     required this.originalText,
     required this.translation,
+    this.translationHi,
     required this.executiveTakeaway,
+    this.executiveTakeawayHi,
     this.tags = const [],
     this.isEmergencyPerspective = false,
   });
 
+  /// Alias for authentic Sanskrit shloka or classical original text
+  String get shlokaText => originalText;
+
+  /// Returns localized title based on active language
+  String getTitle([bool isHindi = false]) {
+    if (isHindi && titleHi != null && titleHi!.trim().isNotEmpty) {
+      return titleHi!;
+    }
+    return title;
+  }
+
+  /// Returns localized source / subtitle based on active language
+  String getSubtitle([bool isHindi = false]) {
+    if (isHindi && sourceHi != null && sourceHi!.trim().isNotEmpty) {
+      return sourceHi!;
+    }
+    return source;
+  }
+
+  /// Returns localized translation based on active language
+  String getTranslation([bool isHindi = false]) {
+    if (isHindi && translationHi != null && translationHi!.trim().isNotEmpty) {
+      return translationHi!;
+    }
+    return translation;
+  }
+
+  /// Returns localized executive takeaway based on active language
+  String getExecutiveTakeaway([bool isHindi = false]) {
+    if (isHindi &&
+        executiveTakeawayHi != null &&
+        executiveTakeawayHi!.trim().isNotEmpty) {
+      return executiveTakeawayHi!;
+    }
+    return executiveTakeaway;
+  }
+
   factory WisdomEntry.fromJson(Map<String, dynamic> json) {
+    String parseEn(dynamic value, [String fallback = '']) {
+      if (value is Map) {
+        return value['en']?.toString() ?? fallback;
+      }
+      return value?.toString() ?? fallback;
+    }
+
+    String? parseHi(dynamic value) {
+      if (value is Map) {
+        return value['hi']?.toString();
+      }
+      return null;
+    }
+
+    final rawTitle = json['title'];
+    final rawSubtitle = json['subtitle'] ?? json['source'];
+    final rawTranslation = json['translation'];
+    final rawTakeaway = json['executiveTakeaway'];
+
+    final titleEn = parseEn(rawTitle, json['titleEn']?.toString() ?? '');
+    final titleHi = parseHi(rawTitle) ?? json['titleHi']?.toString();
+
+    final sourceEn = parseEn(
+      rawSubtitle,
+      json['sourceEn']?.toString() ?? json['subtitleEn']?.toString() ?? '',
+    );
+    final sourceHi = parseHi(rawSubtitle) ??
+        json['sourceHi']?.toString() ??
+        json['subtitleHi']?.toString();
+
+    final transEn =
+        parseEn(rawTranslation, json['translationEn']?.toString() ?? '');
+    final transHi =
+        parseHi(rawTranslation) ?? json['translationHi']?.toString();
+
+    final takeEn =
+        parseEn(rawTakeaway, json['executiveTakeawayEn']?.toString() ?? '');
+    final takeHi =
+        parseHi(rawTakeaway) ?? json['executiveTakeawayHi']?.toString();
+
     return WisdomEntry(
       id: json['id'] as String? ?? '',
       category: json['category'] as String? ?? 'general',
       categoryName: json['categoryName'] as String? ?? 'Wisdom',
-      title: json['title'] as String? ?? '',
-      source: json['source'] as String? ?? '',
-      originalText: json['originalText'] as String? ?? '',
-      translation: json['translation'] as String? ?? '',
-      executiveTakeaway: json['executiveTakeaway'] as String? ?? '',
+      title: titleEn,
+      titleHi: titleHi,
+      source: sourceEn,
+      sourceHi: sourceHi,
+      originalText:
+          (json['shlokaText'] ?? json['originalText']) as String? ?? '',
+      translation: transEn,
+      translationHi: transHi,
+      executiveTakeaway: takeEn,
+      executiveTakeawayHi: takeHi,
       tags: (json['tags'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
@@ -48,11 +138,25 @@ class WisdomEntry {
       'id': id,
       'category': category,
       'categoryName': categoryName,
-      'title': title,
+      'title': {
+        'en': title,
+        if (titleHi != null) 'hi': titleHi,
+      },
       'source': source,
+      'subtitle': {
+        'en': source,
+        if (sourceHi != null) 'hi': sourceHi,
+      },
       'originalText': originalText,
-      'translation': translation,
-      'executiveTakeaway': executiveTakeaway,
+      'shlokaText': originalText,
+      'translation': {
+        'en': translation,
+        if (translationHi != null) 'hi': translationHi,
+      },
+      'executiveTakeaway': {
+        'en': executiveTakeaway,
+        if (executiveTakeawayHi != null) 'hi': executiveTakeawayHi,
+      },
       'tags': tags,
       'isEmergencyPerspective': isEmergencyPerspective,
     };

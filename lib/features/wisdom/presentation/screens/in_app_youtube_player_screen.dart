@@ -9,6 +9,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import 'in_app_web_viewer_screen.dart';
 
@@ -236,7 +237,7 @@ class _InAppYouTubePlayerScreenState extends State<InAppYouTubePlayerScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'EXECUTIVE TAKEAWAY & CONTEXT',
+                          context.loc.executiveActionTakeaway,
                           style: AppTextStyles.labelBadge.copyWith(
                             color: AppColors.shieldPrimary,
                             fontSize: 9.0,

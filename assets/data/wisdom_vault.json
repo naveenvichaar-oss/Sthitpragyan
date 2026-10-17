@@ -3,11 +3,25 @@
     "id": "gita_2_47",
     "category": "gita",
     "categoryName": "Gita & Sthitaprajna",
-    "title": "कर्मण्येवाधिकारस्ते (Karmanye Vadhikaraste)",
+    "title": {
+      "en": "Karmanye Vadhikaraste",
+      "hi": "कर्मण्येवाधिकारस्ते (कर्म का अधिकार)"
+    },
+    "subtitle": {
+      "en": "Bhagavad Gita 2.47",
+      "hi": "श्रीमद्भगवद्गीता २.४७"
+    },
     "source": "Bhagavad Gita 2.47",
     "originalText": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
-    "translation": "You have a right only to perform your duties, but never to the fruits of your actions. Never consider yourself to be the cause of the results of your activities, nor be attached to inaction.",
-    "executiveTakeaway": "Radically detach your internal self-worth and composure from stakeholder validation, promotions, and volatile corporate outcomes. Direct 100% of your cognitive bandwidth to the meticulous quality of your execution today.",
+    "shlokaText": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
+    "translation": {
+      "en": "You have a right only to perform your duties, but never to the fruits of your actions. Never consider yourself to be the cause of the results of your activities, nor be attached to inaction.",
+      "hi": "तुम्हारा अधिकार केवल कर्म करने में है, उसके फलों में कभी नहीं। इसलिए कर्मफल के हेतु मत बनो और न ही अकर्मण्यता (निष्क्रियता) में तुम्हारी आसक्ति हो।"
+    },
+    "executiveTakeaway": {
+      "en": "Radically detach your internal self-worth and composure from stakeholder validation, promotions, and volatile corporate outcomes. Direct 100% of your cognitive bandwidth to the meticulous quality of your execution today.",
+      "hi": "अपने आत्मसम्मान और मानसिक शांति को परिणामों, पदोन्नति या अन्यों की प्रशंसा से पूर्णतः विलग रखें। अपनी संपूर्ण मानसिक ऊर्जा को केवल आज के कार्य की उत्कृष्टता पर केंद्रित करें।"
+    },
     "tags": ["Detachment", "Action", "Focus", "Self-Mastery"],
     "isEmergencyPerspective": false
   },
@@ -15,11 +29,25 @@
     "id": "gita_2_56",
     "category": "gita",
     "categoryName": "Gita & Sthitaprajna",
-    "title": "दुःखेष्वनुद्विग्नमनाः (Equanimity in Turmoil)",
+    "title": {
+      "en": "Equanimity in Turmoil",
+      "hi": "दुःखेष्वनुद्विग्नमनाः (विपत्ति में स्थिरता)"
+    },
+    "subtitle": {
+      "en": "Bhagavad Gita 2.56",
+      "hi": "श्रीमद्भगवद्गीता २.५६"
+    },
     "source": "Bhagavad Gita 2.56",
-    "originalText": "दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मु Nicholsनि रुच्यते॥",
-    "translation": "One whose mind is undisturbed in distress, who does not crave worldly pleasure, and who is free from attachment, fear, and anger, is called a sage of steady intellect (Sthitaprajna).",
-    "executiveTakeaway": "When deadlines implode and toxic stakeholders posture, maintain a flat pulse. Distress cannot pierce an intellect that has systematically excised the need for corporate approval, dread of conflict, and retaliatory impulse.",
+    "originalText": "दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥",
+    "shlokaText": "दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥",
+    "translation": {
+      "en": "One whose mind is undisturbed in distress, who does not crave worldly pleasure, and who is free from attachment, fear, and anger, is called a sage of steady intellect.",
+      "hi": "जिसका मन दुखों की प्राप्ति पर उद्वेग रहित रहता है, जो सुखों की प्राप्ति में सर्वथा निष्पृह है, तथा जिसके राग, भय और क्रोध नष्ट हो चुके हैं, ऐसा मुनि स्थिरबुद्धि (स्थितप्रज्ञ) कहलाता है।"
+    },
+    "executiveTakeaway": {
+      "en": "When deadlines implode and toxic stakeholders posture, maintain a flat pulse. Distress cannot pierce an intellect that has systematically excised the need for approval, dread of conflict, and retaliatory impulse.",
+      "hi": "जब कार्य का दबाव चरम पर हो या परिस्थितियाँ प्रतिकूल हों, तब अपनी मानसिक धड़कन शांत रखें। संकट उस बुद्धि को विचलित नहीं कर सकता जिसने अनुमोदन की अपेक्षा, टकराव के भय और प्रतिशोध की भावना को समूल त्याग दिया है।"
+    },
     "tags": ["Equanimity", "Emotional Flatline", "Crisis Composure"],
     "isEmergencyPerspective": true
   },
@@ -27,11 +55,25 @@
     "id": "gita_2_62_63",
     "category": "gita",
     "categoryName": "Gita & Sthitaprajna",
-    "title": "क्रोधाद्भवति संमोहः (The Cascade of Ruin)",
+    "title": {
+      "en": "The Cascade of Ruin",
+      "hi": "क्रोधाद्भवति संमोहः (पतन का चक्र)"
+    },
+    "subtitle": {
+      "en": "Bhagavad Gita 2.62-63",
+      "hi": "श्रीमद्भगवद्गीता २.६२-६३"
+    },
     "source": "Bhagavad Gita 2.62-63",
     "originalText": "ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते।\nसङ्गात्संजायते कामः कामात्क्रोधोऽभिजायते॥\nक्रोधाद्भवति संमोहः संमोहात्स्मृतिविभ्रमः।\nस्मृतिभ्रंशाद् बुद्धिनाशो बुद्धिनाशात्प्रणश्यति॥",
-    "translation": "Dwelling on sensory objects breeds attachment; attachment breeds desire; desire unfulfilled breeds anger. From anger arises delusion; from delusion, confusion of memory; from confusion of memory, loss of intellect; and from loss of intellect, total ruin.",
-    "executiveTakeaway": "The moment you mentally replay a toxic interaction, you trigger a biological slide toward rage and flawed executive judgment. Cut the cognitive loop at the root: observe the provocation neutrally and refuse to validate the drama.",
+    "shlokaText": "ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते।\nसङ्गात्संजायते कामः कामात्क्रोधोऽभिजायते॥\nक्रोधाद्भवति संमोहः संमोहात्स्मृतिविभ्रमः।\nस्मृतिभ्रंशाद् बुद्धिनाशो बुद्धिनाशात्प्रणश्यति॥",
+    "translation": {
+      "en": "Dwelling on sensory objects breeds attachment; attachment breeds desire; desire unfulfilled breeds anger. From anger arises delusion; from delusion, confusion of memory; from confusion of memory, loss of intellect; and from loss of intellect, total ruin.",
+      "hi": "विषयों का निरंतर चिंतन करने से उनमें आसक्ति उत्पन्न होती है; आसक्ति से कामना और कामना में बाधा से क्रोध उत्पन्न होता है। क्रोध से सम्मोह (अविवेक), सम्मोह से स्मृति-भ्रम, स्मृति-भ्रम से बुद्धि का नाश और बुद्धि का नाश होने से मनुष्य का सर्वनाश हो जाता है।"
+    },
+    "executiveTakeaway": {
+      "en": "The moment you mentally replay a toxic interaction, you trigger a biological slide toward rage and flawed executive judgment. Cut the cognitive loop at the root: observe the provocation neutrally and refuse to validate the drama.",
+      "hi": "जैसे ही आप किसी कटु या अपमानजनक बातचीत का मन में बार-बार चिंतन करते हैं, आप अविवेक और क्रोध के गर्त में गिर जाते हैं। इस मानसिक चक्र को आरंभ में ही काटें: उकसावे को तटस्थ भाव से देखें और विवाद को तूल देने से इंकार करें।"
+    },
     "tags": ["Anger Control", "Mental Discipline", "Cognitive Cascades"],
     "isEmergencyPerspective": true
   },
@@ -39,11 +81,25 @@
     "id": "gita_2_70",
     "category": "gita",
     "categoryName": "Gita & Sthitaprajna",
-    "title": "समुद्रमापः प्रविशन्ति (The Unshaken Ocean)",
+    "title": {
+      "en": "The Unshaken Ocean",
+      "hi": "समुद्रमापः प्रविशन्ति (अचल महासागर)"
+    },
+    "subtitle": {
+      "en": "Bhagavad Gita 2.70",
+      "hi": "श्रीमद्भगवद्गीता २.७०"
+    },
     "source": "Bhagavad Gita 2.70",
     "originalText": "आपूर्यमाणमचलप्रतिष्ठं समुद्रमापः प्रविशन्ति यद्वत्।\nतद्वत्कामा यं प्रविशन्ति सर्वे स शान्तिमाप्नोति न कामकामी॥",
-    "translation": "Just as the ocean remains undisturbed while rivers continuously flow into it, so the person into whom all sensory disturbances flow without producing a ripple achieves true peace, not the seeker of desires.",
-    "executiveTakeaway": "Be the ocean, not the shallow puddle. Let unsolicited criticisms, passive aggression, and chaotic escalations pour into your awareness without disturbing the depths of your professional poise.",
+    "shlokaText": "आपूर्यमाणमचलप्रतिष्ठं समुद्रमापः प्रविशन्ति यद्वत्।\nतद्वत्कामा यं प्रविशन्ति सर्वे स शान्तिमाप्नोति न कामकामी॥",
+    "translation": {
+      "en": "Just as the ocean remains undisturbed while rivers continuously flow into it, so the person into whom all sensory disturbances flow without producing a ripple achieves true peace, not the seeker of desires.",
+      "hi": "जिस प्रकार सब ओर से जल से परिपूर्ण अचल महासागर में नदियाँ आकर मिलती हैं किंतु वह विचलित नहीं होता, उसी प्रकार जिस स्थिर मनुष्य में सभी विकार बिना हलचल समा जाते हैं, वही शांति पाता है, कामनाओं का दास नहीं।"
+    },
+    "executiveTakeaway": {
+      "en": "Be the ocean, not the shallow puddle. Let unsolicited criticisms, passive aggression, and chaotic escalations pour into your awareness without disturbing the depths of your professional poise.",
+      "hi": "छिछले पोखरे के समान नहीं, अपितु अगाध समुद्र बनें। व्यर्थ की आलोचनाएँ और अप्रत्याशित तनाव आपके समक्ष आएँ, किंतु वे आपके आंतरिक गांभीर्य को ज़रा भी विचलित न कर सकें।"
+    },
     "tags": ["Unshakeable", "Absorption", "Stoic Shield"],
     "isEmergencyPerspective": false
   },
@@ -51,11 +107,25 @@
     "id": "stoic_marcus_2_1",
     "category": "western_stoicism",
     "categoryName": "Western Stoicism & Classics",
-    "title": "Morning Pre-Mortem on Toxic People",
-    "source": "Marcus Aurelius • Meditations, Book II.1",
+    "title": {
+      "en": "Morning Pre-Mortem on Toxic People",
+      "hi": "प्रातः स्मरण: प्रतिकूल स्वभाव का बोध"
+    },
+    "subtitle": {
+      "en": "Marcus Aurelius • Meditations 2.1",
+      "hi": "मार्कस ऑरेलियस • मेडिटेशन्स २.१"
+    },
+    "source": "Marcus Aurelius • Meditations 2.1",
     "originalText": "When you wake up in the morning, tell yourself: The people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous, and surly. They are like this because they cannot distinguish good from evil.",
-    "translation": "प्रातः स्मरण: आज आपका पाला कृतघ्न, अहंकारी, धूर्त और ईर्ष्यालु लोगों से पड़ेगा। वे ऐसे इसलिए हैं क्योंकि वे भले और बुरे में भेद नहीं कर पाते।",
-    "executiveTakeaway": "Never enter the workplace expecting saintly conduct. Expect passive aggression, credit theft, and panic. When it happens, your reaction is zero surprise—merely operational execution according to your pre-calculated protocol.",
+    "shlokaText": "When you wake up in the morning, tell yourself: The people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous, and surly. They are like this because they cannot distinguish good from evil.",
+    "translation": {
+      "en": "When you wake up in the morning, tell yourself: The people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous, and surly. They are like this because they cannot distinguish good from evil.",
+      "hi": "प्रातः स्मरण: आज आपका पाला कृतघ्न, अहंकारी, धूर्त और ईर्ष्यालु लोगों से पड़ेगा। वे ऐसे इसलिए हैं क्योंकि वे भले और बुरे में भेद नहीं कर पाते।"
+    },
+    "executiveTakeaway": {
+      "en": "Never enter the workplace expecting saintly conduct. Expect passive aggression, credit theft, and panic. When it happens, your reaction is zero surprise—merely operational execution according to your pre-calculated protocol.",
+      "hi": "कार्यस्थल पर आदर्श आचरण की अपेक्षा न रखें। राजनीति और संकीर्णता का पहले से ही अनुमान रखें। जब वे सामने आएँ, तो तनिक भी आश्चर्यचकित न हों—केवल अपनी नीति के अनुसार शांत भाव से कार्य करें।"
+    },
     "tags": ["Pre-Mortem", "Expectations", "Workplace Shield"],
     "isEmergencyPerspective": false
   },
@@ -63,11 +133,25 @@
     "id": "stoic_epictetus_insults",
     "category": "western_stoicism",
     "categoryName": "Western Stoicism & Classics",
-    "title": "Neutralizing Insults & Public Put-Downs",
-    "source": "Epictetus • Enchiridion, Chapter 20",
+    "title": {
+      "en": "Neutralizing Insults & Public Put-Downs",
+      "hi": "अपमान व प्रहार का निष्प्रभावीकरण"
+    },
+    "subtitle": {
+      "en": "Epictetus • Enchiridion 20",
+      "hi": "एपिक्टेटस • एनकिरीडियन २०"
+    },
+    "source": "Epictetus • Enchiridion 20",
     "originalText": "Remember that what insults you is not the person who abuses you or strikes you, but your judgment that these things are insulting. When someone provokes you, know that your own opinion has provoked you.",
-    "translation": "याद रखें कि जो आपको आहत करता है वह अपमान करने वाला व्यक्ति नहीं, बल्कि आपकी यह धारणा है कि आपका अपमान हुआ है।",
-    "executiveTakeaway": "An insult requires your emotional consent to land. If a hostile manager calls your plan inadequate in public, treat their words as ambient noise. Analyze if there is a factual kernel; if yes, adopt it; if no, discard it without a heartbeat of offense.",
+    "shlokaText": "Remember that what insults you is not the person who abuses you or strikes you, but your judgment that these things are insulting. When someone provokes you, know that your own opinion has provoked you.",
+    "translation": {
+      "en": "Remember that what insults you is not the person who abuses you or strikes you, but your judgment that these things are insulting. When someone provokes you, know that your own opinion has provoked you.",
+      "hi": "स्मरण रखें कि जो आपको आहत करता है वह अपमान करने वाला व्यक्ति नहीं, बल्कि आपकी यह धारणा है कि आपका अपमान हुआ है। जब कोई आपको उकसाए, तो जान लें कि आपके अपने निर्णय ने ही आपको उद्वेलित किया है।"
+    },
+    "executiveTakeaway": {
+      "en": "An insult requires your emotional consent to land. If a hostile manager calls your plan inadequate in public, treat their words as ambient noise. Analyze if there is a factual kernel; if yes, adopt it; if no, discard it without a heartbeat of offense.",
+      "hi": "किसी भी अपमान को प्रभावी होने के लिए आपकी आंतरिक स्वीकृति आवश्यक है। यदि कोई सार्वजनिक रूप से आपकी आलोचना करे, तो उनके शब्दों को केवल पृष्ठभूमि का शोर मानें। यदि उसमें कोई तथ्यात्मक सत्य है, तो उसे स्वीकारें; यदि नहीं, तो बिना किसी रोष के उसे त्याग दें।"
+    },
     "tags": ["Insults", "Ego Detachment", "Reframing"],
     "isEmergencyPerspective": true
   },
@@ -75,11 +159,25 @@
     "id": "stoic_epictetus_master",
     "category": "western_stoicism",
     "categoryName": "Western Stoicism & Classics",
-    "title": "Who Owns Your Emotional Master Key?",
+    "title": {
+      "en": "Who Owns Your Emotional Master Key?",
+      "hi": "आपकी मानसिक स्वतंत्रता का स्वामी कौन?"
+    },
+    "subtitle": {
+      "en": "Epictetus • Discourses",
+      "hi": "एपिक्टेटस • डिस्कोर्सेज"
+    },
     "source": "Epictetus • Discourses",
     "originalText": "Any person capable of angering you becomes your master; he can anger you only when you permit yourself to be disturbed by him.",
-    "translation": "जो भी व्यक्ति आपको क्रोधित करने में सक्षम है, वह आपका स्वामी बन जाता है; वह आपको केवल तभी विचलित कर सकता है जब आप उसे ऐसा करने की अनुमति देते हैं।",
-    "executiveTakeaway": "The second you lose your temper or defensively justify yourself, you yield operational authority to your adversary. Keep the master key in your own pocket: monotone voice, neutral gaze, no defensive explanations.",
+    "shlokaText": "Any person capable of angering you becomes your master; he can anger you only when you permit yourself to be disturbed by him.",
+    "translation": {
+      "en": "Any person capable of angering you becomes your master; he can anger you only when you permit yourself to be disturbed by him.",
+      "hi": "जो भी व्यक्ति आपको क्रोधित करने में सक्षम है, वह आपका स्वामी बन जाता है; वह आपको केवल तभी विचलित कर सकता है जब आप उसे ऐसा करने की अनुमति देते हैं।"
+    },
+    "executiveTakeaway": {
+      "en": "The second you lose your temper or defensively justify yourself, you yield operational authority to your adversary. Keep the master key in your own pocket: monotone voice, neutral gaze, no defensive explanations.",
+      "hi": "जिस क्षण आप आपा खोते हैं या रक्षात्मक सफाई देने लगते हैं, आप अपनी शक्ति सामने वाले को सौंप देते हैं। अपनी बागडोर स्वयं अपने हाथ में रखें: धीर स्वर, तटस्थ दृष्टि और व्यर्थ स्पष्टीकरण से पूर्ण परहेज।"
+    },
     "tags": ["Sovereignty", "Power Dynamics", "Composure"],
     "isEmergencyPerspective": true
   },
@@ -87,11 +185,25 @@
     "id": "stoic_seneca_imagination",
     "category": "western_stoicism",
     "categoryName": "Western Stoicism & Classics",
-    "title": "Suffering in Imagination vs Reality",
+    "title": {
+      "en": "Suffering in Imagination vs Reality",
+      "hi": "कल्पना का कष्ट बनाम वास्तविक स्थिति"
+    },
+    "subtitle": {
+      "en": "Seneca • Epistulae Morales, Letter 13",
+      "hi": "सेनेका • पत्र १३"
+    },
     "source": "Seneca • Epistulae Morales, Letter 13",
     "originalText": "We suffer more often in imagination than in reality. Some things torment us more than they ought; some torment us before they ought; and some torment us when they ought not to torment us at all.",
-    "translation": "हम वास्तविकता से कहीं अधिक अपनी कल्पना में कष्ट भोगते हैं।",
-    "executiveTakeaway": "Catastrophic corporate rumination ('What if they escalate this to the VP?') consumes 90% of your nervous energy. Anchor your mind to the physical present: two feet flat on the floor, breath deep, dealing only with what is in front of you.",
+    "shlokaText": "We suffer more often in imagination than in reality. Some things torment us more than they ought; some torment us before they ought; and some torment us when they ought not to torment us at all.",
+    "translation": {
+      "en": "We suffer more often in imagination than in reality. Some things torment us more than they ought; some torment us before they ought; and some torment us when they ought not to torment us at all.",
+      "hi": "हम वास्तविकता की तुलना में अपनी कल्पना में कहीं अधिक कष्ट भोगते हैं। कुछ बातें हमें आवश्यकता से अधिक, समय से पहले, या व्यर्थ ही पीड़ित करती हैं।"
+    },
+    "executiveTakeaway": {
+      "en": "Catastrophic corporate rumination ('What if they escalate this to the VP?') consumes 90% of your nervous energy. Anchor your mind to the physical present: two feet flat on the floor, breath deep, dealing only with what is in front of you.",
+      "hi": "भविष्य की अनहोनी की काल्पनिक चिंता आपकी ९०% ऊर्जा नष्ट कर देती है। अपने मन को वर्तमान क्षण में स्थिर करें: गहरी श्वास लें और केवल उस कार्य पर ध्यान दें जो प्रत्यक्ष रूप से आपके नियंत्रण में है।"
+    },
     "tags": ["Anxiety", "Grounding", "Present Moment"],
     "isEmergencyPerspective": true
   },
@@ -99,11 +211,25 @@
     "id": "stoic_seneca_delay",
     "category": "western_stoicism",
     "categoryName": "Western Stoicism & Classics",
-    "title": "Delay: The Absolute Remedy for Anger",
+    "title": {
+      "en": "Delay: The Remedy for Anger",
+      "hi": "क्रोध की अचूक औषधि: विलंब"
+    },
+    "subtitle": {
+      "en": "Seneca • De Ira (On Anger)",
+      "hi": "सेनेका • डी इरा (क्रोध पर विचार)"
+    },
     "source": "Seneca • De Ira (On Anger)",
     "originalText": "The greatest remedy for anger is delay: ask it at the beginning not to forgive, but to judge; its initial impulses are fierce, but if it waits, it will subside.",
-    "translation": "क्रोध की सबसे अचूक औषधि है: विलंब (देरी)। पहले आवेग को कभी कार्य में न बदलने दें।",
-    "executiveTakeaway": "Never reply to an inflammatory Slack, email, or meeting jab within the first 60 seconds. Give adrenaline time to metabolize. A 24-hour draft policy prevents career-limiting emotional outbursts.",
+    "shlokaText": "The greatest remedy for anger is delay: ask it at the beginning not to forgive, but to judge; its initial impulses are fierce, but if it waits, it will subside.",
+    "translation": {
+      "en": "The greatest remedy for anger is delay: ask it at the beginning not to forgive, but to judge; its initial impulses are fierce, but if it waits, it will subside.",
+      "hi": "क्रोध की सबसे अचूक औषधि है: विलंब (देरी)। पहले आवेग को कभी कार्य में न बदलने दें।"
+    },
+    "executiveTakeaway": {
+      "en": "Never reply to an inflammatory Slack, email, or meeting jab within the first 60 seconds. Give adrenaline time to metabolize. A 24-hour draft policy prevents career-limiting emotional outbursts.",
+      "hi": "उकसावे वाले संदेश या ईमेल का उत्तर तुरंत ६० सेकंड में न दें। एड्रेनालिन के शांत होने की प्रतीक्षा करें। समय का यह विराम आपको किसी बड़े पछतावे से बचाएगा।"
+    },
     "tags": ["Tactical Delay", "Impulse Control", "Executive Frame"],
     "isEmergencyPerspective": false
   },
@@ -111,11 +237,25 @@
     "id": "psych_frankl_space",
     "category": "psychology_behavioral",
     "categoryName": "Psychology & Behavioral Models",
-    "title": "The Space Between Stimulus and Response",
+    "title": {
+      "en": "The Space Between Stimulus and Response",
+      "hi": "उद्दीपन और प्रतिक्रिया के मध्य का अंतराल"
+    },
+    "subtitle": {
+      "en": "Viktor E. Frankl • Man's Search for Meaning",
+      "hi": "विक्टर फ्रैंकल • मैन्स सर्च फॉर मीनिंग"
+    },
     "source": "Viktor E. Frankl • Man's Search for Meaning",
     "originalText": "Between stimulus and response there is a space. In that space is our power to choose our response. In our response lies our growth and our freedom.",
-    "translation": "उद्दीपन और प्रतिक्रिया के बीच एक रिक्त स्थान होता है। उसी स्थान में अपने प्रत्युत्तर को चुनने की शक्ति निहित है।",
-    "executiveTakeaway": "Amateur professionals react reflexively in 0.2 seconds. Seasoned executives inhabit the 3-second buffer. That micro-second pause allows your prefrontal cortex to disarm the amygdala and choose strategic diplomacy over primal defense.",
+    "shlokaText": "Between stimulus and response there is a space. In that space is our power to choose our response. In our response lies our growth and our freedom.",
+    "translation": {
+      "en": "Between stimulus and response there is a space. In that space is our power to choose our response. In our response lies our growth and our freedom.",
+      "hi": "उद्दीपन और प्रतिक्रिया के बीच एक रिक्त स्थान होता है। उसी अंतराल में अपने प्रत्युत्तर को चुनने की शक्ति निहित है। हमारी प्रतिक्रिया में ही हमारा विकास और हमारी स्वतंत्रता बसती है।"
+    },
+    "executiveTakeaway": {
+      "en": "Amateur professionals react reflexively in 0.2 seconds. Seasoned executives inhabit the 3-second buffer. That micro-second pause allows your prefrontal cortex to disarm the amygdala and choose strategic diplomacy over primal defense.",
+      "hi": "साधारण व्यक्ति तात्कालिक आवेग में प्रतिक्रिया करता है। परिपक्व नेतृत्व ३ सेकंड के अंतराल में ठहरता है। यह संक्षिप्त विराम बुद्धि को सचेत कर आदिम आवेगी रक्षा के स्थान पर विवेकपूर्ण कूटनीति चुनने की शक्ति देता है।"
+    },
     "tags": ["The Buffer", "Free Will", "Impulse Neutralization"],
     "isEmergencyPerspective": true
   },
@@ -123,11 +263,25 @@
     "id": "psych_greene_detachment",
     "category": "psychology_behavioral",
     "categoryName": "Psychology & Behavioral Models",
-    "title": "Strategic Psychological Specimen Model",
+    "title": {
+      "en": "Strategic Psychological Specimen Model",
+      "hi": "मनोवैज्ञानिक विश्लेषण व अनासक्त दृष्टि"
+    },
+    "subtitle": {
+      "en": "Robert Greene • The Laws of Human Nature",
+      "hi": "रॉबर्ट ग्रीन • द लॉज ऑफ ह्यूमन नेचर"
+    },
     "source": "Robert Greene • The Laws of Human Nature",
     "originalText": "Never take anything personally. When people attack you or behave irrationally, see them as physiological specimens to observe, not enemies to combat.",
-    "translation": "किसी भी बात को व्यक्तिगत न लें। जब लोग आक्रामक व्यवहार करें, तो उन्हें प्रयोगशाला के नमूनों की तरह वैज्ञानिक दृष्टि से देखें।",
-    "executiveTakeaway": "Depersonalize workplace toxicity. When a director berates your team, recognize their narcissism and panic as an internal symptom of their own fragile ego. You are not the cause of their drama; you are merely the mirror in their path.",
+    "shlokaText": "Never take anything personally. When people attack you or behave irrationally, see them as physiological specimens to observe, not enemies to combat.",
+    "translation": {
+      "en": "Never take anything personally. When people attack you or behave irrationally, see them as physiological specimens to observe, not enemies to combat.",
+      "hi": "किसी भी बात को व्यक्तिगत न लें। जब लोग आक्रामक या अतार्किक व्यवहार करें, तो उन्हें युद्ध के शत्रु के रूप में नहीं, बल्कि प्रयोगशाला के विषय के रूप में तटस्थता से देखें।"
+    },
+    "executiveTakeaway": {
+      "en": "Depersonalize workplace toxicity. When a director berates your team, recognize their narcissism and panic as an internal symptom of their own fragile ego. You are not the cause of their drama; you are merely the mirror in their path.",
+      "hi": "कार्यस्थल के विषैले माहौल को व्यक्तिगत स्तर पर न लें। जब कोई अधिकारी अकारण उत्तेजित हो, तो समझें कि यह उनके अपने आंतरिक भय और दुर्बल अहंकार का लक्षण है। आप उनके तनाव का कारण नहीं हैं; केवल शांत साक्षी बने रहें।"
+    },
     "tags": ["Depersonalization", "Greene", "Observation"],
     "isEmergencyPerspective": true
   },
@@ -135,11 +289,25 @@
     "id": "psych_kahneman_sys1_sys2",
     "category": "psychology_behavioral",
     "categoryName": "Psychology & Behavioral Models",
-    "title": "System 1 vs System 2 Cognitive Intercept",
+    "title": {
+      "en": "System 1 vs System 2 Cognitive Intercept",
+      "hi": "सिस्टम १ बनाम सिस्टम २ का विवेक"
+    },
+    "subtitle": {
+      "en": "Daniel Kahneman • Thinking, Fast and Slow",
+      "hi": "डेनियल काह्नमैन • थिंकिंग, फास्ट एंड स्लो"
+    },
     "source": "Daniel Kahneman • Thinking, Fast and Slow",
     "originalText": "System 1 operates automatically and quickly, with little or no effort. System 2 allocates attention to effortful mental operations. Self-control requires System 2 activation.",
-    "translation": "सिस्टम 1 तीव्र व स्वचालित आवेग है। सिस्टम 2 विवेकपूर्ण व सुविचारित नियंत्रण है।",
-    "executiveTakeaway": "Workplace provocations aim to trap you in System 1 (flight, fight, fluster). Reclaim command by forcing System 2 activation: take a slow sip of water, ask a clarifying calibrated question, or write down their exact words.",
+    "shlokaText": "System 1 operates automatically and quickly, with little or no effort. System 2 allocates attention to effortful mental operations. Self-control requires System 2 activation.",
+    "translation": {
+      "en": "System 1 operates automatically and quickly, with little or no effort. System 2 allocates attention to effortful mental operations. Self-control requires System 2 activation.",
+      "hi": "सिस्टम १ तीव्र व स्वचालित आवेग है। सिस्टम २ विवेकपूर्ण व सुविचारित नियंत्रण है। आत्म-नियंत्रण के लिए सिस्टम २ को सक्रिय करना आवश्यक है।"
+    },
+    "executiveTakeaway": {
+      "en": "Workplace provocations aim to trap you in System 1 (flight, fight, fluster). Reclaim command by forcing System 2 activation: take a slow sip of water, ask a clarifying calibrated question, or write down their exact words.",
+      "hi": "विवाद आपको जल्दबाजी और उत्तेजना में धकेलने का प्रयास करते हैं। पानी का एक घूंट लें, प्रश्न पूछें या सामने वाले के शब्दों को नोट करें—इससे आपकी प्रज्ञा जाग्रत होगी।"
+    },
     "tags": ["Cognitive Science", "Kahneman", "Pacing"],
     "isEmergencyPerspective": false
   },
@@ -147,11 +315,25 @@
     "id": "psych_voss_calibrated",
     "category": "psychology_behavioral",
     "categoryName": "Psychology & Behavioral Models",
-    "title": "Calibrated Questions & Tactical Empathy",
+    "title": {
+      "en": "Calibrated Questions & Tactical Empathy",
+      "hi": "शांत प्रश्न एवं कूटनीतिक संतुलन"
+    },
+    "subtitle": {
+      "en": "Chris Voss • Never Split the Difference",
+      "hi": "क्रिस वॉस • नेवर स्प्लिट द डिफरेंस"
+    },
     "source": "Chris Voss • Never Split the Difference",
     "originalText": "Conflict brings out the fight-or-flight response. Tactical empathy and calibrated questions starting with 'How' or 'What' put the burden of problem-solving back on the aggressive party.",
-    "translation": "उग्र टकराव पर रक्षात्मक सफाई न दें; 'क्या' और 'कैसे' से शुरू होने वाले शांत प्रश्नों से दबाव सामने वाले पर लौटाएं।",
-    "executiveTakeaway": "When faced with an unreasonable demand, never say 'That is impossible.' Instead, with a calm late-night FM DJ voice, ask: 'How am I supposed to execute that without sacrificing code reliability?' Let them solve their own dilemma.",
+    "shlokaText": "Conflict brings out the fight-or-flight response. Tactical empathy and calibrated questions starting with 'How' or 'What' put the burden of problem-solving back on the aggressive party.",
+    "translation": {
+      "en": "Conflict brings out the fight-or-flight response. Tactical empathy and calibrated questions starting with 'How' or 'What' put the burden of problem-solving back on the aggressive party.",
+      "hi": "उग्र टकराव पर रक्षात्मक सफाई न दें; 'क्या' और 'कैसे' से शुरू होने वाले शांत प्रश्नों से दबाव सामने वाले पर लौटाएं।"
+    },
+    "executiveTakeaway": {
+      "en": "When faced with an unreasonable demand, never say 'That is impossible.' Instead, with a calm late-night FM DJ voice, ask: 'How am I supposed to execute that without sacrificing code reliability?' Let them solve their own dilemma.",
+      "hi": "अनुचित माँग पर कभी उत्तेजित न हों। इसके बजाय शांत और गंभीर स्वर में पूछें: 'गुणवत्ता को प्रभावित किए बिना इसे कैसे किया जा सकता है?' उन्हें स्वयं समाधान सोचने दें।"
+    },
     "tags": ["Negotiation", "Frame Control", "Calibrated Questions"],
     "isEmergencyPerspective": false
   }
