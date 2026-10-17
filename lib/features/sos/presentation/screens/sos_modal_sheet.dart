@@ -8,8 +8,10 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/defensive_scripts_vault.dart';
+import '../widgets/defensive_script_edit_sheet.dart';
 import '../../../journal/data/models/journal_models.dart';
 
 /// The 4 states of the SOS Finite State Machine (FSM)
@@ -215,6 +217,139 @@ class _SOSModalSheetState extends State<SOSModalSheet>
     }
   }
 
+  void _openScriptEditor(DefensiveScript? script) {
+    HapticService.selectionClick();
+    DefensiveScriptEditSheet.show(
+      context,
+      script: script,
+      initialCategory: _selectedCategory,
+      onSaved: () {
+        setState(() {});
+      },
+    );
+  }
+
+  Future<void> _confirmDeleteScript(DefensiveScript script) async {
+    HapticService.selectionClick();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          side: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        title: Text(
+          context.loc.deleteScript,
+          style: AppTextStyles.heading.copyWith(fontSize: 16),
+        ),
+        content: Text(
+          context.loc.confirmDeleteScriptMsg,
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              context.loc.cancel,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.roseDanger,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(context.loc.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _storage.deleteDefensiveScript(script.id);
+      HapticService.selectionClick();
+      if (mounted) {
+        setState(() {
+          _activeScriptIndex = 0;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.loc.isHindi
+                  ? 'रक्षात्मक सूत्र हटा दिया गया'
+                  : 'Defensive script deleted',
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.background),
+            ),
+            backgroundColor: AppColors.roseDanger,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _confirmResetScripts() async {
+    HapticService.selectionClick();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceElevated,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          side: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        title: Text(
+          context.loc.resetToDefaultScripts,
+          style: AppTextStyles.heading.copyWith(fontSize: 16),
+        ),
+        content: Text(
+          context.loc.isHindi
+              ? 'क्या आप सभी रक्षात्मक सूत्रों को मूल फ़ैक्टरी स्थिति में रीसेट करना चाहते हैं?'
+              : 'Reset all defensive scripts back to factory blueprints?',
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(context.loc.cancel, style: const TextStyle(color: AppColors.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.amberWarning,
+              foregroundColor: Colors.black,
+            ),
+            child: Text(context.loc.reset),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _storage.resetDefensiveScriptsToDefault();
+      HapticService.selectionClick();
+      if (mounted) {
+        setState(() {
+          _activeScriptIndex = 0;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.loc.isHindi
+                  ? 'सभी रक्षात्मक सूत्र मूल स्थिति में रीसेट कर दिए गए'
+                  : 'Defensive scripts restored to factory defaults',
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.background),
+            ),
+            backgroundColor: AppColors.shieldPrimary,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Strict dismissal lock during State 1 and State 2
@@ -305,15 +440,82 @@ class _SOSModalSheetState extends State<SOSModalSheet>
             ],
           ),
           if (canPop)
-            IconButton(
-              onPressed: () {
-                HapticService.lightImpact();
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.close_rounded, size: 22),
-              color: AppColors.textSecondary,
-              splashRadius: 20,
-              tooltip: 'Close Shield',
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () => _openScriptEditor(null),
+                  icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+                  color: AppColors.shieldPrimary,
+                  splashRadius: 20,
+                  tooltip: context.loc.addDefensiveScript,
+                ),
+                PopupMenuButton<String>(
+                  icon: const Icon(
+                    Icons.more_vert_rounded,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                  color: AppColors.surfaceElevated,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                    side: const BorderSide(color: AppColors.borderSubtle),
+                  ),
+                  onSelected: (val) {
+                    if (val == 'reset') {
+                      _confirmResetScripts();
+                    } else if (val == 'add') {
+                      _openScriptEditor(null);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'add',
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.add_moderator_rounded,
+                            size: 16,
+                            color: AppColors.shieldPrimary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            context.loc.addDefensiveScript,
+                            style: AppTextStyles.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'reset',
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.restore_rounded,
+                            size: 16,
+                            color: AppColors.amberWarning,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            context.loc.resetToDefaultScripts,
+                            style: AppTextStyles.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () {
+                    HapticService.lightImpact();
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.close_rounded, size: 22),
+                  color: AppColors.textSecondary,
+                  splashRadius: 20,
+                  tooltip: 'Close Shield',
+                ),
+              ],
             )
           else
             Container(
@@ -570,33 +772,64 @@ class _SOSModalSheetState extends State<SOSModalSheet>
   // STATE 3: DEFENSIVE SCRIPTS ACTIVE (Indefinite)
   // ---------------------------------------------------------------------------
   Widget _buildState3ScriptsCarousel() {
+    final allScripts = _storage.getAllDefensiveScripts();
     final List<String> availableCategories = [
       'All',
       if (_pinnedScriptIds.isNotEmpty) 'Pinned',
-      ...DefensiveScriptsVault.categories.where((c) => c != 'All'),
+      ...DefensiveScriptsVault.getCategories(allScripts).where((c) => c != 'All'),
     ];
 
     final List<DefensiveScript> scripts;
     if (_selectedCategory == 'Pinned') {
-      scripts = DefensiveScriptsVault.scripts
+      scripts = allScripts
           .where((s) => _pinnedScriptIds.contains(s.id))
           .toList();
     } else {
-      scripts = DefensiveScriptsVault.getByCategory(_selectedCategory);
+      scripts =
+          DefensiveScriptsVault.getByCategory(_selectedCategory, allScripts);
+    }
+
+    if (_activeScriptIndex >= scripts.length && scripts.isNotEmpty) {
+      _activeScriptIndex = scripts.length - 1;
     }
 
     return Column(
       children: [
-        // Category Selector Chips
+        // Category Selector Chips & + Add Script Chip
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: SizedBox(
             height: 34,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: availableCategories.length,
+              itemCount: availableCategories.length + 1,
               separatorBuilder: (context, index) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
+                if (index == availableCategories.length) {
+                  return ActionChip(
+                    avatar: const Icon(
+                      Icons.add_rounded,
+                      size: 14,
+                      color: AppColors.shieldPrimary,
+                    ),
+                    label: Text(
+                      context.loc.isHindi ? '+ नया सूत्र' : '+ Add Script',
+                    ),
+                    onPressed: () => _openScriptEditor(null),
+                    backgroundColor: AppColors.surfaceElevated,
+                    side: const BorderSide(
+                      color: AppColors.shieldPrimary,
+                      width: 1.0,
+                    ),
+                    labelStyle: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.shieldPrimary,
+                    ),
+                    visualDensity: VisualDensity.compact,
+                  );
+                }
+
                 final cat = availableCategories[index];
                 final isSelected = cat == _selectedCategory;
                 return ChoiceChip(
@@ -635,59 +868,130 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           ),
         ),
 
-        // Carousel of Response Cards
-        Expanded(
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: scripts.length,
-            onPageChanged: (idx) {
-              HapticService.lightImpact();
-              setState(() => _activeScriptIndex = idx);
-            },
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              final script = scripts[index];
-              return _buildExecutiveScriptCard(script);
-            },
-          ),
-        ),
-
-        // Pagination Dots & Navigation Prompt
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'SCRIPT ${_activeScriptIndex + 1} OF ${scripts.length}',
-                style: AppTextStyles.labelBadge.copyWith(fontSize: 9.5),
+        // Carousel of Response Cards or Empty State
+        if (scripts.isEmpty)
+          Expanded(
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                  border: Border.all(color: AppColors.borderSubtle),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.shield_outlined,
+                      size: 40,
+                      color: AppColors.textMuted,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      context.loc.isHindi
+                          ? 'इस श्रेणी में कोई सूत्र नहीं है'
+                          : 'No defensive scripts in this category',
+                      style: AppTextStyles.heading.copyWith(fontSize: 15),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      context.loc.isHindi
+                          ? 'नया सूत्र जोड़ने के लिए नीचे दिए बटन पर टैप करें।'
+                          : 'Tap below to author a custom script or restore defaults.',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () => _openScriptEditor(null),
+                          icon: const Icon(Icons.add_rounded, size: 16),
+                          label: Text(context.loc.addDefensiveScript),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.shieldPrimary,
+                            foregroundColor: AppColors.background,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        OutlinedButton.icon(
+                          onPressed: _confirmResetScripts,
+                          icon: const Icon(Icons.restore_rounded, size: 16),
+                          label: Text(context.loc.resetToDefaultScripts),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textSecondary,
+                            side:
+                                const BorderSide(color: AppColors.borderMedium),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              Row(
-                children: List.generate(
-                  math.min(scripts.length, 6),
-                  (i) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 2.5),
-                    width: _activeScriptIndex == i ? 16 : 5,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: _activeScriptIndex == i
-                          ? AppColors.shieldPrimary
-                          : AppColors.borderMedium,
-                      borderRadius: BorderRadius.circular(2),
+            ),
+          )
+        else ...[
+          // Carousel of Response Cards
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: scripts.length,
+              onPageChanged: (idx) {
+                HapticService.lightImpact();
+                setState(() => _activeScriptIndex = idx);
+              },
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, index) {
+                final script = scripts[index];
+                return _buildExecutiveScriptCard(script);
+              },
+            ),
+          ),
+
+          // Pagination Dots & Navigation Prompt
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'SCRIPT ${_activeScriptIndex + 1} OF ${scripts.length}',
+                  style: AppTextStyles.labelBadge.copyWith(fontSize: 9.5),
+                ),
+                Row(
+                  children: List.generate(
+                    math.min(scripts.length, 6),
+                    (i) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                      width: _activeScriptIndex == i ? 16 : 5,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: _activeScriptIndex == i
+                            ? AppColors.shieldPrimary
+                            : AppColors.borderMedium,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Text(
-                'SWIPE FOR MORE →',
-                style: AppTextStyles.labelBadge.copyWith(
-                  fontSize: 9.5,
-                  color: AppColors.shieldPrimary,
+                Text(
+                  'SWIPE FOR MORE →',
+                  style: AppTextStyles.labelBadge.copyWith(
+                    fontSize: 9.5,
+                    color: AppColors.shieldPrimary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -731,14 +1035,44 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                     color: AppColors.textMuted,
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    script.toneGuidance,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textMuted,
-                      fontSize: 10.5,
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 120),
+                    child: Text(
+                      script.toneGuidance,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textMuted,
+                        fontSize: 10.5,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
+                  InkWell(
+                    onTap: () => _openScriptEditor(script),
+                    borderRadius: BorderRadius.circular(4),
+                    child: const Padding(
+                      padding: EdgeInsets.all(3.0),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        size: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () => _confirmDeleteScript(script),
+                    borderRadius: BorderRadius.circular(4),
+                    child: const Padding(
+                      padding: EdgeInsets.all(3.0),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        size: 16,
+                        color: AppColors.roseDanger,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   InkWell(
                     onTap: () async {
                       if (_storage.isInitialized) {
@@ -751,7 +1085,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                     },
                     borderRadius: BorderRadius.circular(4),
                     child: Padding(
-                      padding: const EdgeInsets.all(2.0),
+                      padding: const EdgeInsets.all(3.0),
                       child: Icon(
                         _pinnedScriptIds.contains(script.id)
                             ? Icons.bookmark_rounded

@@ -9,6 +9,7 @@ import '../../features/journal/data/models/media_record_log.dart';
 import '../../features/joy_reservoir/data/models/joy_item.dart';
 import '../../features/recovery/data/models/incident_slip_up_log.dart';
 import '../../features/settings/data/models/notification_slot_config.dart';
+import '../../features/sos/data/defensive_scripts_vault.dart';
 import '../../features/wisdom/data/models/resource_link.dart';
 import 'hive_boxes.dart';
 
@@ -35,6 +36,7 @@ class HiveStorage {
   late Box<Map> _characterLedgerBox;
   late Box<Map> _executionTriggersBox;
   late Box<Map> _htmlToolsBox;
+  late Box<Map> _defensiveScriptsBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -67,6 +69,15 @@ class HiveStorage {
       _characterLedgerBox = await Hive.openBox<Map>(HiveBoxes.characterLedger);
       _executionTriggersBox = await Hive.openBox<Map>(HiveBoxes.executionTriggers);
       _htmlToolsBox = await Hive.openBox<Map>(HiveBoxes.htmlTools);
+      _defensiveScriptsBox =
+          await Hive.openBox<Map>(HiveBoxes.defensiveScripts);
+
+      // Pre-seed default defensive scripts if empty
+      if (_defensiveScriptsBox.isEmpty) {
+        for (final script in DefensiveScriptsVault.scripts) {
+          await _defensiveScriptsBox.put(script.id, script.toMap());
+        }
+      }
 
       // Pre-seed starter anchors for Joy Reservoir if empty
       if (_joyReservoirBox.isEmpty) {
@@ -668,6 +679,43 @@ class HiveStorage {
     await _htmlToolsBox.clear();
     final starter = LocalHtmlTool.starterDashboard();
     await _htmlToolsBox.put(starter.id, starter.toMap());
+  }
+
+  // ---------------------------------------------------------
+  // Defensive Scripts Operations (DefensiveScript)
+  // ---------------------------------------------------------
+
+  List<DefensiveScript> getAllDefensiveScripts() {
+    if (!_initialized) return DefensiveScriptsVault.scripts;
+    final list = <DefensiveScript>[];
+    for (final raw in _defensiveScriptsBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        list.add(DefensiveScript.fromMap(map));
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing DefensiveScript: $e');
+      }
+    }
+    if (list.isEmpty) return DefensiveScriptsVault.scripts;
+    return list;
+  }
+
+  Future<void> saveDefensiveScript(DefensiveScript script) async {
+    if (!_initialized) return;
+    await _defensiveScriptsBox.put(script.id, script.toMap());
+  }
+
+  Future<void> deleteDefensiveScript(String id) async {
+    if (!_initialized) return;
+    await _defensiveScriptsBox.delete(id);
+  }
+
+  Future<void> resetDefensiveScriptsToDefault() async {
+    if (!_initialized) return;
+    await _defensiveScriptsBox.clear();
+    for (final script in DefensiveScriptsVault.scripts) {
+      await _defensiveScriptsBox.put(script.id, script.toMap());
+    }
   }
 }
 

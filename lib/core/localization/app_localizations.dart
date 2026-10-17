@@ -255,6 +255,31 @@ class AppLocalizations {
   String get damageControlScripts => isHindi
       ? 'रणनीतिक संकट निवारण सूत्र'
       : 'Damage Control Scripts';
+  String get addDefensiveScript => isHindi
+      ? 'नया रक्षात्मक सूत्र जोड़ें'
+      : 'Add Defensive Script';
+  String get editDefensiveScript => isHindi
+      ? 'रक्षात्मक सूत्र संपादित करें'
+      : 'Edit Defensive Script';
+  String get deleteScript => isHindi ? 'सूत्र हटाएं' : 'Delete Script';
+  String get confirmDeleteScriptMsg => isHindi
+      ? 'क्या आप वाकई इस रक्षात्मक सूत्र को हटाना चाहते हैं?'
+      : 'Are you sure you want to delete this defensive script?';
+  String get hostileTriggerLabel => isHindi
+      ? 'उकसावा अथवा आक्रामक वक्तव्य'
+      : 'Hostile Trigger / Provocation';
+  String get defensiveScriptLabel => isHindi
+      ? 'सटीक रक्षात्मक उत्तर (सूत्र)'
+      : 'Defensive Response Script';
+  String get subtextLabel => isHindi
+      ? 'आंतरिक मंतव्य व मनोवैज्ञानिक रणनीति'
+      : 'Subtext / Tactical Rationale';
+  String get toneGuidanceLabel => isHindi
+      ? 'स्वर एवं शारीरिक भाव निर्देश'
+      : 'Tone & Posture Guidance';
+  String get resetToDefaultScripts => isHindi
+      ? 'मूल फ़ैक्टरी सूत्रों पर रीसेट करें'
+      : 'Reset to Factory Blueprints';
 
   // -------------------------------------------------------------
   // Daily Journal & Evening Audit

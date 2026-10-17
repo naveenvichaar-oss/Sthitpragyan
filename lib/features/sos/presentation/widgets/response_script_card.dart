@@ -13,12 +13,16 @@ class ResponseScriptCard extends StatefulWidget {
   final DefensiveScript script;
   final bool isBookmarked;
   final VoidCallback onToggleBookmark;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const ResponseScriptCard({
     super.key,
     required this.script,
     required this.isBookmarked,
     required this.onToggleBookmark,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -133,6 +137,34 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                       splashRadius: 18,
                       tooltip: 'Bookmark Script',
                     ),
+                    if (widget.onEdit != null)
+                      IconButton(
+                        onPressed: () {
+                          HapticService.selectionClick();
+                          widget.onEdit!();
+                        },
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: AppColors.textSecondary,
+                        ),
+                        splashRadius: 18,
+                        tooltip: 'Edit Script',
+                      ),
+                    if (widget.onDelete != null)
+                      IconButton(
+                        onPressed: () {
+                          HapticService.selectionClick();
+                          widget.onDelete!();
+                        },
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                          color: AppColors.roseDanger,
+                        ),
+                        splashRadius: 18,
+                        tooltip: 'Delete Script',
+                      ),
                     IconButton(
                       onPressed: _copyScriptToClipboard,
                       icon: Icon(

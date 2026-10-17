@@ -38,4 +38,7 @@ abstract class HiveBoxes {
 
   /// Box containing imported offline HTML tools, interactive dashboards, and standalone calculators
   static const String htmlTools = 'sthitaprajna_html_tools';
+
+  /// Box containing customizable and user-authored tactical defensive response scripts
+  static const String defensiveScripts = 'sthitaprajna_defensive_scripts';
 }

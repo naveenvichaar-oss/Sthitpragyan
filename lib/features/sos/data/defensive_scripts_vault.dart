@@ -7,6 +7,7 @@ class DefensiveScript {
   final String executiveScript;
   final String tacticalRationale;
   final String toneGuidance;
+  final bool isCustom;
 
   const DefensiveScript({
     required this.id,
@@ -16,7 +17,54 @@ class DefensiveScript {
     required this.executiveScript,
     required this.tacticalRationale,
     required this.toneGuidance,
+    this.isCustom = false,
   });
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'category': category,
+    'scenario': scenario,
+    'hostileTrigger': hostileTrigger,
+    'executiveScript': executiveScript,
+    'tacticalRationale': tacticalRationale,
+    'toneGuidance': toneGuidance,
+    'isCustom': isCustom,
+  };
+
+  factory DefensiveScript.fromMap(Map<String, dynamic> map) {
+    return DefensiveScript(
+      id: map['id'] as String? ?? '',
+      category: map['category'] as String? ?? 'Unjust Accusation',
+      scenario: map['scenario'] as String? ?? '',
+      hostileTrigger: map['hostileTrigger'] as String? ?? '',
+      executiveScript: map['executiveScript'] as String? ?? '',
+      tacticalRationale: map['tacticalRationale'] as String? ?? '',
+      toneGuidance: map['toneGuidance'] as String? ?? '',
+      isCustom: map['isCustom'] == true,
+    );
+  }
+
+  DefensiveScript copyWith({
+    String? id,
+    String? category,
+    String? scenario,
+    String? hostileTrigger,
+    String? executiveScript,
+    String? tacticalRationale,
+    String? toneGuidance,
+    bool? isCustom,
+  }) {
+    return DefensiveScript(
+      id: id ?? this.id,
+      category: category ?? this.category,
+      scenario: scenario ?? this.scenario,
+      hostileTrigger: hostileTrigger ?? this.hostileTrigger,
+      executiveScript: executiveScript ?? this.executiveScript,
+      tacticalRationale: tacticalRationale ?? this.tacticalRationale,
+      toneGuidance: toneGuidance ?? this.toneGuidance,
+      isCustom: isCustom ?? this.isCustom,
+    );
+  }
 }
 
 /// DefensiveScriptsVault contains high-leverage, non-reactive scripts
@@ -197,8 +245,10 @@ class DefensiveScriptsVault {
     ),
   ];
 
-  static List<String> get categories {
-    return [
+  static List<String> get categories => getCategories();
+
+  static List<String> getCategories([List<DefensiveScript>? currentScripts]) {
+    const canonicalOrder = [
       'All',
       'Rules of Engagement',
       'Unjust Accusation',
@@ -210,10 +260,31 @@ class DefensiveScriptsVault {
       'Passive Aggression',
       'Scope Creep',
     ];
+    if (currentScripts == null) {
+      return List<String>.from(canonicalOrder);
+    }
+    final set = <String>{};
+    for (final cat in canonicalOrder) {
+      set.add(cat);
+    }
+    for (final s in currentScripts) {
+      if (s.category.trim().isNotEmpty) {
+        set.add(s.category.trim());
+      }
+    }
+    return set.toList();
   }
 
-  static List<DefensiveScript> getByCategory(String category) {
-    if (category == 'All') return scripts;
-    return scripts.where((s) => s.category == category).toList();
+  static List<DefensiveScript> getByCategory(
+    String category, [
+    List<DefensiveScript>? currentScripts,
+  ]) {
+    final list = currentScripts ?? scripts;
+    if (category == 'All') return list;
+    return list
+        .where(
+          (s) => s.category.trim().toLowerCase() == category.trim().toLowerCase(),
+        )
+        .toList();
   }
 }
