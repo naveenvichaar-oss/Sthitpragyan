@@ -238,16 +238,18 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                     Text(
                       'WHY IT WORKS: ',
                       style: AppTextStyles.labelBadge.copyWith(
-                        fontSize: 9.0,
-                        color: AppColors.textMuted,
+                        fontSize: 9.5,
+                        color: AppColors.shieldPrimary,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     Expanded(
                       child: Text(
                         widget.script.tacticalRationale,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 11.5,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                          fontSize: 12.5,
+                          height: 1.4,
                         ),
                       ),
                     ),

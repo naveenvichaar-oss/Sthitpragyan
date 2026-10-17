@@ -402,8 +402,9 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           Text(
             'Vagus nerve activation: Halting amygdala fight-or-flight cascade...',
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textMuted,
-              fontStyle: FontStyle.italic,
+              color: AppColors.textSecondary,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ],
@@ -532,9 +533,9 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           Text(
             'सामने वाले की टोन और आंखों का विचलन केवल देखें।',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              fontStyle: FontStyle.italic,
+              color: AppColors.textPrimary,
               fontSize: 14.5,
+              fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),
@@ -780,8 +781,8 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           Text(
             script.hostileTrigger,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              fontStyle: FontStyle.italic,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 14),
@@ -795,51 +796,97 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                 color: AppColors.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
                 border: Border.all(
-                  color: AppColors.shieldPrimary.withOpacity(0.4),
+                  color: AppColors.shieldPrimary.withValues(alpha: 0.4),
                   width: 1.2,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.shield_rounded,
-                        size: 14,
-                        color: AppColors.shieldPrimary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'DEFENSIVE RESPONSE SCRIPT',
-                        style: AppTextStyles.labelBadge.copyWith(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.shield_rounded,
+                          size: 14,
                           color: AppColors.shieldPrimary,
-                          fontSize: 9.0,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'DEFENSIVE RESPONSE SCRIPT',
+                          style: AppTextStyles.labelBadge.copyWith(
+                            color: AppColors.shieldPrimary,
+                            fontSize: 9.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '"${script.executiveScript}"',
+                      style: AppTextStyles.heading.copyWith(
+                        fontSize: 17,
+                        height: 1.45,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // High-Contrast Crisp Subtext Block
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.background.withValues(alpha: 0.65),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: AppColors.borderSubtle,
+                          width: 1.0,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '"${script.executiveScript}"',
-                    style: AppTextStyles.heading.copyWith(
-                      fontSize: 17,
-                      height: 1.45,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 2),
+                            child: Icon(
+                              Icons.psychology_outlined,
+                              size: 14,
+                              color: AppColors.shieldPrimary,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'SUBTEXT: ',
+                                    style: AppTextStyles.labelBadge.copyWith(
+                                      color: AppColors.shieldPrimary,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: script.tacticalRationale,
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Subtext: ${script.tacticalRationale}',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textMuted,
-                      fontSize: 11.5,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
