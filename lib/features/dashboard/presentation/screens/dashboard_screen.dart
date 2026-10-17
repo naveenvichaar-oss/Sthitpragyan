@@ -4,6 +4,7 @@ import 'package:sthitaprajna/core/constants/app_colors.dart';
 import 'package:sthitaprajna/core/constants/app_dimens.dart';
 import 'package:sthitaprajna/core/constants/app_text_styles.dart';
 import 'package:sthitaprajna/core/database/hive_storage.dart';
+import 'package:sthitaprajna/core/localization/app_localizations.dart';
 import 'package:sthitaprajna/core/notifications/notification_service.dart';
 import 'package:sthitaprajna/core/notifications/notifications_dataset_service.dart';
 import 'package:sthitaprajna/core/utils/haptic_service.dart';
@@ -177,7 +178,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         size: 16,
                         color: AppColors.amberWarning,
                       ),
-                      label: const Text('Log a Slip-Up / Reset'),
+                      label: Text(context.loc.slipUpRecoveryButton),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textPrimary,
                         side: BorderSide(
@@ -222,10 +223,10 @@ class DashboardScreenState extends State<DashboardScreen> {
                           accentColor: isDebriefCompleted
                               ? AppColors.emeraldSuccess
                               : AppColors.shieldPrimary,
-                          title: '3-INDEX DEBRIEF',
+                          title: context.loc.dailyJournalTitle.toUpperCase(),
                           subtitle: isDebriefCompleted
-                              ? 'Logged (${_todayEntry!.compositeScore}%)'
-                              : '60s Evening Audit',
+                              ? '${context.loc.debriefLoggedScore} (${_todayEntry!.compositeScore}%)'
+                              : context.loc.eveningAuditSubtitle,
                           onTap: widget.onNavigateToJournal,
                         ),
                       ),
@@ -235,8 +236,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                         child: _buildNavigationCard(
                           icon: Icons.psychology_rounded,
                           accentColor: const Color(0xFF818CF8),
-                          title: 'COGNITION VAULT',
-                          subtitle: 'Fallacies & Models',
+                          title: context.loc.cognitionVaultTitle,
+                          subtitle: context.loc.segmentFallacies,
                           onTap: widget.onNavigateToVault,
                         ),
                       ),
@@ -306,7 +307,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     children: [
                       Text(
-                        'SOUL SANCTUARY • आनंद कोष',
+                        context.loc.joyReservoirSubtitle.toUpperCase(),
                         style: AppTextStyles.labelBadge.copyWith(
                           color: const Color(0xFFF43F5E),
                           fontSize: 8.5,
@@ -317,13 +318,13 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  const Text(
-                    'JOY RESERVOIR',
+                  Text(
+                    context.loc.joyReservoirTitle.toUpperCase(),
                     style: AppTextStyles.heading,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Personal serene music, visual anchors & comfort words to recalibrate your mind.',
+                    context.loc.joyReservoirDesc,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 11,
@@ -384,7 +385,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     children: [
                       Text(
-                        'ACTION-TRIGGER • प्रतिबद्धता ध्वनि',
+                        context.loc.executionChimesSubtitle.toUpperCase(),
                         style: AppTextStyles.labelBadge.copyWith(
                           color: const Color(0xFF10B981),
                           fontSize: 8.5,
@@ -395,13 +396,13 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  const Text(
-                    'EXECUTION CHIME',
+                  Text(
+                    context.loc.executionChimesTitle.toUpperCase(),
                     style: AppTextStyles.heading,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Zero-snooze commitment blocks & 5-min micro-ignition friction breaker.',
+                    context.loc.microIgnitionDesc,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 11,
@@ -427,18 +428,18 @@ class DashboardScreenState extends State<DashboardScreen> {
                     color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.bolt_rounded,
                       size: 13,
                       color: Color(0xFFF59E0B),
                     ),
-                    SizedBox(width: 3),
+                    const SizedBox(width: 3),
                     Text(
-                      '5-MIN IGNITION',
-                      style: TextStyle(
+                      context.loc.isHindi ? 'सूक्ष्म गति' : '5-MIN IGNITION',
+                      style: const TextStyle(
                         color: Color(0xFFF59E0B),
                         fontSize: 8.5,
                         fontWeight: FontWeight.w800,
@@ -500,7 +501,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     children: [
                       Text(
-                        'SOVEREIGN VIRTUES • चरित्र कोष',
+                        context.loc.characterLedgerSubtitle.toUpperCase(),
                         style: AppTextStyles.labelBadge.copyWith(
                           color: const Color(0xFFF59E0B),
                           fontSize: 8.5,
@@ -511,13 +512,13 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  const Text(
-                    'CHARACTER LEDGER',
+                  Text(
+                    context.loc.characterLedgerTitle.toUpperCase(),
                     style: AppTextStyles.heading,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Structured notepad: Magnanimity, Gravitas, Joy & Tactical Restraint.',
+                    context.loc.characterLedgerDesc,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 11,

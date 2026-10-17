@@ -68,6 +68,12 @@ class VoiceTtsService {
         await _flutterTts.stop();
       }
 
+      // Automatically configure voice language for Devanagari Hindi vs English
+      final hasDevanagari = RegExp(r'[\u0900-\u097F]').hasMatch(text);
+      try {
+        await _flutterTts.setLanguage(hasDevanagari ? 'hi-IN' : 'en-US');
+      } catch (_) {}
+
       currentlySpeakingText.value = text;
       await _flutterTts.speak(text);
     } catch (e) {

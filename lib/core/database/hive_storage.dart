@@ -299,6 +299,14 @@ class HiveStorage {
     await _settingsBox.put('active_rule_index', index);
   }
 
+  String getLanguageCode() {
+    return _settingsBox.get('language_code', defaultValue: 'en') as String;
+  }
+
+  Future<void> setLanguageCode(String code) async {
+    await _settingsBox.put('language_code', code);
+  }
+
   // ---------------------------------------------------------
   // Custom Dynamic Notification Slots
   // ---------------------------------------------------------

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/date_helpers.dart';
 import '../../data/models/streak_data.dart';
 
@@ -46,8 +47,8 @@ class StreakBadge extends StatelessWidget {
                   const SizedBox(width: AppDimens.space8),
                   Text(
                     streakData.currentStreak == 1
-                        ? 'DAY STREAK'
-                        : 'DAYS STREAK',
+                        ? (context.loc.isHindi ? 'दिवस समत्व' : 'DAY STREAK')
+                        : (context.loc.isHindi ? 'दिवसीय समत्व' : 'DAYS STREAK'),
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.textPrimary,
                       letterSpacing: 2.0,
@@ -63,7 +64,9 @@ class StreakBadge extends StatelessWidget {
                   border: Border.all(color: AppColors.borderSubtle),
                 ),
                 child: Text(
-                  'BEST: ${streakData.longestStreak} D',
+                  context.loc.isHindi
+                      ? 'सर्वश्रेष्ठ: ${streakData.longestStreak} दिन'
+                      : 'BEST: ${streakData.longestStreak} D',
                   style: AppTextStyles.metricSmall.copyWith(
                     fontSize: 11,
                     color: AppColors.textSecondary,

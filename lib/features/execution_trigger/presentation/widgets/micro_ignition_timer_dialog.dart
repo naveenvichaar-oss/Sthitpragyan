@@ -5,6 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/services/gong_audio_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 
@@ -166,7 +167,9 @@ class _MicroIgnitionTimerDialogState extends State<MicroIgnitionTimerDialog> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'MICRO-IGNITION • 5-MINUTE RULE',
+                          context.loc.isHindi
+                              ? 'सूक्ष्म गति • ५-मिनट नियम'
+                              : 'MICRO-IGNITION • 5-MINUTE RULE',
                           style: AppTextStyles.labelBadge.copyWith(
                             color: const Color(0xFFF59E0B),
                             fontSize: 8.5,
@@ -194,7 +197,9 @@ class _MicroIgnitionTimerDialogState extends State<MicroIgnitionTimerDialog> {
                 textAlign: TextAlign.center,
                 style: AppTextStyles.heading.copyWith(fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: 'What are you igniting right now?',
+                  hintText: context.loc.isHindi
+                      ? 'आप अभी किस कार्य का आरंभ कर रहे हैं?'
+                      : 'What are you igniting right now?',
                   hintStyle: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textMuted,
                   ),
@@ -214,7 +219,9 @@ class _MicroIgnitionTimerDialogState extends State<MicroIgnitionTimerDialog> {
 
               // Stoic Philosophy Description
               Text(
-                'Commit strictly to 5 minutes. No evaluation of output quality.\nOnce motion starts, psychological friction evaporates.',
+                context.loc.isHindi
+                    ? 'मात्र ५ मिनट का संकल्प। परिणाम की चिंता त्यागें।\nगति आरंभ होते ही मानसिक प्रतिरोध समाप्त हो जाता है।'
+                    : 'Commit strictly to 5 minutes. No evaluation of output quality.\nOnce motion starts, psychological friction evaporates.',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,

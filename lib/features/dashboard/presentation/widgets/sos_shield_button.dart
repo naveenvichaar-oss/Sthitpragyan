@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
 /// SOSShieldButton is the primary emergency trigger.
@@ -147,13 +148,13 @@ class _SOSShieldButtonState extends State<SOSShieldButton>
                         ],
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'ACTIVATE EQUANIMITY SHIELD',
+                      Text(
+                        context.loc.sosCenterButton,
                         style: AppTextStyles.heading,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '3s Breathing • Vagal Grounding • Defensive Scripts',
+                        context.loc.sosShieldSub,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                           fontSize: 11.5,

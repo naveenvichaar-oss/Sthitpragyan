@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/voice_tts_button.dart';
@@ -82,7 +83,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                           ),
                         ),
                         child: Text(
-                          'DAILY TRIGGER (DATASET)',
+                          context.loc.dailyTriggerDatasetBadge,
                           style: AppTextStyles.labelBadge.copyWith(
                             fontSize: 9.0,
                             color: _showDataset
@@ -118,7 +119,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                           ),
                         ),
                         child: Text(
-                          'STOIC RULE',
+                          context.loc.coreStoicRuleBadge,
                           style: AppTextStyles.labelBadge.copyWith(
                             fontSize: 9.0,
                             color: !_showDataset
@@ -137,8 +138,8 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                     VoiceTtsButton(
                       textToSpeak: _showDataset && trigger != null
                           ? '${trigger.title}. ${trigger.body}'
-                          : '${widget.rule.title}. ${widget.rule.aphorism}. Tactical Action: ${widget.rule.tacticalAction}',
-                      tooltip: 'Listen to rule in calm executive voice',
+                          : '${context.loc.getRuleTitle(widget.rule.id, widget.rule.title)}. ${context.loc.getRuleAphorism(widget.rule.id, widget.rule.aphorism)}. ${context.loc.isHindi ? "रणनीतिक निर्देश:" : "Tactical Directive:"} ${context.loc.getRuleTacticalAction(widget.rule.id, widget.rule.tacticalAction)}',
+                      tooltip: context.loc.listenWithCalmVoice,
                     ),
                     const SizedBox(width: 4),
                     IconButton(
@@ -273,7 +274,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                 horizontal: AppDimens.space16,
               ),
               child: Text(
-                widget.rule.title,
+                context.loc.getRuleTitle(widget.rule.id, widget.rule.title),
                 style: AppTextStyles.heading.copyWith(
                   letterSpacing: 0.8,
                   fontWeight: FontWeight.w700,
@@ -287,7 +288,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                 horizontal: AppDimens.space16,
               ),
               child: Text(
-                '"${widget.rule.aphorism}"',
+                '"${context.loc.getRuleAphorism(widget.rule.id, widget.rule.aphorism)}"',
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.textPrimary,
                   fontStyle: FontStyle.italic,
@@ -333,7 +334,9 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                       ),
                       const SizedBox(width: AppDimens.space6),
                       Text(
-                        'TACTICAL DIRECTIVE',
+                        context.loc.isHindi
+                            ? 'रणनीतिक निर्देश'
+                            : 'TACTICAL DIRECTIVE',
                         style: AppTextStyles.labelBadge.copyWith(
                           color: AppColors.shieldPrimary,
                           fontSize: 9.5,
@@ -343,7 +346,10 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    widget.rule.tacticalAction,
+                    context.loc.getRuleTacticalAction(
+                      widget.rule.id,
+                      widget.rule.tacticalAction,
+                    ),
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,

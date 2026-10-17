@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
 enum BreathingPhase { inhale, hold, exhale }
@@ -125,25 +126,33 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
     super.dispose();
   }
 
-  String get _phaseTitle {
+  String _getPhaseTitle(BuildContext context) {
+    final isHindi = context.loc.isHindi;
     switch (_currentPhase) {
       case BreathingPhase.inhale:
-        return 'INHALE (3s)';
+        return isHindi ? 'श्वास लें (३ से.)' : 'INHALE (3s)';
       case BreathingPhase.hold:
-        return 'HOLD & DETACH (3s)';
+        return isHindi ? 'कुंभक / रोकें (३ से.)' : 'HOLD & DETACH (3s)';
       case BreathingPhase.exhale:
-        return 'EXHALE CORTISOL (3s)';
+        return isHindi ? 'श्वास छोड़ें (३ से.)' : 'EXHALE CORTISOL (3s)';
     }
   }
 
-  String get _phaseSubtitle {
+  String _getPhaseSubtitle(BuildContext context) {
+    final isHindi = context.loc.isHindi;
     switch (_currentPhase) {
       case BreathingPhase.inhale:
-        return 'Diaphragm down • Expand ribcage slowly';
+        return isHindi
+            ? 'नाभि नीचे • फेफड़ों का विस्तार'
+            : 'Diaphragm down • Expand ribcage slowly';
       case BreathingPhase.hold:
-        return 'Maintain stillness • You are an impassive witness';
+        return isHindi
+            ? 'अचल साक्षी भाव बनाए रखें'
+            : 'Maintain stillness • You are an impassive witness';
       case BreathingPhase.exhale:
-        return 'Slow stream through teeth • Drop shoulders completely';
+        return isHindi
+            ? 'तनाव विसर्जन • कंधों को शिथिल करें'
+            : 'Slow stream through teeth • Drop shoulders completely';
     }
   }
 
@@ -289,7 +298,7 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
               key: ValueKey<BreathingPhase>(_currentPhase),
               children: [
                 Text(
-                  _phaseTitle,
+                  _getPhaseTitle(context),
                   style: AppTextStyles.heading.copyWith(
                     color: _phaseAccent,
                     letterSpacing: 1.5,
@@ -298,7 +307,7 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
                 ),
                 const SizedBox(height: AppDimens.space4),
                 Text(
-                  _phaseSubtitle,
+                  _getPhaseSubtitle(context),
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),

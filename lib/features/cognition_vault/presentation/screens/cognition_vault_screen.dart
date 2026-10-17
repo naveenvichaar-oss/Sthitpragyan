@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../joy_reservoir/presentation/screens/joy_reservoir_screen.dart';
 import '../../../joy_reservoir/presentation/widgets/add_joy_item_modal_sheet.dart';
@@ -235,7 +236,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'INTELLECTUAL DEFENSE & SANCTUARY',
+                      context.loc.cognitionVaultSubtitle.toUpperCase(),
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
                         letterSpacing: 1.5,
@@ -243,8 +244,8 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text(
-                      'WISDOM & COGNITION',
+                    Text(
+                      context.loc.cognitionVaultTitle,
                       style: AppTextStyles.displayMedium,
                     ),
                   ],
@@ -340,15 +341,15 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildSegmentButton(0, 'WISDOM CARDS', Icons.auto_stories_rounded),
+            _buildSegmentButton(0, context.loc.isHindi ? 'प्रज्ञा पत्र' : 'WISDOM CARDS', Icons.auto_stories_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(1, 'RESOURCE HUB', Icons.hub_rounded),
+            _buildSegmentButton(1, context.loc.isHindi ? 'अध्ययन सामग्री' : 'RESOURCE HUB', Icons.hub_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(2, 'MENTAL MODELS', Icons.psychology_rounded),
+            _buildSegmentButton(2, context.loc.segmentFallacies, Icons.psychology_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(3, 'JOY RESERVOIR', Icons.spa_rounded),
+            _buildSegmentButton(3, context.loc.joyReservoirTitle.toUpperCase(), Icons.spa_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(4, 'HTML TOOLS', Icons.html_rounded),
+            _buildSegmentButton(4, context.loc.segmentHtmlTools, Icons.html_rounded),
           ],
         ),
       ),

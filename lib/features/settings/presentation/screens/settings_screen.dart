@@ -4,8 +4,10 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
+import '../../../../shared/widgets/language_switcher_widget.dart';
 import '../../data/models/notification_slot_config.dart';
 import 'package:sthitaprajna/features/character_ledger/presentation/screens/character_ledger_screen.dart';
 import 'package:sthitaprajna/features/execution_trigger/presentation/screens/execution_trigger_screen.dart';
@@ -239,7 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'EXECUTIVE SETTINGS',
+              context.loc.executiveSettings,
               style: AppTextStyles.labelBadge.copyWith(
                 color: AppColors.shieldPrimary,
                 fontSize: 9.5,
@@ -247,7 +249,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 1),
             Text(
-              'Shield & Notification Timing',
+              context.loc.shieldNotificationTiming,
               style: AppTextStyles.heading.copyWith(fontSize: 17),
             ),
           ],
@@ -263,6 +265,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
+          // Language Switcher Section (EN | HI)
+          const LanguageSwitcherWidget(),
+          const SizedBox(height: 16),
+
           // Master Switch Card
           _buildMasterSwitchCard(),
           const SizedBox(height: 20),
@@ -272,7 +278,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'CONFIGURED CHECKPOINTS',
+                context.loc.configuredCheckpoints,
                 style: AppTextStyles.labelBadge.copyWith(fontSize: 10.5),
               ),
               Container(
@@ -313,7 +319,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           OutlinedButton.icon(
             onPressed: () => _openSlotEditor(),
             icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-            label: const Text('ADD CUSTOM CHECKPOINT'),
+            label: Text(context.loc.addCustomCheckpoint),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.shieldPrimary,
               side: const BorderSide(
@@ -333,8 +339,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: TextButton.icon(
               onPressed: _resetToFactoryDefaults,
               icon: const Icon(Icons.restart_alt_rounded, size: 16),
-              label: const Text(
-                'Reset to Factory Blueprint (4 Canonical Slots)',
+              label: Text(
+                context.loc.resetToFactoryBlueprint,
               ),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.textMuted,

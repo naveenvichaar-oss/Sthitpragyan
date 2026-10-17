@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimens.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/utils/haptic_service.dart';
 import '../../features/cognition_vault/presentation/screens/cognition_vault_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -141,26 +142,26 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                 color: AppColors.textMuted,
                 fontSize: 10,
               ),
-              destinations: const [
+              destinations: [
                 NavigationRailDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  selectedIcon: Icon(Icons.dashboard_rounded),
-                  label: Text('DASHBOARD'),
+                  icon: const Icon(Icons.dashboard_outlined),
+                  selectedIcon: const Icon(Icons.dashboard_rounded),
+                  label: Text(context.loc.navDashboard.toUpperCase()),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.edit_note_outlined),
-                  selectedIcon: Icon(Icons.edit_note_rounded),
-                  label: Text('DEBRIEF'),
+                  icon: const Icon(Icons.edit_note_outlined),
+                  selectedIcon: const Icon(Icons.edit_note_rounded),
+                  label: Text(context.loc.navDebrief.toUpperCase()),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.psychology_outlined),
-                  selectedIcon: Icon(Icons.psychology_rounded),
-                  label: Text('VAULT'),
+                  icon: const Icon(Icons.psychology_outlined),
+                  selectedIcon: const Icon(Icons.psychology_rounded),
+                  label: Text(context.loc.navVault.toUpperCase()),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.tune_outlined),
-                  selectedIcon: Icon(Icons.tune_rounded),
-                  label: Text('SETTINGS'),
+                  icon: const Icon(Icons.tune_outlined),
+                  selectedIcon: const Icon(Icons.tune_rounded),
+                  label: Text(context.loc.navSettings.toUpperCase()),
                 ),
               ],
             ),
@@ -198,47 +199,47 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
             selectedIndex: _currentIndex,
             onDestinationSelected: _onTabSelected,
             indicatorColor: AppColors.surfaceElevated,
-            destinations: const [
+            destinations: [
               NavigationDestination(
-                icon: Icon(
+                icon: const Icon(
                   Icons.dashboard_outlined,
                   color: AppColors.textMuted,
                 ),
-                selectedIcon: Icon(
+                selectedIcon: const Icon(
                   Icons.dashboard_rounded,
                   color: AppColors.shieldPrimary,
                 ),
-                label: 'Dashboard',
+                label: context.loc.navDashboard,
               ),
               NavigationDestination(
-                icon: Icon(
+                icon: const Icon(
                   Icons.edit_note_outlined,
                   color: AppColors.textMuted,
                 ),
-                selectedIcon: Icon(
+                selectedIcon: const Icon(
                   Icons.edit_note_rounded,
                   color: AppColors.shieldPrimary,
                 ),
-                label: 'Debrief',
+                label: context.loc.navDebrief,
               ),
               NavigationDestination(
-                icon: Icon(
+                icon: const Icon(
                   Icons.psychology_outlined,
                   color: AppColors.textMuted,
                 ),
-                selectedIcon: Icon(
+                selectedIcon: const Icon(
                   Icons.psychology_rounded,
                   color: AppColors.shieldPrimary,
                 ),
-                label: 'Vault',
+                label: context.loc.navVault,
               ),
               NavigationDestination(
-                icon: Icon(Icons.tune_outlined, color: AppColors.textMuted),
-                selectedIcon: Icon(
+                icon: const Icon(Icons.tune_outlined, color: AppColors.textMuted),
+                selectedIcon: const Icon(
                   Icons.tune_rounded,
                   color: AppColors.shieldPrimary,
                 ),
-                label: 'Settings',
+                label: context.loc.navSettings,
               ),
             ],
           ),

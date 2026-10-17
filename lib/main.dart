@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'app.dart';
 import 'core/constants/app_colors.dart';
 import 'core/database/hive_storage.dart';
+import 'core/localization/locale_controller.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/notifications/notifications_dataset_service.dart';
 import 'features/journal/data/repositories/journal_repository.dart';
@@ -33,6 +34,9 @@ void main() async {
 
   // Initialize offline-first zero-telemetry local storage
   await HiveStorage().init();
+
+  // Initialize dynamic language & locale preference
+  LocaleController.instance.init();
 
   // Initialize stealth media vault and .nomedia folder security
   await MediaVaultService().init();
