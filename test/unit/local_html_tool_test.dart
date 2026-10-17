@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sthitaprajna/features/cognition_vault/data/models/local_html_tool.dart';
+import 'package:sthitaprajna/features/cognition_vault/presentation/widgets/platform_html_view.dart';
 
 void main() {
   group('LocalHtmlTool Model & Serialization Tests', () {
@@ -43,6 +44,12 @@ void main() {
       expect(updated.localFilePath, equals(tool.localFilePath));
     });
 
+    test('copyWith updates htmlContent seamlessly', () {
+      final updated = tool.copyWith(htmlContent: '<html><body>Updated</body></html>');
+      expect(updated.htmlContent, equals('<html><body>Updated</body></html>'));
+      expect(updated.title, equals(tool.title));
+    });
+
     test('starterDashboard generates valid interactive executive HTML tool', () {
       final starter = LocalHtmlTool.starterDashboard();
 
@@ -55,6 +62,23 @@ void main() {
       expect(starter.htmlContent!, contains('Premeditatio Malorum'));
       expect(starter.htmlContent!, contains('localStorage'));
       expect(starter.fileSizeBytes! > 0, isTrue);
+    });
+  });
+
+  group('PlatformHtmlView Stub & Cross-Platform Tests', () {
+    test('buildPlatformHtmlView builds without throwing on non-web environment', () {
+      final widget = buildPlatformHtmlView(
+        viewKey: 'test_key',
+        htmlContent: '<h1>Hello</h1>',
+      );
+      expect(widget, isNotNull);
+    });
+
+    test('openPlatformHtmlExternal handles empty or missing files gracefully', () async {
+      expect(
+        () => openPlatformHtmlExternal(htmlContent: '', localFilePath: ''),
+        returnsNormally,
+      );
     });
   });
 }

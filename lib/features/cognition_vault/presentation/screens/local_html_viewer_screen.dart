@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -10,9 +11,10 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/local_html_tool.dart';
+import '../widgets/platform_html_view.dart';
 
 /// LocalHtmlViewerScreen renders offline HTML files and interactive dashboards
-/// inside an embedded WebViewController with full JavaScript execution, DOM storage,
+/// across Mobile, Desktop, and Web with full JavaScript execution, DOM storage,
 /// touch interactions, and an executive management toolbar (refresh, rename, delete).
 class LocalHtmlViewerScreen extends StatefulWidget {
   final LocalHtmlTool tool;
@@ -54,12 +56,31 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
   WebViewController? _controller;
   bool _isLoading = true;
   String? _loadError;
+  int _reloadCount = 0;
 
   @override
   void initState() {
     super.initState();
     _currentTool = widget.tool;
-    _initWebView();
+    if (kIsWeb) {
+      _initWeb();
+    } else {
+      _initWebView();
+    }
+  }
+
+  void _initWeb() {
+    if (_currentTool.htmlContent == null || _currentTool.htmlContent!.trim().isEmpty) {
+      setState(() {
+        _isLoading = false;
+        _loadError = 'Offline HTML content is unavailable on this device.';
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+        _loadError = null;
+      });
+    }
   }
 
   void _initWebView() {
@@ -107,7 +128,7 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
         }
       }
 
-      // Fallback or Web platform: load raw HTML string
+      // Fallback: load raw HTML string
       if (_currentTool.htmlContent != null && _currentTool.htmlContent!.isNotEmpty) {
         await controller.loadHtmlString(_currentTool.htmlContent!);
       } else {
@@ -131,10 +152,61 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
 
   void _reload() {
     HapticService.selectionClick();
-    if (_controller != null) {
-      _controller!.reload();
+    if (kIsWeb) {
+      setState(() {
+        _isLoading = true;
+        _reloadCount++;
+        _loadError = null;
+      });
+      Future.delayed(const Duration(milliseconds: 250), () {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      });
     } else {
-      _initWebView();
+      if (_controller != null) {
+        _controller!.reload();
+      } else {
+        _initWebView();
+      }
+    }
+  }
+
+  Future<void> _reimportHtmlContent() async {
+    HapticService.selectionClick();
+    try {
+      final files = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['html', 'htm'],
+      );
+      if (files.isNotEmpty) {
+        final file = files.first;
+        final bytes = await file.readAsBytes();
+        String content;
+        try {
+          content = utf8.decode(bytes);
+        } catch (_) {
+          content = String.fromCharCodes(bytes);
+        }
+        final updated = _currentTool.copyWith(htmlContent: content);
+        await _storage.saveHtmlTool(updated);
+        setState(() {
+          _currentTool = updated;
+          _loadError = null;
+          _isLoading = false;
+        });
+        widget.onToolUpdated?.call(updated);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Updated content for "${updated.title}".'),
+              backgroundColor: AppColors.surfaceElevated,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('[LocalHtmlViewer] Re-import error: $e');
     }
   }
 
@@ -178,23 +250,29 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
             child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.shieldPrimary,
-              foregroundColor: Colors.black,
-            ),
             onPressed: () async {
               final newTitle = titleController.text.trim();
-              if (newTitle.isNotEmpty) {
-                final updated = _currentTool.copyWith(
-                  title: newTitle,
-                  category: categoryController.text.trim().isEmpty
-                      ? 'Personal Tool'
-                      : categoryController.text.trim(),
+              if (newTitle.isEmpty) return;
+
+              final updated = _currentTool.copyWith(
+                title: newTitle,
+                category: categoryController.text.trim().isEmpty
+                    ? _currentTool.category
+                    : categoryController.text.trim(),
+              );
+
+              await _storage.saveHtmlTool(updated);
+              setState(() => _currentTool = updated);
+              widget.onToolUpdated?.call(updated);
+
+              if (mounted) {
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Renamed to "$newTitle".'),
+                    backgroundColor: AppColors.surfaceElevated,
+                  ),
                 );
-                await _storage.saveHtmlTool(updated);
-                setState(() => _currentTool = updated);
-                widget.onToolUpdated?.call(updated);
-                if (ctx.mounted) Navigator.of(ctx).pop();
               }
             },
             child: const Text('SAVE'),
@@ -258,14 +336,16 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
 
   void _openInExternalBrowser() async {
     HapticService.selectionClick();
-    if (_currentTool.htmlContent != null) {
-      final uri = Uri.dataFromString(
-        _currentTool.htmlContent!,
-        mimeType: 'text/html',
+    if (_currentTool.htmlContent != null && _currentTool.htmlContent!.isNotEmpty) {
+      await openPlatformHtmlExternal(
+        htmlContent: _currentTool.htmlContent!,
+        localFilePath: _currentTool.localFilePath,
       );
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
+    } else if (!kIsWeb && _currentTool.localFilePath.isNotEmpty) {
+      await openPlatformHtmlExternal(
+        htmlContent: '',
+        localFilePath: _currentTool.localFilePath,
+      );
     }
   }
 
@@ -381,16 +461,41 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                     ),
                     const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _reload,
-                      child: const Text('RETRY'),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _reload,
+                          icon: const Icon(Icons.refresh_rounded, size: 16),
+                          label: const Text('RETRY'),
+                        ),
+                        const SizedBox(width: 12),
+                        OutlinedButton.icon(
+                          onPressed: _reimportHtmlContent,
+                          icon: const Icon(Icons.file_upload_outlined, size: 16),
+                          label: const Text('RE-SELECT FILE'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textPrimary,
+                            side: const BorderSide(color: AppColors.borderMedium),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             )
+          else if (kIsWeb)
+            Positioned.fill(
+              child: buildPlatformHtmlView(
+                viewKey: '${_currentTool.id}_$_reloadCount',
+                htmlContent: _currentTool.htmlContent ?? '',
+              ),
+            )
           else if (_controller != null)
-            WebViewWidget(controller: _controller!)
+            Positioned.fill(
+              child: WebViewWidget(controller: _controller!),
+            )
           else
             const Center(
               child: CircularProgressIndicator(color: AppColors.shieldPrimary),
