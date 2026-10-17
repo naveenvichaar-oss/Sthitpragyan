@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/execution_trigger.dart';
 import '../widgets/micro_ignition_timer_dialog.dart';
@@ -181,7 +182,7 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
                         final newBlock = ExecutionTrigger(
                           id: 'exec_${DateTime.now().millisecondsSinceEpoch}',
                           title: title,
-                          devanagariSubtitle: 'संकल्पित कर्म',
+                          devanagariSubtitle: ctx.loc.isHindi ? 'संकल्पित कर्म' : 'Committed Block',
                           timeOfDay: timeController.text.trim(),
                           intent: intentController.text.trim().isEmpty
                               ? 'Zero hesitation. Execute with pure presence.'
@@ -218,7 +219,7 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ACTION-TRIGGER • प्रतिबद्धता ध्वनि',
+              context.loc.actionTriggerBadge,
               style: AppTextStyles.labelBadge.copyWith(
                 color: const Color(0xFF10B981),
                 fontSize: 9.5,
@@ -226,8 +227,8 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
               ),
             ),
             const SizedBox(height: 2),
-            const Text(
-              'EXECUTION CHIME',
+            Text(
+              context.loc.actionTriggerTitle,
               style: AppTextStyles.heading,
             ),
           ],
@@ -331,13 +332,13 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            '5-Minute Micro-Ignition Timer',
+          Text(
+            context.loc.microIgnitionCardTitle,
             style: AppTextStyles.heading,
           ),
           const SizedBox(height: 4),
           Text(
-            'Procrastination is merely cognitive friction at the start threshold. Single-tap to begin a discrete 5-minute countdown and dissolve resistance immediately.',
+            context.loc.microIgnitionCardDesc,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
               fontSize: 11.5,
@@ -358,9 +359,9 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
                 ),
               ),
               icon: const Icon(Icons.bolt_rounded, size: 20),
-              label: const Text(
-                'LAUNCH 5-MIN MICRO-IGNITION NOW',
-                style: TextStyle(
+              label: Text(
+                context.loc.launchMicroIgnitionAction,
+                style: const TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.0,
@@ -447,7 +448,9 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      trigger.devanagariSubtitle,
+                      context.loc.isHindi
+                          ? trigger.devanagariSubtitle
+                          : trigger.category.toUpperCase(),
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.textMuted,
                         fontSize: 8.5,

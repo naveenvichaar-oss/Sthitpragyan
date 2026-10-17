@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/incident_slip_up_log.dart';
 import '../../../../shared/widgets/voice_dictation_button.dart';
@@ -16,6 +17,7 @@ import '../widgets/damage_control_card.dart';
 class ArchetypeGuidance {
   final String title;
   final String subtitleHindi;
+  final String subtitleEnglish;
   final String coreDoctrine;
   final String sampleResponse;
   final IconData icon;
@@ -23,6 +25,7 @@ class ArchetypeGuidance {
   const ArchetypeGuidance({
     required this.title,
     required this.subtitleHindi,
+    required this.subtitleEnglish,
     required this.coreDoctrine,
     required this.sampleResponse,
     required this.icon,
@@ -94,6 +97,7 @@ class _PostIncidentRecoveryScreenState
     ArchetypeGuidance(
       title: 'The Stoic',
       subtitleHindi: 'स्थितप्रज्ञ',
+      subtitleEnglish: 'Absolute Poise',
       coreDoctrine: 'Detached, zero emotional reaction, sticks strictly to objective reality. External events cannot disturb internal peace unless judged as harm.',
       sampleResponse: 'भाषा या एंगल में क्या विशिष्ट फैक्चुअल बदलाव चाहिए? कृपया बिंदु स्पष्ट करें।',
       icon: Icons.shield_rounded,
@@ -101,6 +105,7 @@ class _PostIncidentRecoveryScreenState
     ArchetypeGuidance(
       title: 'The Strategist',
       subtitleHindi: 'रणनीतिकार',
+      subtitleEnglish: 'Tactical Restraint',
       coreDoctrine: 'Puts the burden of proof back on the agitator, minimal words, strategic silence. Does not explain or defend.',
       sampleResponse: 'इस दावे का आधार क्या डेटा है? जब आप बिंदुवार विश्लेषण साझा करेंगे, तब मैं समीक्षा करूँगा।',
       icon: Icons.psychology_rounded,
@@ -108,6 +113,7 @@ class _PostIncidentRecoveryScreenState
     ArchetypeGuidance(
       title: 'The Executive',
       subtitleHindi: 'प्रशासक',
+      subtitleEnglish: 'Unruffled Governance',
       coreDoctrine: 'Demands written clarity/specifics, ignores passive-aggressive tone completely. Aligns solely on verified deliverables.',
       sampleResponse: 'Regarding deliverables: let\'s calibrate milestone expectations in writing before allocating engineering capacity.',
       icon: Icons.account_balance_rounded,
@@ -161,7 +167,9 @@ class _PostIncidentRecoveryScreenState
       trigger: _selectedTrigger,
       mistakeType: _selectedMistake,
       physicalState: _selectedPhysicalState,
-      archetype: '${activeArch.title} (${activeArch.subtitleHindi})',
+      archetype: context.loc.isHindi
+          ? '${activeArch.title} (${activeArch.subtitleHindi})'
+          : '${activeArch.title} (${activeArch.subtitleEnglish})',
       idealResponse: _reflectionController.text.trim(),
       revisedScript: _rewriteController.text.trim(),
       damageControlScriptUsed: _selectedDamageControlScript,
@@ -517,7 +525,9 @@ class _PostIncidentRecoveryScreenState
                             textAlign: TextAlign.center,
                           ),
                           Text(
-                            arch.subtitleHindi,
+                            context.loc.isHindi
+                                ? arch.subtitleHindi
+                                : arch.subtitleEnglish,
                             style: AppTextStyles.bodySmall.copyWith(
                               fontSize: 9,
                               color: AppColors.textMuted,
@@ -1041,7 +1051,7 @@ class _PostIncidentRecoveryScreenState
 
               // Translation
               Text(
-                'ESSENCE / अनुवाद:',
+                context.loc.essenceTranslation,
                 style: AppTextStyles.labelBadge.copyWith(
                   fontSize: 8.5,
                   color: AppColors.textMuted,

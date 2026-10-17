@@ -127,32 +127,24 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
   }
 
   String _getPhaseTitle(BuildContext context) {
-    final isHindi = context.loc.isHindi;
     switch (_currentPhase) {
       case BreathingPhase.inhale:
-        return isHindi ? 'श्वास लें (३ से.)' : 'INHALE (3s)';
+        return context.loc.breathInhaleVisual;
       case BreathingPhase.hold:
-        return isHindi ? 'कुंभक / रोकें (३ से.)' : 'HOLD & DETACH (3s)';
+        return context.loc.breathHoldVisual;
       case BreathingPhase.exhale:
-        return isHindi ? 'श्वास छोड़ें (३ से.)' : 'EXHALE CORTISOL (3s)';
+        return context.loc.breathExhaleVisual;
     }
   }
 
   String _getPhaseSubtitle(BuildContext context) {
-    final isHindi = context.loc.isHindi;
     switch (_currentPhase) {
       case BreathingPhase.inhale:
-        return isHindi
-            ? 'नाभि नीचे • फेफड़ों का विस्तार'
-            : 'Diaphragm down • Expand ribcage slowly';
+        return context.loc.breathNavelExpand;
       case BreathingPhase.hold:
-        return isHindi
-            ? 'अचल साक्षी भाव बनाए रखें'
-            : 'Maintain stillness • You are an impassive witness';
+        return context.loc.breathSteadfastObserver;
       case BreathingPhase.exhale:
-        return isHindi
-            ? 'तनाव विसर्जन • कंधों को शिथिल करें'
-            : 'Slow stream through teeth • Drop shoulders completely';
+        return context.loc.breathReleaseCortisol;
     }
   }
 

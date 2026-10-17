@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
 /// 2-Minute Box Breathing Drill Modal for acute physiological de-escalation
@@ -149,26 +150,26 @@ class _BoxBreathingDrillModalState extends State<BoxBreathingDrillModal>
   String get _phaseTitle {
     switch (_currentPhase) {
       case BreathPhase.inhale:
-        return 'INHALE (साँस अंदर)';
+        return context.loc.boxBreathingInhaleTitle;
       case BreathPhase.holdFull:
-        return 'HOLD FULL (रोकें)';
+        return context.loc.boxBreathingHoldFullTitle;
       case BreathPhase.exhale:
-        return 'EXHALE (साँस बाहर)';
+        return context.loc.boxBreathingExhaleTitle;
       case BreathPhase.holdEmpty:
-        return 'HOLD EMPTY (रिक्त रखें)';
+        return context.loc.boxBreathingHoldEmptyTitle;
     }
   }
 
   String get _phaseGuidance {
     switch (_currentPhase) {
       case BreathPhase.inhale:
-        return 'Deep diaphragmatic breath in through nose';
+        return context.loc.boxBreathingInhaleGuidance;
       case BreathPhase.holdFull:
-        return 'Hold lungs full. Soften jaw, neck & shoulders';
+        return context.loc.boxBreathingHoldFullGuidance;
       case BreathPhase.exhale:
-        return 'Slow, controlled exhale through mouth';
+        return context.loc.boxBreathingExhaleGuidance;
       case BreathPhase.holdEmpty:
-        return 'Rest in stillness. Tongue on roof of mouth';
+        return context.loc.boxBreathingHoldEmptyGuidance;
     }
   }
 

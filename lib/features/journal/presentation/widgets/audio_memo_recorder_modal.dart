@@ -9,6 +9,7 @@ import 'package:record/record.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
 /// AudioMemoRecorderModal provides an ultra-discrete, zero-telemetry
@@ -236,9 +237,9 @@ class _AudioMemoRecorderModalState extends State<AudioMemoRecorderModal> {
                           ),
                         ),
                         const SizedBox(height: 1),
-                        const Text(
-                          'मौखिक हिसाब (Audio Note)',
-                          style: TextStyle(
+                        Text(
+                          context.loc.oralAudioNote,
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,

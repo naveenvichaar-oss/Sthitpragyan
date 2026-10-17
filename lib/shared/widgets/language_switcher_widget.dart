@@ -151,7 +151,7 @@ class LanguageSwitcherWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        isHindi ? 'वर्तमान भाषा: हिन्दी' : 'Active Language: English',
+                        loc.activeLanguageLabel,
                         style: AppTextStyles.heading.copyWith(fontSize: 14),
                       ),
                     ],

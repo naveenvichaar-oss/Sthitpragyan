@@ -597,7 +597,277 @@ class AppLocalizations {
         return fallback;
     }
   }
+
+  // -------------------------------------------------------------
+  // Comprehensive Screen-Level Localizations & Actions
+  // -------------------------------------------------------------
+  String get eveningDebriefStatusTitle => isHindi
+      ? 'दैनिक हिसाब (संध्या समीक्षा)'
+      : 'DAILY CLOSURE (EVENING LOG)';
+  String get statusCompleted => isHindi ? '• पूर्ण' : '• COMPLETED';
+  String get statusPending => isHindi ? '• लंबित' : '• PENDING';
+  String get eveningAuditPrompt => isHindi
+      ? 'उकसावे पर चित्त की स्थिरता व मर्यादा का 60-सेकंड ऑडिट करें।'
+      : '60-second audit of reaction composure and boundary integrity under provocation.';
+  String get viewAction => isHindi ? 'देखें' : 'VIEW';
+  String get startAction => isHindi ? 'आरंभ' : 'START';
+
+  // Wisdom of the Day Card
+  String get wisdomOfTheDayTitle => isHindi ? 'आज का प्रज्ञा सूत्र' : 'WISDOM OF THE DAY';
+  String get todaysAffirmationTitle => isHindi ? 'आज का संकल्प' : 'TODAY\'S AFFIRMATION';
+  String get listenWisdomReadout => isHindi ? 'प्रज्ञा पाठ सुनें' : 'Listen to wisdom readout';
+  String get cycleNextWisdom => isHindi ? 'अगला प्रज्ञा सूत्र देखें' : 'Cycle next wisdom';
+  String get openWisdomVault => isHindi ? 'प्रज्ञा कोष खोलें' : 'Open Wisdom Vault';
+  String get affirmedForToday => isHindi ? 'आज का संकल्प स्वीकृत' : 'AFFIRMED FOR TODAY';
+  String get setAsTodaysAffirmation => isHindi ? 'आज का संकल्प बनाएं' : 'SET AS TODAY\'S AFFIRMATION';
+  String setAffirmationSuccess(String title) => isHindi
+      ? '"$title" को आज का संकल्प बनाया गया।'
+      : 'Set "$title" as Today\'s Affirmation.';
+
+  // Sovereign Traits & Micro Ignition
+  String get sovereignTraitsBadge => isHindi ? 'चरित्र कोष' : 'SOVEREIGN TRAITS';
+  String get microIgnitionAction => isHindi ? 'सूक्ष्म गति' : '5-MIN IGNITION';
+  String get microIgnitionRule => isHindi ? 'सूक्ष्म गति • ५-मिनट नियम' : 'Micro-Ignition • 5-Min Rule';
+  String get microIgnitionQuestion => isHindi
+      ? 'आप अभी किस कार्य का आरंभ कर रहे हैं?'
+      : 'What task are you executing right now?';
+  String get microIgnitionDescription => isHindi
+      ? 'मात्र ५ मिनट का संकल्प। परिणाम की चिंता त्यागें।\nगति आरंभ होते ही मानसिक प्रतिरोध समाप्त हो जाता है।'
+      : 'Commit to just 5 minutes without hesitation. Done is better than perfect.\nMomentum breaks all resistance.';
+
+  // Pulse & Box Breathing
+  String get breathInhaleVisual => isHindi ? 'श्वास लें (३ से.)' : 'INHALE (3s)';
+  String get breathHoldVisual => isHindi ? 'कुंभक / रोकें (३ से.)' : 'HOLD & DETACH (3s)';
+  String get breathExhaleVisual => isHindi ? 'श्वास छोड़ें (३ से.)' : 'EXHALE CORTISOL (3s)';
+  String get breathNavelExpand => isHindi
+      ? 'नाभि नीचे • फेफड़ों का विस्तार'
+      : 'Diaphragmatic expansion • Lower belly';
+  String get breathSteadfastObserver => isHindi
+      ? 'अचल साक्षी भाव बनाए रखें'
+      : 'Maintain steadfast detached observer';
+  String get breathReleaseCortisol => isHindi
+      ? 'तनाव विसर्जन • कंधों को शिथिल करें'
+      : 'Release cortisol • Drop shoulder tension';
+  String get looseTeethInstruction => isHindi
+      ? 'दाँत ढीले रखें • जीभ तालू से सटाएं • पैर जमीन पर'
+      : 'Unclench jaw • Tongue to palate • Feet grounded';
+  String get observeToneInstruction => isHindi
+      ? 'सामने वाले की टोन और आंखों का विचलन केवल देखें।'
+      : 'Observe tone and eye deflection with zero emotional absorption.';
+
+  // Defensive Scripts
+  String get addScriptAction => isHindi ? '+ नया सूत्र' : '+ Add Script';
+  String get noScriptsInCategory => isHindi
+      ? 'इस श्रेणी में कोई सूत्र नहीं है'
+      : 'No defensive scripts in this category';
+  String get tapToAddScriptHint => isHindi
+      ? 'नया सूत्र जोड़ने के लिए नीचे दिए बटन पर टैप करें।'
+      : 'Tap the button below to add a custom blueprint.';
+  String get categoryHeaderLabel => isHindi ? 'श्रेणी' : 'CATEGORY';
+  String get customCategoryOption => isHindi ? '+ अन्य श्रेणी' : '+ Custom';
+  String get enterCustomCategoryHint => isHindi
+      ? 'कस्टम श्रेणी का नाम दर्ज करें'
+      : 'Enter custom category name';
+  String get pleaseEnterCategoryError => isHindi
+      ? 'कृपया श्रेणी नाम दर्ज करें'
+      : 'Please enter category name';
+  String get provocationExampleHint => isHindi
+      ? 'उदाहरण: "इस काम में कोई दम नहीं है / Your approach makes no sense"'
+      : 'e.g. "Your approach makes no sense / I need this right now"';
+  String get pleaseEnterProvocationError => isHindi
+      ? 'कृपया उकसावा वक्तव्य दर्ज करें'
+      : 'Please enter provocation statement';
+  String get scriptExactWordsHint => isHindi
+      ? 'सटीक शब्द जो आपको शांति से बोलने हैं...'
+      : 'Exact words to speak with unhurried poise...';
+  String get pleaseEnterScriptError => isHindi
+      ? 'कृपया रक्षात्मक सूत्र दर्ज करें'
+      : 'Please enter defensive response script';
+  String get subtextExampleHint => isHindi
+      ? 'उदाहरण: "कभी सफाई न दें। गेंद उनके पाले में डालें।"'
+      : 'e.g. "Never over-explain. Return the ball to their court."';
+  String get toneExampleHint => isHindi
+      ? 'उदाहरण: "तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।"'
+      : 'e.g. "Neutral, flat monotone, zero smile, 3s eye-contact."';
+  String get scriptSavedMsg => isHindi
+      ? 'रक्षात्मक सूत्र सुरक्षित किया गया'
+      : 'Defensive script saved.';
+  String get scriptUpdatedMsg => isHindi
+      ? 'रक्षात्मक सूत्र अपडेट किया गया'
+      : 'Defensive script updated.';
+  String get scriptDeletedMsg => isHindi
+      ? 'रक्षात्मक सूत्र हटा दिया गया'
+      : 'Defensive script deleted.';
+  String get confirmResetAllScriptsMsg => isHindi
+      ? 'क्या आप सभी रक्षात्मक सूत्रों को मूल फ़ैक्टरी स्थिति में रीसेट करना चाहते हैं?'
+      : 'Reset all defensive scripts to factory blueprint?';
+  String get allScriptsResetMsg => isHindi
+      ? 'सभी रक्षात्मक सूत्र मूल स्थिति में रीसेट कर दिए गए'
+      : 'All defensive scripts reset to factory defaults.';
+
+  // Journal Feedback & Validations
+  String get outputRequiredError => isHindi
+      ? 'आउटपुट अनिवार्य है: आज का कोई एक ठोस deliverable या सीख दर्ज करें।'
+      : 'Output required: Record at least one solid deliverable or key learning.';
+  String debriefSavedConfirmation(int score) => isHindi
+      ? 'आज का हिसाब पूरा हुआ। तनाव यहीं विसर्जित है। (समत्व: $score%)'
+      : 'Daily audit locked. Stress released at the threshold. (Equanimity: $score%)';
+  String get oralAudioNote => isHindi ? 'मौखिक हिसाब (Audio Note)' : 'Audio Reflection Note';
+  String get physicalComposureDrill => isHindi ? 'आंगिक स्थिरता (Composure Drill)' : 'Physical Composure Video Drill';
+  String get yesLabel => isHindi ? 'हाँ' : 'YES';
+  String get noLabel => isHindi ? 'नहीं' : 'NO';
+  String get tacticalInsightLabel => isHindi ? 'रणनीतिक सीख' : 'Tactical Insight';
+  String get updateAction => isHindi ? 'बदलें' : 'UPDATE';
+  String get recordAction => isHindi ? 'रिकॉर्ड' : 'RECORD';
+  String get retakeAction => isHindi ? 'पुनः लें' : 'RETAKE';
+  String get reviewAction => isHindi ? 'समीक्षा' : 'REVIEW';
+
+  // Badges & Toolbars
+  String get systemShareInterceptor => isHindi
+      ? 'शेयर इंटरसेप्टर • सहेजें'
+      : 'SYSTEM SHARE INTERCEPTOR • SAVE';
+  String get offlineLocalTools => isHindi
+      ? 'ऑफ़लाइन वास्तुकला • स्थानीय उपकरण'
+      : 'OFFLINE ARCHITECTURE • LOCAL TOOLS';
+  String get soulSanctuaryBadge => isHindi
+      ? 'शांति धाम • आनंद कोष'
+      : 'SOUL SANCTUARY • JOY RESERVOIR';
+  String get activeLanguageLabel => isHindi
+      ? 'वर्तमान भाषा: हिन्दी'
+      : 'Active Language: English';
+  String get wisdomCardsTab => isHindi ? 'प्रज्ञा पत्र' : 'WISDOM CARDS';
+  String get resourceHubTab => isHindi ? 'अध्ययन सामग्री' : 'RESOURCE HUB';
+  String get essenceTranslation => isHindi ? 'अनुवाद / सार:' : 'ESSENCE / TRANSLATION:';
+  String get tacticalDirectiveLabel => isHindi ? 'रणनीतिक निर्देश:' : 'Tactical Directive:';
+  String get tacticalDirectiveBadge => isHindi ? 'रणनीतिक निर्देश' : 'TACTICAL DIRECTIVE';
+  String get datasetDailyReminder => isHindi
+      ? 'डेटासेट से निर्धारित दैनिक स्मरण (notifications_dataset.json)'
+      : 'Scheduled daily reminder from dataset (notifications_dataset.json)';
+  String get cycleDatasetSlotsTooltip => isHindi
+      ? 'आज के ४ डेटासेट स्लॉट में बदलें'
+      : 'Cycle through today\'s 4 dataset slots';
+  String get cycleStoicRuleTooltip => isHindi
+      ? 'अगले स्थितप्रज्ञ नियम पर जाएं'
+      : 'Cycle to next Stoic rule';
+  String longestStreakDays(int days) => isHindi
+      ? 'सर्वश्रेष्ठ: $days दिन'
+      : 'Best: $days days';
+  String dayStreak(int days) => isHindi
+      ? (days == 1 ? 'दिवस समत्व' : 'दिवसीय समत्व')
+      : (days == 1 ? 'DAY STREAK' : 'DAYS STREAK');
+  String get commitmentChimeBadge => isHindi
+      ? 'प्रतिबद्धता ध्वनि'
+      : 'COMMITMENT CHIME';
+  String get scoreLabel => isHindi ? 'समत्व स्कोर' : 'Score';
+
+  // Box Breathing Drill
+  String get boxBreathingInhaleTitle => isHindi ? 'श्वास लें (पूरक)' : 'INHALE';
+  String get boxBreathingHoldFullTitle => isHindi ? 'कुंभक (रोकें)' : 'HOLD FULL';
+  String get boxBreathingExhaleTitle => isHindi ? 'श्वास छोड़ें (रेचक)' : 'EXHALE';
+  String get boxBreathingHoldEmptyTitle => isHindi ? 'रिक्त कुंभक (शून्य)' : 'HOLD EMPTY';
+  String get boxBreathingInhaleGuidance => isHindi
+      ? 'नासिका से गहरी उदर-श्वास अंदर लें'
+      : 'Deep diaphragmatic breath in through nose';
+  String get boxBreathingHoldFullGuidance => isHindi
+      ? 'श्वास रोकें। जबड़ा, गर्दन व कंधे शिथिल करें'
+      : 'Hold lungs full. Soften jaw, neck & shoulders';
+  String get boxBreathingExhaleGuidance => isHindi
+      ? 'मुख से मंद, नियंत्रित श्वास बाहर छोड़ें'
+      : 'Slow, controlled exhale through mouth';
+  String get boxBreathingHoldEmptyGuidance => isHindi
+      ? 'शांत शून्यता में रहें। जीभ तालू से सटाएं'
+      : 'Rest in stillness. Tongue on roof of mouth';
+
+  // Character Ledger
+  String get recordTraitAction => isHindi ? 'सद्गुण दर्ज करें' : 'RECORD TRAIT';
+  String totalVirtueRecords(int count) => isHindi
+      ? 'कुल सद्गुण प्रविष्टियाँ: $count'
+      : 'TOTAL VIRTUE RECORDS: $count';
+  String get sovereignEquanimityBadge => isHindi ? 'संप्रभु समत्व' : 'SOVEREIGN EQUANIMITY';
+  String get virtueCustom => isHindi ? 'व्यक्तिगत गुण' : 'Custom Trait';
+  String get virtueSubMagnanimity => isHindi ? 'बड़ा दिल' : 'Composure';
+  String get virtueSubGravitas => isHindi ? 'अडिग भाव' : 'Stillness';
+  String get virtueSubJoy => isHindi ? 'प्रसन्नता' : 'Grace';
+  String get virtueSubRestraint => isHindi ? 'रणनीतिक मौन' : 'Silence';
+
+  // Defensive Scripts Tone Default
+  String get defaultNeutralTone => isHindi
+      ? 'तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।'
+      : 'Neutral, flat monotone, zero panic or over-explaining.';
+
+  // Recovery Archetypes
+  String get archetypeStoicSubtitle => isHindi ? 'स्थितप्रज्ञ' : 'Absolute Poise';
+  String get archetypeStoicSample => isHindi
+      ? 'भाषा या एंगल में क्या विशिष्ट फैक्चुअल बदलाव चाहिए? कृपया बिंदु स्पष्ट करें।'
+      : 'What specific factual adjustments are required in the formulation? Please specify the exact points.';
+  String get archetypeStrategistSubtitle => isHindi ? 'रणनीतिकार' : 'Tactical Restraint';
+  String get archetypeStrategistSample => isHindi
+      ? 'इस दावे का आधार क्या डेटा है? जब आप बिंदुवार विश्लेषण साझा करेंगे, तब मैं समीक्षा करूँगा।'
+      : 'What data substantiates this claim? Once you share the itemized breakdown, I will review it.';
+  String get archetypeExecutiveSubtitle => isHindi ? 'प्रशासक' : 'Unruffled Governance';
+  String get archetypeExecutiveSample => isHindi
+      ? 'वितरण के संबंध में: क्षमता आवंटन से पहले लिखित में अपेक्षाओं को स्पष्ट करें।'
+      : 'Regarding deliverables: let\'s calibrate milestone expectations in writing before allocating engineering capacity.';
+
+  // Cognition Vault Descriptions
+  String cognitionVaultDesc(int segment) {
+    if (isHindi) {
+      switch (segment) {
+        case 0:
+          return 'क्लासिकल स्थितप्रज्ञ श्लोक, पाश्चात्य स्टोइकिज्म एवं कार्यकारी समत्व हेतु व्यावहारिक मनोविज्ञान।';
+        case 1:
+          return 'सार्वजनिक साहित्य, ऑडियो/वीडियो विश्लेषण एवं आपके व्यक्तिगत Google Drive व Keep नोट्स।';
+        case 2:
+          return 'बोर्डरूम छल-कपट एवं तार्किक दोषों का विश्लेषण कर शास्त्रीय मॉडल द्वारा निष्प्रभावी करें।';
+        case 3:
+          return 'आपका व्यक्तिगत शांति धाम (आनंद कोष): उत्साहवर्धक संगीत, दृश्य लंगर, शांत स्मृतियां व सांत्वना सूत्र।';
+        default:
+          return 'व्यक्तिगत स्वतंत्र HTML डैशबोर्ड, निर्णय कैलकुलेटर एवं स्थानीय जावास्क्रिप्ट संचालित उपकरण।';
+      }
+    }
+    switch (segment) {
+      case 0:
+        return 'Classic Sthitaprajna shlokas, Western Stoicism, and Behavioral Psychology for unflinching executive composure.';
+      case 1:
+        return 'Curated public-domain literature, audio/video breakdowns, and your personal Google Drive & Keep notes.';
+      case 2:
+        return 'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.';
+      case 3:
+        return 'Your personal soul sanctuary: uplifting music, visual anchors, serene memories, and comfort words.';
+      default:
+        return 'Personal standalone HTML dashboards, decision calculators, and interactive tools rendered with full local JavaScript.';
+    }
+  }
+
+  // Settings Notification Checkpoint Names
+  String getSlotDisplayName(String slotId, String fallback) {
+    if (!isHindi) return fallback;
+    switch (slotId) {
+      case 'slot_morning':
+        return 'प्रातःकालीन लंगर';
+      case 'slot_work_entry':
+        return 'कार्य-प्रवेश कवच';
+      case 'slot_midday':
+        return 'मध्याह्न आत्म-समीक्षा';
+      case 'slot_night_closure':
+        return 'रात्रि विश्राम व समापन';
+      default:
+        return fallback;
+    }
+  }
+
+  // Execution Triggers
+  String get actionTriggerBadge => isHindi ? 'प्रतिबद्धता ध्वनि' : 'ACTION-TRIGGER';
+  String get actionTriggerTitle => isHindi ? 'प्रतिबद्धता ध्वनि' : 'EXECUTION CHIME';
+  String get microIgnitionCardTitle => isHindi ? '५-मिनट सूक्ष्म गति टाइमर' : '5-Minute Micro-Ignition Timer';
+  String get microIgnitionCardDesc => isHindi
+      ? 'टालमटोल मात्र आरंभ बिंदु पर मानसिक प्रतिरोध है। एक टैप से ५ मिनट का काउंटडाउन शुरू करें।'
+      : 'Procrastination is merely cognitive friction at the start threshold. Single-tap to begin a discrete 5-minute countdown and dissolve resistance immediately.';
+  String get launchMicroIgnitionAction => isHindi
+      ? '५-मिनट सूक्ष्म गति अभी आरंभ करें'
+      : 'LAUNCH 5-MIN MICRO-IGNITION NOW';
 }
+
 
 /// AppLocalizationsDelegate loads and provides AppLocalizations instances
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

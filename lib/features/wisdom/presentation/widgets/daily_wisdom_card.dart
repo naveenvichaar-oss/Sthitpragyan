@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/wisdom_entry.dart';
@@ -78,7 +79,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Set "${_currentWisdom.title}" as Today\'s Affirmation.',
+                  context.loc.setAffirmationSuccess(_currentWisdom.title),
                   style: const TextStyle(fontSize: 12),
                 ),
               ),
@@ -127,7 +128,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                       border: Border.all(color: AppColors.borderSubtle),
                     ),
                     child: Text(
-                      'WISDOM OF THE DAY',
+                      context.loc.wisdomOfTheDayTitle,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
                         fontSize: 8.5,
@@ -155,7 +156,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                           ),
                           const SizedBox(width: 3),
                           Text(
-                            'TODAY\'S AFFIRMATION',
+                            context.loc.todaysAffirmationTitle,
                             style: AppTextStyles.labelBadge.copyWith(
                               fontSize: 7.5,
                               color: AppColors.emeraldSuccess,
@@ -172,7 +173,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                   VoiceTtsButton(
                     textToSpeak: '${_currentWisdom.title}. ${_currentWisdom.originalText}. ${_currentWisdom.translation}. Executive Takeaway: ${_currentWisdom.executiveTakeaway}',
                     audioTopicKey: 'wisdom_${_currentWisdom.id}',
-                    tooltip: 'Listen to wisdom readout',
+                    tooltip: context.loc.listenWisdomReadout,
                   ),
                   const SizedBox(width: 4),
                   IconButton(
@@ -183,7 +184,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                     ),
                     onPressed: _cycleNext,
                     visualDensity: VisualDensity.compact,
-                    tooltip: 'Cycle Next Wisdom',
+                    tooltip: context.loc.cycleNextWisdom,
                   ),
                   if (widget.onOpenVault != null)
                     IconButton(
@@ -194,7 +195,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                       ),
                       onPressed: widget.onOpenVault,
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Open Wisdom Vault',
+                      tooltip: context.loc.openWisdomVault,
                     ),
                 ],
               ),
@@ -265,7 +266,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                 color: isAffirmation ? AppColors.emeraldSuccess : AppColors.shieldPrimary,
               ),
               label: Text(
-                isAffirmation ? 'AFFIRMED FOR TODAY' : 'SET AS TODAY\'S AFFIRMATION',
+                isAffirmation ? context.loc.affirmedForToday : context.loc.setAsTodaysAffirmation,
                 style: AppTextStyles.button.copyWith(
                   fontSize: 10.5,
                   color: isAffirmation ? AppColors.emeraldSuccess : AppColors.shieldPrimary,

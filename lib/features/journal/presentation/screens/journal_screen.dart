@@ -100,9 +100,7 @@ class _JournalScreenState extends State<JournalScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.isHindi
-                ? 'आउटपुट अनिवार्य है: आज का कोई एक ठोस deliverable या सीख दर्ज करें।'
-                : 'Output required: Please enter today\'s primary deliverable or strategic insight.',
+            context.loc.outputRequiredError,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.background,
             ),
@@ -158,9 +156,7 @@ class _JournalScreenState extends State<JournalScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  context.loc.isHindi
-                      ? 'आज का हिसाब पूरा हुआ। तनाव यहीं विसर्जित है। (Equanimity: ${entry.compositeScore}%)'
-                      : 'Daily closure complete. Mental detachment secured. (Equanimity: ${entry.compositeScore}%)',
+                  context.loc.debriefSavedConfirmation(entry.compositeScore),
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.background,
                     fontWeight: FontWeight.w600,
@@ -983,8 +979,8 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           child: Text(
                             _audioMemoPath != null
-                                ? (context.loc.isHindi ? 'बदलें' : 'UPDATE')
-                                : (context.loc.isHindi ? 'रिकॉर्ड' : 'RECORD'),
+                                ? context.loc.updateAction
+                                : context.loc.recordAction,
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -1104,8 +1100,8 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           child: Text(
                             _videoReflectionPath != null
-                                ? (context.loc.isHindi ? 'पुनः लें' : 'RETAKE')
-                                : (context.loc.isHindi ? 'समीक्षा' : 'REVIEW'),
+                                ? context.loc.retakeAction
+                                : context.loc.reviewAction,
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,

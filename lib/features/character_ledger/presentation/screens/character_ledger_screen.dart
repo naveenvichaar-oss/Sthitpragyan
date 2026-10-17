@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/character_trait_entry.dart';
 import '../widgets/add_character_entry_modal_sheet.dart';
@@ -138,7 +139,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'SOVEREIGN TRAITS • चरित्र कोष',
+              context.loc.sovereignTraitsBadge,
               style: AppTextStyles.labelBadge.copyWith(
                 color: const Color(0xFFF59E0B),
                 fontSize: 9.5,
@@ -147,8 +148,8 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
               ),
             ),
             const SizedBox(height: 2),
-            const Text(
-              'CHARACTER LEDGER',
+            Text(
+              context.loc.characterLedgerTitle,
               style: AppTextStyles.heading,
             ),
           ],
@@ -156,7 +157,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded, color: AppColors.shieldPrimary),
-            tooltip: 'Record Character Trait',
+            tooltip: context.loc.recordTraitAction,
             onPressed: () => _openAddModal(),
           ),
         ],
@@ -166,9 +167,9 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
         foregroundColor: Colors.black,
         elevation: 2,
         icon: const Icon(Icons.edit_note_rounded, size: 20),
-        label: const Text(
-          'RECORD TRAIT',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+        label: Text(
+          context.loc.recordTraitAction.toUpperCase(),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.8),
         ),
         onPressed: () => _openAddModal(),
       ),
@@ -190,7 +191,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'TOTAL VIRTUE RECORDS: ${_allEntries.length}',
+                      context.loc.totalVirtueRecords(_allEntries.length),
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.textSecondary,
                         fontSize: 9.5,
@@ -198,7 +199,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                       ),
                     ),
                     Text(
-                      'SOVEREIGN EQUANAMITY',
+                      context.loc.sovereignEquanimityBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: const Color(0xFFF59E0B),
                         fontSize: 9,
@@ -210,13 +211,13 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    _buildStatPill('उदारता', 'Magnanimity', magnanimityCount, const Color(0xFFF59E0B)),
+                    _buildStatPill(context.loc.virtueMagnanimity, context.loc.virtueSubMagnanimity, magnanimityCount, const Color(0xFFF59E0B)),
                     const SizedBox(width: 6),
-                    _buildStatPill('गांभीर्य', 'Gravitas', gravitasCount, const Color(0xFF38BDF8)),
+                    _buildStatPill(context.loc.virtueGravitas, context.loc.virtueSubGravitas, gravitasCount, const Color(0xFF38BDF8)),
                     const SizedBox(width: 6),
-                    _buildStatPill('प्रसन्नता', 'Joy', joyCount, const Color(0xFF10B981)),
+                    _buildStatPill(context.loc.virtueJoy, context.loc.virtueSubJoy, joyCount, const Color(0xFF10B981)),
                     const SizedBox(width: 6),
-                    _buildStatPill('संयम', 'Restraint', restraintCount, const Color(0xFF818CF8)),
+                    _buildStatPill(context.loc.virtueRestraint, context.loc.virtueSubRestraint, restraintCount, const Color(0xFF818CF8)),
                   ],
                 ),
               ],
@@ -254,28 +255,28 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('ALL (${_allEntries.length})', null),
+                _buildFilterChip('${context.loc.all.toUpperCase()} (${_allEntries.length})', null),
                 const SizedBox(width: 6),
                 _buildFilterChip(
-                  'उदारता • Magnanimity',
+                  context.loc.virtueMagnanimity,
                   CharacterTraitCategory.magnanimity,
                   const Color(0xFFF59E0B),
                 ),
                 const SizedBox(width: 6),
                 _buildFilterChip(
-                  'गांभीर्य • Gravitas',
+                  context.loc.virtueGravitas,
                   CharacterTraitCategory.gravitas,
                   const Color(0xFF38BDF8),
                 ),
                 const SizedBox(width: 6),
                 _buildFilterChip(
-                  'प्रसन्नता • Joy',
+                  context.loc.virtueJoy,
                   CharacterTraitCategory.joy,
                   const Color(0xFF10B981),
                 ),
                 const SizedBox(width: 6),
                 _buildFilterChip(
-                  'संयम • Restraint',
+                  context.loc.virtueRestraint,
                   CharacterTraitCategory.restraint,
                   const Color(0xFF818CF8),
                 ),

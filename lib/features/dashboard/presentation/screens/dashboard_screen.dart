@@ -438,7 +438,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      context.loc.isHindi ? 'सूक्ष्म गति' : '5-MIN IGNITION',
+                      context.loc.microIgnitionAction.toUpperCase(),
                       style: const TextStyle(
                         color: Color(0xFFF59E0B),
                         fontSize: 8.5,
@@ -643,7 +643,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   children: [
                     Text(
-                      'दैनिक हिसाब (EVENING LOG)',
+                      context.loc.eveningDebriefStatusTitle,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: isCompleted
                             ? AppColors.emeraldSuccess
@@ -653,7 +653,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      isCompleted ? '• बंद (LOCKED)' : '• लंबित (PENDING)',
+                      isCompleted ? context.loc.statusCompleted : context.loc.statusPending,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: isCompleted
                             ? AppColors.emeraldSuccess
@@ -666,8 +666,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 2),
                 Text(
                   isCompleted
-                      ? 'स्कोर: ${_todayEntry!.compositeScore}% • "${_todayEntry!.coreOutputSummary}"'
-                      : 'उकसावे पर चित्त की स्थिरता व मर्यादा का 60-सेकंड ऑडिट करें।',
+                      ? '${context.loc.scoreLabel}: ${_todayEntry!.compositeScore}% • "${_todayEntry!.coreOutputSummary}"'
+                      : context.loc.eveningAuditPrompt,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                     fontSize: 11.5,
@@ -686,7 +686,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
             ),
             child: Text(
-              isCompleted ? 'VIEW' : 'START',
+              isCompleted ? context.loc.viewAction : context.loc.startAction,
               style: AppTextStyles.button.copyWith(
                 fontSize: 12,
                 color: AppColors.shieldPrimary,

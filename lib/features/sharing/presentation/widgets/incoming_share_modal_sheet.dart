@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../joy_reservoir/data/models/joy_item.dart';
 import '../../../recovery/data/models/incident_slip_up_log.dart';
@@ -262,7 +263,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
           trigger: title,
           mistakeType: 'Tactical Reference Saved',
           physicalState: 'Strategic Review',
-          archetype: 'The Stoic (स्थितप्रज्ञ)',
+          archetype: 'The Stoic',
           idealResponse: note ?? 'Saved tactical guidance',
           revisedScript: content,
           damageControlScriptUsed: _recoveryTag,
@@ -337,7 +338,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'SYSTEM SHARE INTERCEPTOR • सहेजें',
+                        context.loc.systemShareInterceptor,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: AppColors.shieldPrimary,
                           letterSpacing: 1.5,

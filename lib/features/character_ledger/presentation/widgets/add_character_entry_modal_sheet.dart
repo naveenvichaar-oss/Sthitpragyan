@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/voice_dictation_button.dart';
 import '../../data/models/character_trait_entry.dart';
@@ -184,7 +185,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'VIRTUE & TRAIT NOTEPAD • चरित्र कोष',
+                      context.loc.sovereignTraitsBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: accent,
                         fontSize: 9.5,

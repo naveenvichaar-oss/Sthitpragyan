@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/wisdom_entry.dart';
@@ -227,7 +228,7 @@ class _WisdomCardState extends State<WisdomCard> {
                 if (_isExpanded) ...[
                   const SizedBox(height: 10),
                   Text(
-                    'TRANSLATION / अर्थ:',
+                    context.loc.essenceTranslation,
                     style: AppTextStyles.labelBadge.copyWith(
                       fontSize: 8.5,
                       color: AppColors.textMuted,

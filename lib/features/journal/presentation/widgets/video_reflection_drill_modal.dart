@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
 /// VideoReflectionDrillModal provides a 60-second front-camera composure review.
@@ -241,9 +242,9 @@ class _VideoReflectionDrillModalState extends State<VideoReflectionDrillModal> {
                           fontSize: 9.0,
                         ),
                       ),
-                      const Text(
-                        'आंगिक स्थिरता (Composure Drill)',
-                        style: TextStyle(
+                      Text(
+                        context.loc.physicalComposureDrill,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,

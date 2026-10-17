@@ -138,7 +138,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                     VoiceTtsButton(
                       textToSpeak: _showDataset && trigger != null
                           ? '${trigger.localizedTitle(context.loc.isHindi)}. ${trigger.localizedBody(context.loc.isHindi)}'
-                          : '${context.loc.getRuleTitle(widget.rule.id, widget.rule.title)}. ${context.loc.getRuleAphorism(widget.rule.id, widget.rule.aphorism)}. ${context.loc.isHindi ? "रणनीतिक निर्देश:" : "Tactical Directive:"} ${context.loc.getRuleTacticalAction(widget.rule.id, widget.rule.tacticalAction)}',
+                          : '${context.loc.getRuleTitle(widget.rule.id, widget.rule.title)}. ${context.loc.getRuleAphorism(widget.rule.id, widget.rule.aphorism)}. ${context.loc.tacticalDirectiveLabel} ${context.loc.getRuleTacticalAction(widget.rule.id, widget.rule.tacticalAction)}',
                       audioTopicKey: _showDataset && trigger != null
                           ? 'trigger_${trigger.id}'
                           : 'rule_${widget.rule.id}',
@@ -157,12 +157,8 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                       icon: const Icon(Icons.sync_rounded, size: 18),
                       color: AppColors.textSecondary,
                       tooltip: _showDataset
-                          ? (context.loc.isHindi
-                              ? 'आज के ४ डेटासेट स्लॉट में बदलें'
-                              : 'Cycle through today\'s 4 dataset slots')
-                          : (context.loc.isHindi
-                              ? 'अगले स्थितप्रज्ञ नियम पर जाएं'
-                              : 'Cycle to next Stoic rule'),
+                          ? context.loc.cycleDatasetSlotsTooltip
+                          : context.loc.cycleStoicRuleTooltip,
                       splashRadius: 18,
                     ),
                   ],
@@ -264,9 +260,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      context.loc.isHindi
-                          ? 'डेटासेट से निर्धारित दैनिक स्मरण (notifications_dataset.json)'
-                          : 'Scheduled daily trigger from notifications_dataset.json',
+                      context.loc.datasetDailyReminder,
                       style: AppTextStyles.bodySmall.copyWith(
                         fontSize: 11,
                         color: AppColors.textMuted,
@@ -343,9 +337,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                       ),
                       const SizedBox(width: AppDimens.space6),
                       Text(
-                        context.loc.isHindi
-                            ? 'रणनीतिक निर्देश'
-                            : 'TACTICAL DIRECTIVE',
+                        context.loc.tacticalDirectiveBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: AppColors.shieldPrimary,
                           fontSize: 9.5,

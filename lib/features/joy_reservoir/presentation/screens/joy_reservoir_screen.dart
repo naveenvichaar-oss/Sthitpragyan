@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/joy_item.dart';
 import '../widgets/add_joy_item_modal_sheet.dart';
@@ -133,7 +134,7 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SOUL SANCTUARY • आनंद कोष',
+                    context.loc.soulSanctuaryBadge,
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.shieldPrimary,
                       letterSpacing: 1.5,
@@ -141,8 +142,8 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const Text(
-                    'JOY RESERVOIR',
+                  Text(
+                    context.loc.joyReservoirTitle.toUpperCase(),
                     style: AppTextStyles.displayMedium,
                   ),
                 ],

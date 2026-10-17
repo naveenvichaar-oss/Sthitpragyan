@@ -6,7 +6,8 @@ import 'core/theme/app_theme.dart';
 import 'shared/widgets/responsive_scaffold.dart';
 
 /// SthitaprajnaApp configures the root application widget.
-/// Enforces Dark Mode Only, dynamic bilingual localization (EN & HI), and rapid startup time (<100ms).
+/// Enforces Dark Mode Only, dynamic reactive bilingual localization (EN & HI),
+/// and rapid startup time (<100ms).
 class SthitaprajnaApp extends StatelessWidget {
   const SthitaprajnaApp({super.key});
 
@@ -15,17 +16,21 @@ class SthitaprajnaApp extends StatelessWidget {
     return ListenableBuilder(
       listenable: LocaleController.instance,
       builder: (context, _) {
+        final locale = LocaleController.instance.locale;
         final isHindi = LocaleController.instance.isHindi;
 
         return MaterialApp(
+          key: ValueKey('app_root_${locale.languageCode}'),
           title: isHindi ? 'स्थितप्रज्ञ' : 'Sthitaprajna',
           debugShowCheckedModeBanner: false,
           themeMode: ThemeMode.dark,
           darkTheme: AppTheme.darkTheme,
-          locale: LocaleController.instance.locale,
+          locale: locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const ResponsiveScaffold(),
+          home: ResponsiveScaffold(
+            key: ValueKey('scaffold_${locale.languageCode}'),
+          ),
         );
       },
     );

@@ -277,9 +277,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.loc.isHindi
-                  ? 'रक्षात्मक सूत्र हटा दिया गया'
-                  : 'Defensive script deleted',
+              context.loc.scriptDeletedMsg,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.background),
             ),
             backgroundColor: AppColors.roseDanger,
@@ -305,9 +303,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           style: AppTextStyles.heading.copyWith(fontSize: 16),
         ),
         content: Text(
-          context.loc.isHindi
-              ? 'क्या आप सभी रक्षात्मक सूत्रों को मूल फ़ैक्टरी स्थिति में रीसेट करना चाहते हैं?'
-              : 'Reset all defensive scripts back to factory blueprints?',
+          context.loc.confirmResetAllScriptsMsg,
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
         ),
         actions: [
@@ -337,9 +333,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.loc.isHindi
-                  ? 'सभी रक्षात्मक सूत्र मूल स्थिति में रीसेट कर दिए गए'
-                  : 'Defensive scripts restored to factory defaults',
+              context.loc.allScriptsResetMsg,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.background),
             ),
             backgroundColor: AppColors.shieldPrimary,
@@ -591,7 +585,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           ),
           const SizedBox(height: AppDimens.space32),
           Text(
-            'दाँत ढीले रखें। जीभ तालू से सटाएं। पैर जमीन पर।',
+            context.loc.looseTeethInstruction,
             style: AppTextStyles.displayMedium.copyWith(
               color: AppColors.textPrimary,
               height: 1.4,
@@ -642,7 +636,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'दाँत ढीले रखें • जीभ तालू से सटाएं • पैर जमीन पर',
+                  context.loc.looseTeethInstruction,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
@@ -733,7 +727,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           ),
           const SizedBox(height: 8),
           Text(
-            'सामने वाले की टोन और आंखों का विचलन केवल देखें।',
+            context.loc.observeToneInstruction,
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textPrimary,
               fontSize: 14.5,
@@ -813,7 +807,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                       color: AppColors.shieldPrimary,
                     ),
                     label: Text(
-                      context.loc.isHindi ? '+ नया सूत्र' : '+ Add Script',
+                      context.loc.addScriptAction,
                     ),
                     onPressed: () => _openScriptEditor(null),
                     backgroundColor: AppColors.surfaceElevated,
@@ -890,17 +884,13 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      context.loc.isHindi
-                          ? 'इस श्रेणी में कोई सूत्र नहीं है'
-                          : 'No defensive scripts in this category',
+                      context.loc.noScriptsInCategory,
                       style: AppTextStyles.heading.copyWith(fontSize: 15),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      context.loc.isHindi
-                          ? 'नया सूत्र जोड़ने के लिए नीचे दिए बटन पर टैप करें।'
-                          : 'Tap below to author a custom script or restore defaults.',
+                      context.loc.tapToAddScriptHint,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                       ),

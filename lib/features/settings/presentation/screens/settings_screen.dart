@@ -670,7 +670,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 6),
                     // Slot Name
                     Text(
-                      slot.slotName,
+                      context.loc.getSlotDisplayName(slot.id, slot.slotName),
                       style: AppTextStyles.heading.copyWith(
                         fontSize: 16,
                         color: isSlotActive

@@ -287,15 +287,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              _selectedMainSegment == 0
-                  ? 'Classic Sthitaprajna shlokas, Western Stoicism, and Behavioral Psychology for unflinching executive composure.'
-                  : _selectedMainSegment == 1
-                      ? 'Curated public-domain literature, audio/video breakdowns, and your personal Google Drive & Keep notes.'
-                      : _selectedMainSegment == 2
-                          ? 'Dissect boardroom manipulation tactics and deploy classical Stoic mental models to neutralize bad actors.'
-                          : _selectedMainSegment == 3
-                              ? 'Your personal soul sanctuary (आनंद कोष): uplifting music, visual anchors, serene memories, and comfort words.'
-                              : 'Personal standalone HTML dashboards, decision calculators, and interactive tools rendered with full local JavaScript.',
+              context.loc.cognitionVaultDesc(_selectedMainSegment),
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.4,
@@ -341,9 +333,9 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildSegmentButton(0, context.loc.isHindi ? 'प्रज्ञा पत्र' : 'WISDOM CARDS', Icons.auto_stories_rounded),
+            _buildSegmentButton(0, context.loc.wisdomCardsTab, Icons.auto_stories_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(1, context.loc.isHindi ? 'अध्ययन सामग्री' : 'RESOURCE HUB', Icons.hub_rounded),
+            _buildSegmentButton(1, context.loc.resourceHubTab, Icons.hub_rounded),
             const SizedBox(width: 4),
             _buildSegmentButton(2, context.loc.segmentFallacies, Icons.psychology_rounded),
             const SizedBox(width: 4),

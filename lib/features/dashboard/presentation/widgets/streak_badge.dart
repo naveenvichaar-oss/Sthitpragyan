@@ -46,9 +46,7 @@ class StreakBadge extends StatelessWidget {
                   ),
                   const SizedBox(width: AppDimens.space8),
                   Text(
-                    streakData.currentStreak == 1
-                        ? (context.loc.isHindi ? 'दिवस समत्व' : 'DAY STREAK')
-                        : (context.loc.isHindi ? 'दिवसीय समत्व' : 'DAYS STREAK'),
+                    context.loc.dayStreak(streakData.currentStreak),
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.textPrimary,
                       letterSpacing: 2.0,
@@ -64,9 +62,7 @@ class StreakBadge extends StatelessWidget {
                   border: Border.all(color: AppColors.borderSubtle),
                 ),
                 child: Text(
-                  context.loc.isHindi
-                      ? 'सर्वश्रेष्ठ: ${streakData.longestStreak} दिन'
-                      : 'BEST: ${streakData.longestStreak} D',
+                  context.loc.longestStreakDays(streakData.longestStreak).toUpperCase(),
                   style: AppTextStyles.metricSmall.copyWith(
                     fontSize: 11,
                     color: AppColors.textSecondary,

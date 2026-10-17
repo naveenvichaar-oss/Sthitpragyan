@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/joy_item.dart';
 
@@ -131,7 +132,7 @@ class _AddJoyItemModalSheetState extends State<AddJoyItemModalSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'SOUL SANCTUARY • आनंद कोष',
+                        context.loc.soulSanctuaryBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: AppColors.shieldPrimary,
                           letterSpacing: 1.5,

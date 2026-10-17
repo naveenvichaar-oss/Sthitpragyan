@@ -9,6 +9,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/local_html_tool.dart';
 
@@ -255,7 +256,7 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'OFFLINE ARCHITECTURE • स्थानीय उपकरण',
+                      context.loc.offlineLocalTools,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: const Color(0xFF10B981),
                         fontSize: 9.5,

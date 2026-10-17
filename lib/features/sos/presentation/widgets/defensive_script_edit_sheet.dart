@@ -106,8 +106,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
         _selectedCategory = 'Unjust Accusation';
       }
       _isCustomCategory = false;
-      _toneGuidanceController.text =
-          'तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।';
+      _toneGuidanceController.text = '';
     }
   }
 
@@ -140,7 +139,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
       tacticalRationale: _tacticalRationaleController.text.trim(),
       toneGuidance: _toneGuidanceController.text.trim().isNotEmpty
           ? _toneGuidanceController.text.trim()
-          : 'तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।',
+          : (mounted ? context.loc.defaultNeutralTone : 'Neutral, flat monotone, zero panic or over-explaining.'),
       isCustom: true,
     );
 
@@ -154,12 +153,8 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
         SnackBar(
           content: Text(
             widget.script == null
-                ? (context.loc.isHindi
-                    ? 'रक्षात्मक सूत्र सुरक्षित किया गया'
-                    : 'Defensive script successfully saved')
-                : (context.loc.isHindi
-                    ? 'रक्षात्मक सूत्र अपडेट किया गया'
-                    : 'Defensive script updated'),
+                ? context.loc.scriptSavedMsg
+                : context.loc.scriptUpdatedMsg,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.background,
             ),
@@ -218,9 +213,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.loc.isHindi
-                  ? 'रक्षात्मक सूत्र हटा दिया गया'
-                  : 'Defensive script removed',
+              context.loc.scriptDeletedMsg,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.background,
               ),
@@ -327,7 +320,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                     children: [
                       // Category Selector
                       Text(
-                        context.loc.isHindi ? 'श्रेणी (CATEGORY)' : 'CATEGORY',
+                        context.loc.categoryHeaderLabel,
                         style: AppTextStyles.labelBadge.copyWith(
                           fontSize: 9.5,
                           color: AppColors.shieldPrimary,
@@ -373,7 +366,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                           }),
                           ChoiceChip(
                             label: Text(
-                              context.loc.isHindi ? '+ अन्य श्रेणी' : '+ Custom',
+                              context.loc.customCategoryOption,
                             ),
                             selected: _isCustomCategory,
                             onSelected: (selected) {
@@ -408,9 +401,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                           controller: _customCategoryController,
                           style: AppTextStyles.bodyMedium,
                           decoration: InputDecoration(
-                            hintText: context.loc.isHindi
-                                ? 'कस्टम श्रेणी का नाम दर्ज करें'
-                                : 'Enter custom category name...',
+                            hintText: context.loc.enterCustomCategoryHint,
                             hintStyle: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.textMuted,
                             ),
@@ -432,9 +423,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                           validator: (val) {
                             if (_isCustomCategory &&
                                 (val == null || val.trim().isEmpty)) {
-                              return context.loc.isHindi
-                                  ? 'कृपया श्रेणी नाम दर्ज करें'
-                                  : 'Please enter category name';
+                              return context.loc.pleaseEnterCategoryError;
                             }
                             return null;
                           },
@@ -465,9 +454,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                         style: AppTextStyles.bodyMedium,
                         maxLines: 2,
                         decoration: InputDecoration(
-                          hintText: context.loc.isHindi
-                              ? 'उदाहरण: "इस काम में कोई दम नहीं है / Your approach makes no sense"'
-                              : 'e.g. "You are missing the point / This makes no sense"',
+                          hintText: context.loc.provocationExampleHint,
                           hintStyle: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 12,
@@ -486,9 +473,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                         ),
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
-                            return context.loc.isHindi
-                                ? 'कृपया उकसावा वक्तव्य दर्ज करें'
-                                : 'Please enter hostile trigger/scenario';
+                            return context.loc.pleaseEnterProvocationError;
                           }
                           return null;
                         },
@@ -522,9 +507,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                         ),
                         maxLines: 3,
                         decoration: InputDecoration(
-                          hintText: context.loc.isHindi
-                              ? 'सटीक शब्द जो आपको शांति से बोलने हैं...'
-                              : 'Exact words to speak with unruffled gravitas...',
+                          hintText: context.loc.scriptExactWordsHint,
                           hintStyle: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 13,
@@ -543,9 +526,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                         ),
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
-                            return context.loc.isHindi
-                                ? 'कृपया रक्षात्मक सूत्र दर्ज करें'
-                                : 'Please enter defensive response script';
+                            return context.loc.pleaseEnterScriptError;
                           }
                           return null;
                         },
@@ -575,9 +556,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                         style: AppTextStyles.bodyMedium,
                         maxLines: 2,
                         decoration: InputDecoration(
-                          hintText: context.loc.isHindi
-                              ? 'उदाहरण: "कभी सफाई न दें। गेंद उनके पाले में डालें।"'
-                              : 'e.g. "Never over-explain; force them to substantiate claims."',
+                          hintText: context.loc.subtextExampleHint,
                           hintStyle: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 12,
@@ -610,9 +589,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                         controller: _toneGuidanceController,
                         style: AppTextStyles.bodyMedium,
                         decoration: InputDecoration(
-                          hintText: context.loc.isHindi
-                              ? 'उदाहरण: "तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।"'
-                              : 'e.g. "Calm, slow tempo, direct eye contact."',
+                          hintText: context.loc.toneExampleHint,
                           hintStyle: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textMuted,
                             fontSize: 12,

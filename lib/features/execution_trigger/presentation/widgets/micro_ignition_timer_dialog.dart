@@ -167,9 +167,7 @@ class _MicroIgnitionTimerDialogState extends State<MicroIgnitionTimerDialog> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          context.loc.isHindi
-                              ? 'सूक्ष्म गति • ५-मिनट नियम'
-                              : 'MICRO-IGNITION • 5-MINUTE RULE',
+                          context.loc.microIgnitionRule.toUpperCase(),
                           style: AppTextStyles.labelBadge.copyWith(
                             color: const Color(0xFFF59E0B),
                             fontSize: 8.5,
@@ -197,9 +195,7 @@ class _MicroIgnitionTimerDialogState extends State<MicroIgnitionTimerDialog> {
                 textAlign: TextAlign.center,
                 style: AppTextStyles.heading.copyWith(fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: context.loc.isHindi
-                      ? 'आप अभी किस कार्य का आरंभ कर रहे हैं?'
-                      : 'What are you igniting right now?',
+                  hintText: context.loc.microIgnitionQuestion,
                   hintStyle: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textMuted,
                   ),
@@ -219,9 +215,7 @@ class _MicroIgnitionTimerDialogState extends State<MicroIgnitionTimerDialog> {
 
               // Stoic Philosophy Description
               Text(
-                context.loc.isHindi
-                    ? 'मात्र ५ मिनट का संकल्प। परिणाम की चिंता त्यागें।\nगति आरंभ होते ही मानसिक प्रतिरोध समाप्त हो जाता है।'
-                    : 'Commit strictly to 5 minutes. No evaluation of output quality.\nOnce motion starts, psychological friction evaporates.',
+                context.loc.microIgnitionDescription,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/voice_tts_button.dart';
 import '../../data/models/wisdom_entry.dart';
@@ -265,7 +266,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
 
                   // Translation
                   Text(
-                    'ESSENCE / अनुवाद:',
+                    context.loc.essenceTranslation,
                     style: AppTextStyles.labelBadge.copyWith(
                       fontSize: 8.5,
                       color: AppColors.textMuted,

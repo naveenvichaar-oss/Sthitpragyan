@@ -230,8 +230,8 @@ class PastDebriefsList extends StatelessWidget {
                         children: [
                           Text(
                             entry.boundaryMaintained
-                                ? (context.loc.isHindi ? 'हाँ (YES)' : 'YES')
-                                : (context.loc.isHindi ? 'नहीं (NO)' : 'NO'),
+                                ? context.loc.yesLabel
+                                : context.loc.noLabel,
                             style: AppTextStyles.metricSmall.copyWith(
                               color: entry.boundaryMaintained
                                   ? AppColors.emeraldSuccess
@@ -314,7 +314,7 @@ class PastDebriefsList extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '${context.loc.isHindi ? "रणनीतिक सीख" : "Tactical Insight"}: ${entry.provocationHandled}',
+                          '${context.loc.tacticalInsightLabel}: ${entry.provocationHandled}',
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                             fontSize: 11,
