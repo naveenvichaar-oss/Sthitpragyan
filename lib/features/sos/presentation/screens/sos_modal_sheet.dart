@@ -1028,7 +1028,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 120),
                     child: Text(
-                      script.toneGuidance,
+                      script.getLocalizedToneGuidance(context.loc.isHindi),
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textMuted,
                         fontSize: 10.5,
@@ -1103,7 +1103,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
           ),
           const SizedBox(height: 2),
           Text(
-            script.hostileTrigger,
+            script.getLocalizedHostileTrigger(context.loc.isHindi),
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w500,
@@ -1147,7 +1147,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      '"${script.executiveScript}"',
+                      '"${script.getLocalizedExecutiveScript(context.loc.isHindi)}"',
                       style: AppTextStyles.heading.copyWith(
                         fontSize: 17,
                         height: 1.45,
@@ -1194,7 +1194,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                                     ),
                                   ),
                                   TextSpan(
-                                    text: script.tacticalRationale,
+                                    text: script.getLocalizedTacticalRationale(context.loc.isHindi),
                                     style: AppTextStyles.bodyMedium.copyWith(
                                       color: AppColors.textPrimary,
                                       fontSize: 12.5,
@@ -1221,7 +1221,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _handleCopyScript(script.executiveScript),
+                  onPressed: () => _handleCopyScript(script.getLocalizedExecutiveScript(context.loc.isHindi)),
                   icon: const Icon(Icons.copy_rounded, size: 16),
                   label: Text(context.loc.copyTextAction),
                   style: OutlinedButton.styleFrom(

@@ -9,6 +9,10 @@ class DefensiveScript {
   final String tacticalRationale;
   final String toneGuidance;
   final bool isCustom;
+  final String? hostileTriggerEn;
+  final String? executiveScriptEn;
+  final String? tacticalRationaleEn;
+  final String? toneGuidanceEn;
 
   const DefensiveScript({
     required this.id,
@@ -19,7 +23,39 @@ class DefensiveScript {
     required this.tacticalRationale,
     required this.toneGuidance,
     this.isCustom = false,
+    this.hostileTriggerEn,
+    this.executiveScriptEn,
+    this.tacticalRationaleEn,
+    this.toneGuidanceEn,
   });
+
+  String getLocalizedHostileTrigger(bool isHindi) {
+    if (!isHindi && hostileTriggerEn != null && hostileTriggerEn!.isNotEmpty) {
+      return hostileTriggerEn!;
+    }
+    return hostileTrigger;
+  }
+
+  String getLocalizedExecutiveScript(bool isHindi) {
+    if (!isHindi && executiveScriptEn != null && executiveScriptEn!.isNotEmpty) {
+      return executiveScriptEn!;
+    }
+    return executiveScript;
+  }
+
+  String getLocalizedTacticalRationale(bool isHindi) {
+    if (!isHindi && tacticalRationaleEn != null && tacticalRationaleEn!.isNotEmpty) {
+      return tacticalRationaleEn!;
+    }
+    return tacticalRationale;
+  }
+
+  String getLocalizedToneGuidance(bool isHindi) {
+    if (!isHindi && toneGuidanceEn != null && toneGuidanceEn!.isNotEmpty) {
+      return toneGuidanceEn!;
+    }
+    return toneGuidance;
+  }
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -30,6 +66,10 @@ class DefensiveScript {
     'tacticalRationale': tacticalRationale,
     'toneGuidance': toneGuidance,
     'isCustom': isCustom,
+    if (hostileTriggerEn != null) 'hostileTriggerEn': hostileTriggerEn,
+    if (executiveScriptEn != null) 'executiveScriptEn': executiveScriptEn,
+    if (tacticalRationaleEn != null) 'tacticalRationaleEn': tacticalRationaleEn,
+    if (toneGuidanceEn != null) 'toneGuidanceEn': toneGuidanceEn,
   };
 
   factory DefensiveScript.fromMap(Map<String, dynamic> map) {
@@ -42,6 +82,10 @@ class DefensiveScript {
       tacticalRationale: map['tacticalRationale'] as String? ?? '',
       toneGuidance: map['toneGuidance'] as String? ?? '',
       isCustom: map['isCustom'] == true,
+      hostileTriggerEn: map['hostileTriggerEn'] as String?,
+      executiveScriptEn: map['executiveScriptEn'] as String?,
+      tacticalRationaleEn: map['tacticalRationaleEn'] as String?,
+      toneGuidanceEn: map['toneGuidanceEn'] as String?,
     );
   }
 
@@ -54,6 +98,10 @@ class DefensiveScript {
     String? tacticalRationale,
     String? toneGuidance,
     bool? isCustom,
+    String? hostileTriggerEn,
+    String? executiveScriptEn,
+    String? tacticalRationaleEn,
+    String? toneGuidanceEn,
   }) {
     return DefensiveScript(
       id: id ?? this.id,
@@ -64,6 +112,10 @@ class DefensiveScript {
       tacticalRationale: tacticalRationale ?? this.tacticalRationale,
       toneGuidance: toneGuidance ?? this.toneGuidance,
       isCustom: isCustom ?? this.isCustom,
+      hostileTriggerEn: hostileTriggerEn ?? this.hostileTriggerEn,
+      executiveScriptEn: executiveScriptEn ?? this.executiveScriptEn,
+      tacticalRationaleEn: tacticalRationaleEn ?? this.tacticalRationaleEn,
+      toneGuidanceEn: toneGuidanceEn ?? this.toneGuidanceEn,
     );
   }
 }
@@ -85,6 +137,10 @@ class DefensiveScriptsVault {
       executiveScript: 'भाषा या एंगल में क्या विशिष्ट फैक्चुअल बदलाव चाहिए? कृपया बिंदु स्पष्ट करें।',
       tacticalRationale: 'कभी सफाई न दें। गेंद उनके पाले में डालें।',
       toneGuidance: 'तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।',
+      hostileTriggerEn: 'Your approach makes no sense / There is no substance in this work / The angle is off.',
+      executiveScriptEn: 'What specific factual modifications do you require in the framing? Please clarify the points.',
+      tacticalRationaleEn: 'Never make excuses. Place the burden of proof back on them.',
+      toneGuidanceEn: 'Neutral, flat, without agitation or defensive explanations.',
     ),
 
     // -------------------------------------------------------------
@@ -98,6 +154,10 @@ class DefensiveScriptsVault {
       executiveScript: 'नोट कर लिया है। इसे रिव्यू करके अपडेट करता हूँ।',
       tacticalRationale: 'सपाट टोन, शून्य मुस्कान, 3 सेकंड आई-कांटेक्ट।',
       toneGuidance: 'धीमी गति, गहरी आवाज, आँखों में सीधा संपर्क।',
+      hostileTriggerEn: 'You don\'t understand what I am saying / "You need to fix your attitude"',
+      executiveScriptEn: 'Noted. I will review this and follow up with an update.',
+      tacticalRationaleEn: 'Flat tone, zero smile, 3 seconds direct eye contact.',
+      toneGuidanceEn: 'Measured cadence, lower vocal register, direct eye contact.',
     ),
 
     // -------------------------------------------------------------
@@ -112,6 +172,10 @@ class DefensiveScriptsVault {
       executiveScript: 'प्राथमिकता तय कर दीजिए। मौजूदा 2 मुख्य टास्क में से किसे होल्ड पर डालना है?',
       tacticalRationale: 'काम से मना नहीं किया, तार्किक सीमा खींच दी।',
       toneGuidance: 'पेशेवर, तार्किक, स्पष्ट सीमा रेखा।',
+      hostileTriggerEn: 'I need this done tonight / "I need this done right now regardless"',
+      executiveScriptEn: 'Please help prioritize. Which of our current 2 primary deliverables should be placed on hold?',
+      tacticalRationaleEn: 'Do not refuse the work; enforce realistic boundaries and trade-offs.',
+      toneGuidanceEn: 'Professional, analytical, clear boundary.',
     ),
 
     // -------------------------------------------------------------
@@ -187,6 +251,10 @@ class DefensiveScriptsVault {
       executiveScript: 'शून्य प्रतिक्रिया। खिड़की बंद। नज़र आगे। आंतरिक वाक्य: "इसका गुस्सा इसकी समस्या है, मेरी नहीं।"',
       tacticalRationale: 'सड़क पर किसी अजनबी से वाद-विवाद में कोई जीत नहीं होती — केवल जोखिम बढ़ता है।',
       toneGuidance: 'शून्य आई-कॉन्टैक्ट, शून्य जवाब, शांत गति बनाए रखें।',
+      hostileTriggerEn: '"Are you blind? / Don\'t you know how to drive?" / Aggressive honking and road rage.',
+      executiveScriptEn: 'Zero verbal reaction. Roll up window. Look straight ahead. Internal anchor: "Their anger is their affliction, not mine."',
+      tacticalRationaleEn: 'Arguing with a stranger on the road yields zero wins — only compounding risk.',
+      toneGuidanceEn: 'Zero eye contact, zero verbal response, maintain calm steady motion.',
     ),
     DefensiveScript(
       id: 'transit_02',
@@ -196,6 +264,10 @@ class DefensiveScriptsVault {
       executiveScript: 'हल्का सिर हिलाना। बिना बोले एक कदम हटना। "मैं इसके स्तर पर नहीं उतरूंगा।"',
       tacticalRationale: 'भीड़ में तर्क करना हमेशा दर्शकों के सामने आपकी गरिमा घटाता है।',
       toneGuidance: 'तटस्थ, शून्य भाव, सपाट चेहरा।',
+      hostileTriggerEn: '"You are taking too much space / Move out of the way / Let elders sit"',
+      executiveScriptEn: 'Brief nod. Step aside silently without a word. "I will not sink to this level."',
+      tacticalRationaleEn: 'Engaging in crowd disputes always erodes your dignity before onlookers.',
+      toneGuidanceEn: 'Neutral, unexpressive, calm posture.',
     ),
     DefensiveScript(
       id: 'transit_03',
@@ -219,6 +291,10 @@ class DefensiveScriptsVault {
       executiveScript: 'क्या विशिष्ट तथ्यात्मक बिंदु में बदलाव चाहिए? कृपया स्पष्ट करें।',
       tacticalRationale: 'कभी सफाई न दें। गेंद उनके पाले में डालें। अस्पष्ट आलोचना को विशिष्ट बनाने से वो बेनकाब होते हैं।',
       toneGuidance: 'तटस्थ, सपाट, बिना किसी घबराहट या सफाई के।',
+      hostileTriggerEn: '"There is no substance here / We expected better from you / You always mess things up."',
+      executiveScriptEn: 'Which specific factual item requires revision? Please clarify.',
+      tacticalRationaleEn: 'Never make excuses. Pass the ball to their court. Forcing specificity disarms vague critics.',
+      toneGuidanceEn: 'Neutral, calm, unruffled, zero defensive energy.',
     ),
     DefensiveScript(
       id: 'prov_02',
@@ -228,6 +304,10 @@ class DefensiveScriptsVault {
       executiveScript: '"नोट कर लिया है।" — बस। कोई विस्तार नहीं, कोई सफाई नहीं।',
       tacticalRationale: 'संक्षिप्त, सपाट उत्तर उत्तेजक को शक्तिहीन बनाता है। लंबा जवाब = उनकी जीत।',
       toneGuidance: 'धीमी गति, गहरी आवाज, आँखों में सीधा संपर्क।',
+      hostileTriggerEn: '"You don\'t get it, do you? / You never understand."',
+      executiveScriptEn: '"Noted." — That is all. No explanation, no elaboration.',
+      tacticalRationaleEn: 'A short, flat acknowledgement starves the provoker. Elaborate replies hand them victory.',
+      toneGuidanceEn: 'Slow pace, deep voice, steady direct eye contact.',
     ),
     DefensiveScript(
       id: 'prov_03',
@@ -251,6 +331,10 @@ class DefensiveScriptsVault {
       executiveScript: '"मैं आपकी बात सुन रहा हूँ। मुझे सोचने का समय दीजिए।" — फिर कमरे से बाहर निकलें।',
       tacticalRationale: 'भावनात्मक बहस में उतरना = हार। "सोचने का समय" = शांत सीमा रेखा।',
       toneGuidance: 'सम्मानजनक किंतु दृढ़। स्वर ऊंचा न हो।',
+      hostileTriggerEn: '"You never listen to us! / Children shouldn\'t be like this / Look at all we sacrificed for you!"',
+      executiveScriptEn: '"I hear what you are saying. Please give me some time to think." — then exit the room.',
+      tacticalRationaleEn: 'Engaging in emotional escalation = defeat. "Time to think" = a firm, peaceful boundary.',
+      toneGuidanceEn: 'Respectful yet firm. Keep your vocal pitch low and steady.',
     ),
     DefensiveScript(
       id: 'fam_02',
@@ -260,6 +344,10 @@ class DefensiveScriptsVault {
       executiveScript: '"शुक्रिया, ध्यान रखूंगा।" — फिर विषय बदलें। कोई बहस नहीं, कोई सफाई नहीं।',
       tacticalRationale: 'सलाह देने वाले को सफाई चाहिए, सहमति नहीं। "ध्यान रखूंगा" बंद कर देता है।',
       toneGuidance: 'सौम्य, हल्की मुस्कान, कोई कड़वाहट नहीं।',
+      hostileTriggerEn: '"When will you get married? / When are kids coming? / Change your career / Those clothes aren\'t right."',
+      executiveScriptEn: '"Thank you, I will keep that in mind." — then change the topic. No argument, no justification.',
+      tacticalRationaleEn: 'Unsolicited advisors crave defensive explanations, not agreement. "I\'ll keep that in mind" closes the loop.',
+      toneGuidanceEn: 'Gentle, slight smile, zero bitterness or defensiveness.',
     ),
     DefensiveScript(
       id: 'fam_03',
@@ -280,9 +368,13 @@ class DefensiveScriptsVault {
       category: 'WorkplaceComposure',
       scenario: 'आवाज ऊंची करना, धौंस जमाना या माइक्रो-डोमिनेंस दिखाना।',
       hostileTrigger: '"तुम्हें समझ नहीं आ रहा मैं क्या कह रहा हूँ / Fix your attitude!"',
-      executiveScript: '"नोट कर लिया है। इसे रिव्यू करके अपडेट करता हूँ।"',
+      executiveScript: '"नोट कर लिया है। इसे रिव्यू करके अपडेट करता हूँ।',
       tacticalRationale: 'सपाट टोन, शून्य मुस्कान, 3 सेकंड आई-कांटेक्ट।',
       toneGuidance: 'धीमी गति, गहरी आवाज, आँखों में सीधा संपर्क।',
+      hostileTriggerEn: '"You don\'t understand what I am saying / Fix your attitude!"',
+      executiveScriptEn: '"Noted. I will review this and follow up with an update."',
+      tacticalRationaleEn: 'Flat tone, zero smile, 3 seconds direct eye contact.',
+      toneGuidanceEn: 'Slow tempo, low voice, direct eye contact.',
     ),
     DefensiveScript(
       id: 'work_02',
@@ -292,6 +384,10 @@ class DefensiveScriptsVault {
       executiveScript: '"प्राथमिकता तय कर दीजिए। मौजूदा 2 मुख्य टास्क में से किसे होल्ड पर डालना है?"',
       tacticalRationale: 'काम से मना नहीं किया, तार्किक सीमा खींच दी।',
       toneGuidance: 'पेशेवर, तार्किक, स्पष्ट सीमा रेखा।',
+      hostileTriggerEn: '"This needs to be finished tonight / I need this right now regardless."',
+      executiveScriptEn: '"Please help prioritize. Which of our current 2 active deliverables should be placed on hold?"',
+      tacticalRationaleEn: 'Did not refuse the task; asserted professional trade-offs.',
+      toneGuidanceEn: 'Professional, analytical, clear boundary.',
     ),
     DefensiveScript(
       id: 'work_03',
@@ -324,6 +420,10 @@ class DefensiveScriptsVault {
       executiveScript: '"मेरा स्वर तटस्थ है; मेरा फोकस तथ्यों पर है। चलिए मुद्दे पर लौटते हैं।"',
       tacticalRationale: 'लेबलिंग को एक वाक्य में खारिज करें और चर्चा को तकनीकी मुद्दे पर लौटाएं।',
       toneGuidance: 'पूर्णत: सपाट स्वर। शून्य उतार-चढ़ाव।',
+      hostileTriggerEn: '"You are too emotional / Why are you taking this so personally?"',
+      executiveScriptEn: '"My tone is completely neutral; my focus is on verified facts. Let us return to the agenda."',
+      tacticalRationaleEn: 'Dismiss emotional labels in a single sentence and re-anchor the dialogue on objective facts.',
+      toneGuidanceEn: 'Completely flat cadence. Zero emotional fluctuation.',
     ),
     DefensiveScript(
       id: 'gas_02',
@@ -347,6 +447,10 @@ class DefensiveScriptsVault {
       executiveScript: 'केवल 5 मिनट। बस शुरू करो। टाइमर लगाओ। 5 मिनट बाद फैसला करना।',
       tacticalRationale: '5-मिनट नियम प्रतिरोध की सबसे बड़ी दीवार तोड़ता है। शुरू करने के बाद रुकना कठिन हो जाता है।',
       toneGuidance: 'आंतरिक — दृढ़, संक्षिप्त, बिना दया के।',
+      hostileTriggerEn: 'Internal voice: "Just skip today / I\'m too exhausted / I\'ll start fresh tomorrow."',
+      executiveScriptEn: 'Just 5 minutes. Begin immediately. Set the timer. Decide only after 5 minutes.',
+      tacticalRationaleEn: 'The 5-minute rule shatters initial cognitive resistance. Stopping after starting becomes difficult.',
+      toneGuidanceEn: 'Internal — firm, resolute, zero self-pity.',
     ),
     DefensiveScript(
       id: 'self_02',
@@ -365,6 +469,10 @@ class DefensiveScriptsVault {
       executiveScript: '"तुलना = चोरी। दूसरे का हाइलाइट रील ≠ मेरी असलियत। मेरा मापदंड = कल का मैं।"',
       tacticalRationale: 'तुलना हमेशा अधूरी जानकारी पर होती है। एकमात्र वैध मापदंड = कल का स्वयं।',
       toneGuidance: 'आंतरिक — करुणामय किंतु तार्किक।',
+      hostileTriggerEn: '"Everyone has everything, I have nothing / Look how great their lives are."',
+      executiveScriptEn: '"Comparison is theft. Another\'s highlight reel is not my reality. My sole benchmark is who I was yesterday."',
+      tacticalRationaleEn: 'Social comparison is always founded on partial illusions. The only valid metric is continuous self-evolution.',
+      toneGuidanceEn: 'Internal — compassionate yet rigorously rational.',
     ),
 
     // -------------------------------------------------------------
@@ -379,6 +487,10 @@ class DefensiveScriptsVault {
       executiveScript: '"दो स्पष्ट विकल्प हैं: A गति पर केंद्रित है, B विश्वसनीयता पर। आपकी प्राथमिकता क्या है?"',
       tacticalRationale: 'विकल्प देने से सामने वाले के इरादे उजागर होते हैं। अनुमान मत लगाओ — उनके चयन को उनके इरादे प्रकट करने दो।',
       toneGuidance: 'शांत, मापा हुआ, परामर्शदात्री।',
+      hostileTriggerEn: 'Hidden agendas, ambiguous demands, or manipulative framing.',
+      executiveScriptEn: '"There are two distinct options: Option A optimizes for speed; Option B optimizes for reliability. Which is your priority?"',
+      tacticalRationaleEn: 'Forcing a binary trade-off exposes hidden motives. Never guess — let their choice reveal their true intent.',
+      toneGuidanceEn: 'Calm, measured, advisory.',
     ),
     DefensiveScript(
       id: 'roe_02',
@@ -388,6 +500,10 @@ class DefensiveScriptsVault {
       executiveScript: '"किन विशिष्ट मापदंडों के आधार पर? [मौन — सीधा आई-कॉन्टैक्ट, मौन न तोड़ें]"',
       tacticalRationale: 'विशिष्ट तथ्य माँगकर मौन साधना आलोचक को या तो प्रमाणित करने पर मजबूर करता है या वापस हटने पर।',
       toneGuidance: 'धीमी, स्थिर लय, सीधा आई-कॉन्टैक्ट; मौन भरने की जल्दी शून्य।',
+      hostileTriggerEn: '"This didn\'t feel right / Your team lacks executive presence."',
+      executiveScriptEn: '"Against which specific measurable criteria? [Strategic silence — hold direct eye contact, do not break the pause]"',
+      tacticalRationaleEn: 'Demanding concrete criteria followed by disciplined silence forces the critic to either substantiate or retreat.',
+      toneGuidanceEn: 'Slow, unhurried cadence, direct eye contact; zero rush to fill the silence.',
     ),
     DefensiveScript(
       id: 'roe_03',

@@ -127,5 +127,21 @@ void main() {
       expect(filtered.length, equals(1));
       expect(filtered.first.id, equals('cust_01'));
     });
+
+    test('DefensiveScript supports bilingual getters for English and Hindi', () {
+      final fam01 = DefensiveScriptsVault.scripts.firstWhere((s) => s.id == 'fam_01');
+
+      // In Hindi mode, returns native Hindi script
+      expect(fam01.getLocalizedHostileTrigger(true), contains('सुनते ही नहीं'));
+      expect(fam01.getLocalizedExecutiveScript(true), contains('सोचने का समय'));
+      expect(fam01.getLocalizedTacticalRationale(true), contains('भावनात्मक बहस'));
+      expect(fam01.getLocalizedToneGuidance(true), contains('सम्मानजनक'));
+
+      // In English mode, returns calibrated English translation
+      expect(fam01.getLocalizedHostileTrigger(false), contains('never listen'));
+      expect(fam01.getLocalizedExecutiveScript(false), contains('give me some time to think'));
+      expect(fam01.getLocalizedTacticalRationale(false), contains('emotional escalation'));
+      expect(fam01.getLocalizedToneGuidance(false), contains('Respectful yet firm'));
+    });
   });
 }

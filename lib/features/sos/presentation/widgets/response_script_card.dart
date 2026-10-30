@@ -35,7 +35,8 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
 
   Future<void> _copyScriptToClipboard() async {
     HapticService.lightImpact();
-    await Clipboard.setData(ClipboardData(text: widget.script.executiveScript));
+    final scriptText = widget.script.getLocalizedExecutiveScript(context.loc.isHindi);
+    await Clipboard.setData(ClipboardData(text: scriptText));
 
     if (mounted) {
       setState(() {
@@ -116,7 +117,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     VoiceTtsButton(
-                      textToSpeak: widget.script.executiveScript,
+                      textToSpeak: widget.script.getLocalizedExecutiveScript(context.loc.isHindi),
                       audioTopicKey: 'sos_script_${widget.script.id}',
                       size: 19,
                       color: AppColors.textMuted,
@@ -203,7 +204,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  widget.script.hostileTrigger,
+                  widget.script.getLocalizedHostileTrigger(context.loc.isHindi),
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -249,7 +250,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '"${widget.script.executiveScript}"',
+                  '"${widget.script.getLocalizedExecutiveScript(context.loc.isHindi)}"',
                   style: AppTextStyles.scriptVerbatim,
                 ),
               ],
@@ -281,7 +282,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                     ),
                     Expanded(
                       child: Text(
-                        widget.script.tacticalRationale,
+                        widget.script.getLocalizedTacticalRationale(context.loc.isHindi),
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textPrimary,
                           fontSize: 12.5,
@@ -304,7 +305,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                     ),
                     Expanded(
                       child: Text(
-                        widget.script.toneGuidance,
+                        widget.script.getLocalizedToneGuidance(context.loc.isHindi),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textMuted,
                           fontSize: 11.5,

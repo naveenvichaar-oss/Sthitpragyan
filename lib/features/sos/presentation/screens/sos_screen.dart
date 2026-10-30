@@ -181,7 +181,7 @@ class _SOSScreenState extends State<SOSScreen> with TickerProviderStateMixin {
     }
   }
 
-  List<DefensiveScript> _getFilteredScripts() {
+  List<DefensiveScript> _getFilteredScripts(bool isHindi) {
     final query = _searchController.text.trim().toLowerCase();
 
     return _allScripts.where((script) {
@@ -191,9 +191,12 @@ class _SOSScreenState extends State<SOSScreen> with TickerProviderStateMixin {
               : script.category.toLowerCase() == _selectedCategory.toLowerCase());
 
       final matchesSearch = query.isEmpty ||
+          script.getLocalizedHostileTrigger(isHindi).toLowerCase().contains(query) ||
           script.hostileTrigger.toLowerCase().contains(query) ||
           script.scenario.toLowerCase().contains(query) ||
+          script.getLocalizedExecutiveScript(isHindi).toLowerCase().contains(query) ||
           script.executiveScript.toLowerCase().contains(query) ||
+          script.getLocalizedTacticalRationale(isHindi).toLowerCase().contains(query) ||
           script.tacticalRationale.toLowerCase().contains(query);
 
       return matchesCategory && matchesSearch;
@@ -203,7 +206,7 @@ class _SOSScreenState extends State<SOSScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final isHindi = context.loc.isHindi;
-    final filteredScripts = _getFilteredScripts();
+    final filteredScripts = _getFilteredScripts(isHindi);
     final categories = [
       'All',
       if (_pinnedScriptIds.isNotEmpty) 'Pinned',
