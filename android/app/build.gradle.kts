@@ -24,10 +24,18 @@ android {
         multiDexEnabled = true
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("release.keystore")
+            storePassword = "businessjourno123"
+            keyAlias = "businessjourno"
+            keyPassword = "businessjourno123"
+        }
+    }
+
     buildTypes {
         release {
-            // Signing with debug keys so release APK is immediately installable
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
