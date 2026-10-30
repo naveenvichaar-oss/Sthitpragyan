@@ -554,7 +554,9 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                   )
                 else
                   Text(
-                    'RULE ${widget.rule.id.toString().padLeft(2, '0')} OF 07',
+                    context.loc.isHindi
+                        ? 'नियम ${widget.rule.id.toString().padLeft(2, '0')} / 07'
+                        : 'RULE ${widget.rule.id.toString().padLeft(2, '0')} OF 07',
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 9.5,

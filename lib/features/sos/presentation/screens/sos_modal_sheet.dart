@@ -1010,7 +1010,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                   border: Border.all(color: AppColors.borderSubtle),
                 ),
                 child: Text(
-                  script.category.toUpperCase(),
+                  context.loc.getDefensiveCategoryName(script.category).toUpperCase(),
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.shieldPrimary,
                     fontSize: 9.5,
@@ -1137,7 +1137,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'DEFENSIVE RESPONSE SCRIPT',
+                          context.loc.isHindi ? 'बचाव प्रतिक्रिया स्क्रिप्ट' : 'DEFENSIVE RESPONSE SCRIPT',
                           style: AppTextStyles.labelBadge.copyWith(
                             color: AppColors.shieldPrimary,
                             fontSize: 9.0,
@@ -1185,7 +1185,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                               text: TextSpan(
                                 children: [
                                   TextSpan(
-                                    text: 'SUBTEXT: ',
+                                    text: context.loc.isHindi ? 'रणनीतिक प्रभाव: ' : 'SUBTEXT: ',
                                     style: AppTextStyles.labelBadge.copyWith(
                                       color: AppColors.shieldPrimary,
                                       fontSize: 10.5,

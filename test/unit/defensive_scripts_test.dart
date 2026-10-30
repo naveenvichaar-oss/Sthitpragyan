@@ -142,6 +142,23 @@ void main() {
       expect(fam01.getLocalizedExecutiveScript(false), contains('give me some time to think'));
       expect(fam01.getLocalizedTacticalRationale(false), contains('emotional escalation'));
       expect(fam01.getLocalizedToneGuidance(false), contains('Respectful yet firm'));
+
+      final gas02 = DefensiveScriptsVault.scripts.firstWhere((s) => s.id == 'gas_02');
+      // In Hindi mode, returns Hindi text for gaslighting
+      expect(gas02.getLocalizedHostileTrigger(true), contains('मनगढ़ंत बातें'));
+      expect(gas02.getLocalizedExecutiveScript(true), contains('लिखित रिकॉर्ड्स'));
+      expect(gas02.getLocalizedTacticalRationale(true), contains('लिखित प्रमाण'));
+      // In English mode, returns English text
+      expect(gas02.getLocalizedHostileTrigger(false), contains('making things up'));
+      expect(gas02.getLocalizedExecutiveScript(false), contains('I have the records'));
+
+      final int01 = DefensiveScriptsVault.scripts.firstWhere((s) => s.id == 'int_01');
+      // In Hindi mode, returns Hindi text for interruption
+      expect(int01.getLocalizedHostileTrigger(true), contains('टोकने दीजिए'));
+      expect(int01.getLocalizedExecutiveScript(true), contains('60 सेकंड'));
+      // In English mode, returns English text
+      expect(int01.getLocalizedHostileTrigger(false), contains('stop you right there'));
+      expect(int01.getLocalizedExecutiveScript(false), contains('Allow me 60 seconds'));
     });
   });
 }

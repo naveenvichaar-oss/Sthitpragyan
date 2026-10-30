@@ -91,16 +91,9 @@ class HiveStorage {
         }
       }
 
-      // Pre-seed default defensive scripts if not present or upgrade with bilingual fields
+      // Pre-seed default defensive scripts and keep canonical definitions updated
       for (final script in DefensiveScriptsVault.scripts) {
-        if (!_defensiveScriptsBox.containsKey(script.id)) {
-          await _defensiveScriptsBox.put(script.id, script.toMap());
-        } else {
-          final existing = _defensiveScriptsBox.get(script.id);
-          if (existing != null && existing['hostileTriggerEn'] == null) {
-            await _defensiveScriptsBox.put(script.id, script.toMap());
-          }
-        }
+        await _defensiveScriptsBox.put(script.id, script.toMap());
       }
 
       // Pre-seed starter anchors for Joy Reservoir if not present
@@ -746,18 +739,11 @@ class HiveStorage {
         final map = Map<String, dynamic>.from(raw);
         var script = DefensiveScript.fromMap(map);
 
-        // Auto-upgrade built-in scripts with latest bilingual translations if missing
+        // Auto-upgrade built-in scripts with latest canonical bilingual translations
         if (!script.isCustom && defaultScriptMap.containsKey(script.id)) {
           final def = defaultScriptMap[script.id]!;
-          if (script.hostileTriggerEn == null || script.hostileTriggerEn!.isEmpty) {
-            script = script.copyWith(
-              hostileTriggerEn: def.hostileTriggerEn,
-              executiveScriptEn: def.executiveScriptEn,
-              tacticalRationaleEn: def.tacticalRationaleEn,
-              toneGuidanceEn: def.toneGuidanceEn,
-            );
-            _defensiveScriptsBox.put(script.id, script.toMap());
-          }
+          script = def;
+          _defensiveScriptsBox.put(script.id, script.toMap());
         }
 
         list.add(script);
