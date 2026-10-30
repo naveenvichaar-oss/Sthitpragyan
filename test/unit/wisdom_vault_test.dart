@@ -52,6 +52,8 @@ void main() {
             'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
         'originalText':
             'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
+        'romanizedText':
+            'duḥkheṣv anudvigna-manāḥ sukheṣu vigata-spṛhaḥ |\nvīta-rāga-bhaya-krodhaḥ sthita-dhīr munir ucyate ||',
         'translation': {
           'en': 'One whose mind is undisturbed in distress...',
           'hi': 'जिसका मन दुखों की प्राप्ति पर उद्वेग रहित रहता है...',
@@ -72,6 +74,8 @@ void main() {
       expect(entry.getSubtitle(true), 'श्रीमद्भगवद्गीता 2.56');
       expect(entry.shlokaText, contains('स्थितधीर्मुनि रुच्यते॥'));
       expect(entry.shlokaText, isNot(contains('Nichols')));
+      expect(entry.getLocalizedOriginalText(true), contains('स्थितधीर्मुनि रुच्यते॥'));
+      expect(entry.getLocalizedOriginalText(false), contains('duḥkheṣv anudvigna-manāḥ'));
       expect(entry.getTranslation(true), startsWith('जिसका मन'));
       expect(entry.getExecutiveTakeaway(true), startsWith('जब कार्य का दबाव'));
       expect(entry.isEmergencyPerspective, true);

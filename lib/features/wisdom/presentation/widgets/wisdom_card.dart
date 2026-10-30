@@ -34,7 +34,7 @@ class _WisdomCardState extends State<WisdomCard> {
     HapticService.selectionClick();
     final isHi = context.loc.isHindi;
     final text =
-        '${widget.entry.getTitle(isHi)}\n${widget.entry.getSubtitle(isHi)}\n\n"${widget.entry.originalText}"\n\n${context.loc.essenceTranslation}: ${widget.entry.getTranslation(isHi)}\n\n${context.loc.executiveActionTakeaway}: ${widget.entry.getExecutiveTakeaway(isHi)}';
+        '${widget.entry.getTitle(isHi)}\n${widget.entry.getSubtitle(isHi)}\n\n"${widget.entry.getLocalizedOriginalText(isHi)}"\n\n${context.loc.essenceTranslation}: ${widget.entry.getTranslation(isHi)}\n\n${context.loc.executiveActionTakeaway}: ${widget.entry.getExecutiveTakeaway(isHi)}';
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -145,7 +145,7 @@ class _WisdomCardState extends State<WisdomCard> {
                           ),
                         VoiceTtsButton(
                           textToSpeak:
-                              '${widget.entry.getTitle(context.loc.isHindi)}. ${widget.entry.originalText}. ${widget.entry.getTranslation(context.loc.isHindi)}. ${widget.entry.getExecutiveTakeaway(context.loc.isHindi)}',
+                              '${widget.entry.getTitle(context.loc.isHindi)}. ${widget.entry.getLocalizedOriginalText(context.loc.isHindi)}. ${widget.entry.getTranslation(context.loc.isHindi)}. ${widget.entry.getExecutiveTakeaway(context.loc.isHindi)}',
                           audioTopicKey: 'wisdom_${widget.entry.id}',
                           size: 16,
                           tooltip: context.loc.listenWisdomReadout,
@@ -203,7 +203,7 @@ class _WisdomCardState extends State<WisdomCard> {
                     border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
                   ),
                   child: Text(
-                    widget.entry.originalText,
+                    widget.entry.getLocalizedOriginalText(context.loc.isHindi),
                     style: TextStyle(
                       fontFamily: 'serif',
                       fontSize: 12.5,

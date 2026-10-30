@@ -14,6 +14,7 @@
     "source": "Bhagavad Gita 2.47",
     "originalText": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
     "shlokaText": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
+    "romanizedText": "karmaṇy evādhikāras te mā phaleṣu kadācana |\nmā karma-phala-hetur bhūr mā te saṅgo 'stv akarmaṇi ||",
     "translation": {
       "en": "You have a right only to perform your duties, but never to the fruits of your actions. Never consider yourself to be the cause of the results of your activities, nor be attached to inaction.",
       "hi": "तुम्हारा अधिकार केवल कर्म करने में है, उसके फलों में कभी नहीं। इसलिए कर्मफल के हेतु मत बनो और न ही अकर्मण्यता (निष्क्रियता) में तुम्हारी आसक्ति हो।"
@@ -40,6 +41,7 @@
     "source": "Bhagavad Gita 2.56",
     "originalText": "दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥",
     "shlokaText": "दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥",
+    "romanizedText": "duḥkheṣv anudvigna-manāḥ sukheṣu vigata-spṛhaḥ |\nvīta-rāga-bhaya-krodhaḥ sthita-dhīr munir ucyate ||",
     "translation": {
       "en": "One whose mind is undisturbed in distress, who does not crave worldly pleasure, and who is free from attachment, fear, and anger, is called a sage of steady intellect.",
       "hi": "जिसका मन दुखों की प्राप्ति पर उद्वेग रहित रहता है, जो सुखों की प्राप्ति में सर्वथा निष्पृह है, तथा जिसके राग, भय और क्रोध नष्ट हो चुके हैं, ऐसा मुनि स्थिरबुद्धि (स्थितप्रज्ञ) कहलाता है।"
@@ -66,6 +68,7 @@
     "source": "Bhagavad Gita 2.62-63",
     "originalText": "ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते।\nसङ्गात्संजायते कामः कामात्क्रोधोऽभिजायते॥\nक्रोधाद्भवति संमोहः संमोहात्स्मृतिविभ्रमः।\nस्मृतिभ्रंशाद् बुद्धिनाशो बुद्धिनाशात्प्रणश्यति॥",
     "shlokaText": "ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते।\nसङ्गात्संजायते कामः कामात्क्रोधोऽभिजायते॥\nक्रोधाद्भवति संमोहः संमोहात्स्मृतिविभ्रमः।\nस्मृतिभ्रंशाद् बुद्धिनाशो बुद्धिनाशात्प्रणश्यति॥",
+    "romanizedText": "dhyāyato viṣayān puṁsaḥ saṅgas teṣūpajāyate |\nsaṅgāt sañjāyate kāmaḥ kāmāt krodho 'bhijāyate ||\nkrodhād bhavati saṁmohaḥ saṁmohāt smṛti-vibhramaḥ |\nsmṛti-bhraṁśād buddhi-nāśo buddhi-nāśāt praṇaśyati ||",
     "translation": {
       "en": "Dwelling on sensory objects breeds attachment; attachment breeds desire; desire unfulfilled breeds anger. From anger arises delusion; from delusion, confusion of memory; from confusion of memory, loss of intellect; and from loss of intellect, total ruin.",
       "hi": "विषयों का निरंतर चिंतन करने से उनमें आसक्ति उत्पन्न होती है; आसक्ति से कामना और कामना में बाधा से क्रोध उत्पन्न होता है। क्रोध से सम्मोह (अविवेक), सम्मोह से स्मृति-भ्रम, स्मृति-भ्रम से बुद्धि का नाश और बुद्धि का नाश होने से मनुष्य का सर्वनाश हो जाता है।"
@@ -92,6 +95,7 @@
     "source": "Bhagavad Gita 2.70",
     "originalText": "आपूर्यमाणमचलप्रतिष्ठं समुद्रमापः प्रविशन्ति यद्वत्।\nतद्वत्कामा यं प्रविशन्ति सर्वे स शान्तिमाप्नोति न कामकामी॥",
     "shlokaText": "आपूर्यमाणमचलप्रतिष्ठं समुद्रमापः प्रविशन्ति यद्वत्।\nतद्वत्कामा यं प्रविशन्ति सर्वे स शान्तिमाप्नोति न कामकामी॥",
+    "romanizedText": "āpūryamāṇam acala-pratiṣṭhaṁ samudram āpaḥ praviśanti yadvat |\ntadvat kāmā yaṁ praviśanti sarve sa śāntim āpnoti na kāma-kāmī ||",
     "translation": {
       "en": "Just as the ocean remains undisturbed while rivers continuously flow into it, so the person into whom all sensory disturbances flow without producing a ripple achieves true peace, not the seeker of desires.",
       "hi": "जिस प्रकार सब ओर से जल से परिपूर्ण अचल महासागर में नदियाँ आकर मिलती हैं किंतु वह विचलित नहीं होता, उसी प्रकार जिस स्थिर मनुष्य में सभी विकार बिना हलचल समा जाते हैं, वही शांति पाता है, कामनाओं का दास नहीं।"

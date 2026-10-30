@@ -597,7 +597,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                     ] else if (_activeTabIndex == 1) ...[
                       VoiceTtsButton(
                         textToSpeak:
-                            '${_currentWisdom.getTitle(context.loc.isHindi)}. ${_currentWisdom.originalText}. ${_currentWisdom.getTranslation(context.loc.isHindi)}. ${_currentWisdom.getExecutiveTakeaway(context.loc.isHindi)}',
+                            '${_currentWisdom.getTitle(context.loc.isHindi)}. ${_currentWisdom.getLocalizedOriginalText(context.loc.isHindi)}. ${_currentWisdom.getTranslation(context.loc.isHindi)}. ${_currentWisdom.getExecutiveTakeaway(context.loc.isHindi)}',
                         audioTopicKey: 'wisdom_${_currentWisdom.id}',
                         tooltip: context.loc.listenWisdomReadout,
                       ),
@@ -942,7 +942,7 @@ class _CoreRuleCardState extends State<CoreRuleCard> {
                       border: Border.all(color: AppColors.borderSubtle),
                     ),
                     child: Text(
-                      _currentWisdom.originalText,
+                      _currentWisdom.getLocalizedOriginalText(context.loc.isHindi),
                       style: const TextStyle(
                         fontFamily: 'serif',
                         fontSize: 13,

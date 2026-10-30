@@ -9,6 +9,7 @@ class WisdomEntry {
   final String source;
   final String? sourceHi;
   final String originalText;
+  final String? romanizedText;
   final String translation;
   final String? translationHi;
   final String executiveTakeaway;
@@ -25,6 +26,7 @@ class WisdomEntry {
     required this.source,
     this.sourceHi,
     required this.originalText,
+    this.romanizedText,
     required this.translation,
     this.translationHi,
     required this.executiveTakeaway,
@@ -35,6 +37,16 @@ class WisdomEntry {
 
   /// Alias for authentic Sanskrit shloka or classical original text
   String get shlokaText => originalText;
+
+  /// Returns localized shloka or original text based on active language:
+  /// In English mode (isHindi == false), returns Roman transliteration when available.
+  /// In Hindi mode (isHindi == true), returns original Devanagari Sanskrit text.
+  String getLocalizedOriginalText([bool isHindi = false]) {
+    if (!isHindi && romanizedText != null && romanizedText!.trim().isNotEmpty) {
+      return romanizedText!;
+    }
+    return originalText;
+  }
 
   /// Returns localized title based on active language
   String getTitle([bool isHindi = false]) {
@@ -111,6 +123,10 @@ class WisdomEntry {
     final takeHi =
         parseHi(rawTakeaway) ?? json['executiveTakeawayHi']?.toString();
 
+    final romanized = json['romanizedText']?.toString() ??
+        json['originalTextEn']?.toString() ??
+        json['shlokaTextEn']?.toString();
+
     return WisdomEntry(
       id: json['id'] as String? ?? '',
       category: json['category'] as String? ?? 'general',
@@ -121,6 +137,7 @@ class WisdomEntry {
       sourceHi: sourceHi,
       originalText:
           (json['shlokaText'] ?? json['originalText']) as String? ?? '',
+      romanizedText: romanized,
       translation: transEn,
       translationHi: transHi,
       executiveTakeaway: takeEn,
@@ -149,6 +166,8 @@ class WisdomEntry {
       },
       'originalText': originalText,
       'shlokaText': originalText,
+      if (romanizedText != null) 'romanizedText': romanizedText,
+      if (romanizedText != null) 'originalTextEn': romanizedText,
       'translation': {
         'en': translation,
         if (translationHi != null) 'hi': translationHi,

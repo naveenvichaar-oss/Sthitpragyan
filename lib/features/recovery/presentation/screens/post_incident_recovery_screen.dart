@@ -1062,7 +1062,7 @@ class _PostIncidentRecoveryScreenState
                   ),
                 ),
                 child: Text(
-                  '"${activePerspective.originalText}"',
+                  '"${activePerspective.getLocalizedOriginalText(context.loc.isHindi)}"',
                   style: const TextStyle(
                     fontFamily: 'serif',
                     fontSize: 13,

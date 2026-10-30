@@ -172,7 +172,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                 children: [
                   VoiceTtsButton(
                     textToSpeak:
-                        '${_currentWisdom.getTitle(context.loc.isHindi)}. ${_currentWisdom.originalText}. ${_currentWisdom.getTranslation(context.loc.isHindi)}. ${_currentWisdom.getExecutiveTakeaway(context.loc.isHindi)}',
+                        '${_currentWisdom.getTitle(context.loc.isHindi)}. ${_currentWisdom.getLocalizedOriginalText(context.loc.isHindi)}. ${_currentWisdom.getTranslation(context.loc.isHindi)}. ${_currentWisdom.getExecutiveTakeaway(context.loc.isHindi)}',
                     audioTopicKey: 'wisdom_${_currentWisdom.id}',
                     tooltip: context.loc.listenWisdomReadout,
                   ),
@@ -231,7 +231,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
               border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
             ),
             child: Text(
-              _currentWisdom.originalText,
+              _currentWisdom.getLocalizedOriginalText(context.loc.isHindi),
               style: TextStyle(
                 fontFamily: 'serif',
                 fontSize: 12,

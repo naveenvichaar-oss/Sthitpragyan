@@ -139,7 +139,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                 children: [
                   VoiceTtsButton(
                     textToSpeak:
-                        '${entry.getTitle(context.loc.isHindi)}. ${entry.originalText}. ${entry.getTranslation(context.loc.isHindi)}. ${entry.getExecutiveTakeaway(context.loc.isHindi)}',
+                        '${entry.getTitle(context.loc.isHindi)}. ${entry.getLocalizedOriginalText(context.loc.isHindi)}. ${entry.getTranslation(context.loc.isHindi)}. ${entry.getExecutiveTakeaway(context.loc.isHindi)}',
                     audioTopicKey: 'wisdom_${entry.id}',
                     size: 20,
                     tooltip: context.loc.listenToEmergencyPerspective,
@@ -252,7 +252,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                       ),
                     ),
                     child: Text(
-                      '"${entry.originalText}"',
+                      '"${entry.getLocalizedOriginalText(context.loc.isHindi)}"',
                       style: const TextStyle(
                         fontFamily: 'serif',
                         fontSize: 13.5,

@@ -112,6 +112,8 @@ class WisdomVaultService {
         sourceHi: 'श्रीमद्भगवद्गीता 2.56',
         originalText:
             'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
+        romanizedText:
+            'duḥkheṣv anudvigna-manāḥ sukheṣu vigata-spṛhaḥ |\nvīta-rāga-bhaya-krodhaḥ sthita-dhīr munir ucyate ||',
         translation:
             'One whose mind is undisturbed in distress, who does not crave worldly pleasure, and who is free from attachment, fear, and anger, is called a sage of steady intellect.',
         translationHi:
