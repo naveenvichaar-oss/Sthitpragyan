@@ -91,10 +91,15 @@ class HiveStorage {
         }
       }
 
-      // Pre-seed default defensive scripts if not present
+      // Pre-seed default defensive scripts if not present or upgrade with bilingual fields
       for (final script in DefensiveScriptsVault.scripts) {
         if (!_defensiveScriptsBox.containsKey(script.id)) {
           await _defensiveScriptsBox.put(script.id, script.toMap());
+        } else {
+          final existing = _defensiveScriptsBox.get(script.id);
+          if (existing != null && existing['hostileTriggerEn'] == null) {
+            await _defensiveScriptsBox.put(script.id, script.toMap());
+          }
         }
       }
 
@@ -734,10 +739,28 @@ class HiveStorage {
   List<DefensiveScript> getAllDefensiveScripts() {
     if (!_initialized) return DefensiveScriptsVault.scripts;
     final list = <DefensiveScript>[];
+    final defaultScriptMap = {for (final s in DefensiveScriptsVault.scripts) s.id: s};
+
     for (final raw in _defensiveScriptsBox.values) {
       try {
         final map = Map<String, dynamic>.from(raw);
-        list.add(DefensiveScript.fromMap(map));
+        var script = DefensiveScript.fromMap(map);
+
+        // Auto-upgrade built-in scripts with latest bilingual translations if missing
+        if (!script.isCustom && defaultScriptMap.containsKey(script.id)) {
+          final def = defaultScriptMap[script.id]!;
+          if (script.hostileTriggerEn == null || script.hostileTriggerEn!.isEmpty) {
+            script = script.copyWith(
+              hostileTriggerEn: def.hostileTriggerEn,
+              executiveScriptEn: def.executiveScriptEn,
+              tacticalRationaleEn: def.tacticalRationaleEn,
+              toneGuidanceEn: def.toneGuidanceEn,
+            );
+            _defensiveScriptsBox.put(script.id, script.toMap());
+          }
+        }
+
+        list.add(script);
       } catch (e) {
         debugPrint('[HiveStorage] Error parsing DefensiveScript: $e');
       }
