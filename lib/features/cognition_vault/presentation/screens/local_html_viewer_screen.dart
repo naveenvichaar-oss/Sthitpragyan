@@ -1,16 +1,18 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/local_html_tool.dart';
+import '../../data/services/html_tool_storage_service.dart';
 import '../widgets/platform_html_view.dart';
 
 /// LocalHtmlViewerScreen renders offline HTML files and interactive dashboards
@@ -51,6 +53,7 @@ class LocalHtmlViewerScreen extends StatefulWidget {
 
 class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
   final HiveStorage _storage = HiveStorage();
+  final HtmlToolStorageService _storageService = HtmlToolStorageService();
   late LocalHtmlTool _currentTool;
 
   WebViewController? _controller;
@@ -107,6 +110,15 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
           ),
         );
 
+      // Enable Android-specific local offline file access, content access, and media playback
+      if (!kIsWeb && controller.platform is AndroidWebViewController) {
+        AndroidWebViewController.enableDebugging(true);
+        final androidController = controller.platform as AndroidWebViewController;
+        androidController.setAllowFileAccess(true);
+        androidController.setAllowContentAccess(true);
+        androidController.setMediaPlaybackRequiresUserGesture(false);
+      }
+
       _loadContent(controller);
       _controller = controller;
     } catch (e) {
@@ -120,16 +132,20 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
 
   Future<void> _loadContent(WebViewController controller) async {
     try {
-      if (!kIsWeb && _currentTool.localFilePath.isNotEmpty) {
-        final file = File(_currentTool.localFilePath);
-        if (await file.exists()) {
-          await controller.loadFile(_currentTool.localFilePath);
+      if (!kIsWeb) {
+        // Ensure the file is physically present in app_html_tools/ sandbox
+        final savedPath = await _storageService.prepareFileForLoading(_currentTool);
+        if (savedPath.isNotEmpty && await File(savedPath).exists()) {
+          // Invalidate cache before loading so CSS/JS changes reflect immediately
+          await controller.clearCache();
+          await controller.loadFile(savedPath);
           return;
         }
       }
 
       // Fallback: load raw HTML string
       if (_currentTool.htmlContent != null && _currentTool.htmlContent!.isNotEmpty) {
+        await controller.clearCache();
         await controller.loadHtmlString(_currentTool.htmlContent!);
       } else {
         setState(() {
@@ -150,7 +166,7 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
     }
   }
 
-  void _reload() {
+  Future<void> _reload() async {
     HapticService.selectionClick();
     if (kIsWeb) {
       setState(() {
@@ -165,7 +181,13 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
       });
     } else {
       if (_controller != null) {
-        _controller!.reload();
+        await _controller!.clearCache();
+        final savedPath = await _storageService.prepareFileForLoading(_currentTool);
+        if (savedPath.isNotEmpty && await File(savedPath).exists()) {
+          await _controller!.loadFile(savedPath);
+        } else {
+          await _controller!.reload();
+        }
       } else {
         _initWebView();
       }
@@ -182,24 +204,35 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
       if (files.isNotEmpty) {
         final file = files.first;
         final bytes = await file.readAsBytes();
-        String content;
-        try {
-          content = utf8.decode(bytes);
-        } catch (_) {
-          content = String.fromCharCodes(bytes);
-        }
-        final updated = _currentTool.copyWith(htmlContent: content);
-        await _storage.saveHtmlTool(updated);
+
+        final result = await _storageService.importOrOverwriteTool(
+          sourceFilePath: file.path,
+          originalFileName: file.name,
+          bytes: bytes,
+          title: _currentTool.title,
+          category: _currentTool.category,
+          description: _currentTool.description,
+        );
+
         setState(() {
-          _currentTool = updated;
+          _currentTool = result.tool;
           _loadError = null;
           _isLoading = false;
         });
-        widget.onToolUpdated?.call(updated);
+        widget.onToolUpdated?.call(result.tool);
+
+        if (_controller != null && !kIsWeb) {
+          await _controller!.clearCache();
+          await _controller!.loadFile(result.tool.localFilePath);
+        }
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Updated content for "${updated.title}".'),
+              content: Text(
+                '${context.loc.toolOverwrittenNotice} ("${result.tool.title}").',
+                style: const TextStyle(fontSize: 12),
+              ),
               backgroundColor: AppColors.surfaceElevated,
             ),
           );
@@ -219,15 +252,14 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Rename HTML Tool', style: AppTextStyles.heading),
+        title: Text(context.loc.toolTitleLabel, style: AppTextStyles.heading),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Tool Title',
+              decoration: InputDecoration(
+                labelText: context.loc.toolTitleLabel,
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
               ),
@@ -235,9 +267,8 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: categoryController,
-              style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Category / Tag',
+              decoration: InputDecoration(
+                labelText: context.loc.toolCategoryLabel,
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
               ),
@@ -247,7 +278,7 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted)),
+            child: Text(context.loc.cancelButton, style: const TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -269,13 +300,13 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Renamed to "$newTitle".'),
+                    content: Text(context.loc.renamedToolNotice(newTitle)),
                     backgroundColor: AppColors.surfaceElevated,
                   ),
                 );
               }
             },
-            child: const Text('SAVE'),
+            child: Text(context.loc.saveAction),
           ),
         ],
       ),
@@ -288,45 +319,34 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Delete HTML Tool?', style: AppTextStyles.heading),
+        title: Text(context.loc.deleteToolTitle, style: AppTextStyles.heading),
         content: Text(
-          'Are you sure you want to delete "${_currentTool.title}"? The offline file and all associated DOM state will be removed.',
+          '${context.loc.deleteToolConfirm}\n\n"${_currentTool.title}" (${_currentTool.fileName})',
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted)),
+            child: Text(context.loc.cancelButton, style: const TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.roseDanger),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('DELETE', style: TextStyle(color: Colors.white)),
+            child: Text(context.loc.deleteAction, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
-      if (!kIsWeb && _currentTool.localFilePath.isNotEmpty) {
-        try {
-          final file = File(_currentTool.localFilePath);
-          if (await file.exists()) {
-            await file.delete();
-          }
-        } catch (e) {
-          debugPrint('[LocalHtmlViewer] File deletion error: $e');
-        }
-      }
-
-      await _storage.deleteHtmlTool(_currentTool.id);
+      await _storageService.deleteTool(_currentTool);
       widget.onToolDeleted?.call();
 
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Deleted "${_currentTool.title}".'),
+            content: Text('${context.loc.toolDeletedNotice} ("${_currentTool.title}")'),
             backgroundColor: AppColors.surfaceElevated,
           ),
         );
@@ -395,46 +415,62 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
-            tooltip: 'Reload Dashboard',
+            tooltip: context.loc.reloadTool,
             onPressed: _reload,
+          ),
+          IconButton(
+            icon: const Icon(Icons.file_upload_outlined, size: 20, color: AppColors.textPrimary),
+            tooltip: context.loc.reimportTool,
+            onPressed: _reimportHtmlContent,
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert_rounded, size: 20, color: AppColors.textPrimary),
             color: AppColors.surfaceElevated,
             onSelected: (value) {
               if (value == 'rename') _showRenameDialog();
+              if (value == 'reimport') _reimportHtmlContent();
               if (value == 'delete') _confirmDelete();
               if (value == 'external') _openInExternalBrowser();
             },
             itemBuilder: (ctx) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'rename',
                 child: Row(
                   children: [
-                    Icon(Icons.edit_outlined, size: 16, color: AppColors.textPrimary),
-                    SizedBox(width: 10),
-                    Text('Rename Tool', style: TextStyle(fontSize: 12)),
+                    const Icon(Icons.edit_outlined, size: 16, color: AppColors.textPrimary),
+                    const SizedBox(width: 10),
+                    Text(context.loc.renameToolAction, style: const TextStyle(fontSize: 12)),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
+                value: 'reimport',
+                child: Row(
+                  children: [
+                    const Icon(Icons.published_with_changes_rounded, size: 16, color: Color(0xFF10B981)),
+                    const SizedBox(width: 10),
+                    Text(context.loc.reimportTool, style: const TextStyle(fontSize: 12)),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
                 value: 'external',
                 child: Row(
                   children: [
-                    Icon(Icons.open_in_browser_rounded, size: 16, color: AppColors.textPrimary),
-                    SizedBox(width: 10),
-                    Text('Open in Browser', style: TextStyle(fontSize: 12)),
+                    const Icon(Icons.open_in_browser_rounded, size: 16, color: AppColors.textPrimary),
+                    const SizedBox(width: 10),
+                    Text(context.loc.openInBrowserAction, style: const TextStyle(fontSize: 12)),
                   ],
                 ),
               ),
               const PopupMenuDivider(),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.roseDanger),
-                    SizedBox(width: 10),
-                    Text('Delete Tool', style: TextStyle(fontSize: 12, color: AppColors.roseDanger)),
+                    const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.roseDanger),
+                    const SizedBox(width: 10),
+                    Text(context.loc.deleteAction, style: const TextStyle(fontSize: 12, color: AppColors.roseDanger)),
                   ],
                 ),
               ),
@@ -453,7 +489,7 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
                   children: [
                     const Icon(Icons.error_outline_rounded, size: 40, color: AppColors.roseDanger),
                     const SizedBox(height: 12),
-                    Text('Unable to render offline tool', style: AppTextStyles.heading),
+                    Text(context.loc.unableToRenderOfflineTool, style: AppTextStyles.heading),
                     const SizedBox(height: 6),
                     Text(
                       _loadError!,
@@ -467,17 +503,13 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
                         ElevatedButton.icon(
                           onPressed: _reload,
                           icon: const Icon(Icons.refresh_rounded, size: 16),
-                          label: const Text('RETRY'),
+                          label: Text(context.loc.retryAction),
                         ),
                         const SizedBox(width: 12),
                         OutlinedButton.icon(
-                          onPressed: _reimportHtmlContent,
-                          icon: const Icon(Icons.file_upload_outlined, size: 16),
-                          label: const Text('RE-SELECT FILE'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.textPrimary,
-                            side: const BorderSide(color: AppColors.borderMedium),
-                          ),
+                          onPressed: _openInExternalBrowser,
+                          icon: const Icon(Icons.open_in_browser_rounded, size: 16),
+                          label: Text(context.loc.externalBrowserAction),
                         ),
                       ],
                     ),
@@ -486,29 +518,28 @@ class _LocalHtmlViewerScreenState extends State<LocalHtmlViewerScreen> {
               ),
             )
           else if (kIsWeb)
-            Positioned.fill(
-              child: buildPlatformHtmlView(
-                viewKey: '${_currentTool.id}_$_reloadCount',
-                htmlContent: _currentTool.htmlContent ?? '',
-              ),
+            buildPlatformHtmlView(
+              viewKey: 'web_tool_${_currentTool.id}_$_reloadCount',
+              htmlContent: _currentTool.htmlContent ?? '',
             )
           else if (_controller != null)
-            Positioned.fill(
-              child: WebViewWidget(controller: _controller!),
-            )
-          else
-            const Center(
-              child: CircularProgressIndicator(color: AppColors.shieldPrimary),
-            ),
-          if (_isLoading)
-            const Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: LinearProgressIndicator(
-                backgroundColor: Colors.transparent,
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
-                minHeight: 2.5,
+            WebViewWidget(controller: _controller!),
+
+          if (_isLoading && _loadError == null)
+            Container(
+              color: AppColors.background,
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: Color(0xFF10B981), strokeWidth: 2.5),
+                    SizedBox(height: 12),
+                    Text(
+                      'Rendering offline sandbox...',
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                    ),
+                  ],
+                ),
               ),
             ),
         ],

@@ -42,7 +42,7 @@ class _WisdomCardState extends State<WisdomCard> {
           children: [
             const Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
             const SizedBox(width: 8),
-            Text(isHi ? 'प्रज्ञा क्लिपबोर्ड पर कॉपी की गई' : 'Copied wisdom to clipboard', style: const TextStyle(fontSize: 12)),
+            Text(context.loc.wisdomCopiedNotice, style: const TextStyle(fontSize: 12)),
           ],
         ),
         backgroundColor: AppColors.surfaceElevated,
@@ -75,7 +75,7 @@ class _WisdomCardState extends State<WisdomCard> {
         borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
         border: Border.all(
           color: widget.isAffirmation
-              ? AppColors.emeraldSuccess.withOpacity(0.6)
+              ? AppColors.emeraldSuccess.withValues(alpha: 0.6)
               : AppColors.borderSubtle,
           width: widget.isAffirmation ? 1.5 : 1.0,
         ),
@@ -102,9 +102,9 @@ class _WisdomCardState extends State<WisdomCard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: catColor.withOpacity(0.12),
+                        color: catColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: catColor.withOpacity(0.3)),
+                        border: Border.all(color: catColor.withValues(alpha: 0.3)),
                       ),
                       child: Text(
                         widget.entry.categoryName.toUpperCase(),
@@ -200,7 +200,7 @@ class _WisdomCardState extends State<WisdomCard> {
                   decoration: BoxDecoration(
                     color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
+                    border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
                   ),
                   child: Text(
                     widget.entry.originalText,
@@ -209,7 +209,7 @@ class _WisdomCardState extends State<WisdomCard> {
                       fontSize: 12.5,
                       fontStyle: FontStyle.italic,
                       height: 1.45,
-                      color: AppColors.textPrimary.withOpacity(0.9),
+                      color: AppColors.textPrimary.withValues(alpha: 0.9),
                     ),
                   ),
                 ),
@@ -294,8 +294,8 @@ class _WisdomCardState extends State<WisdomCard> {
                         ),
                         label: Text(
                           widget.isAffirmation
-                              ? 'ACTIVE DAILY AFFIRMATION'
-                              : 'SET AS TODAY\'S AFFIRMATION',
+                              ? context.loc.affirmedForToday
+                              : context.loc.setAsTodaysAffirmation,
                           style: AppTextStyles.button.copyWith(
                             fontSize: 10.5,
                             color: widget.isAffirmation
@@ -307,10 +307,10 @@ class _WisdomCardState extends State<WisdomCard> {
                           side: BorderSide(
                             color: widget.isAffirmation
                                 ? AppColors.emeraldSuccess
-                                : AppColors.shieldPrimary.withOpacity(0.5),
+                                : AppColors.shieldPrimary.withValues(alpha: 0.5),
                           ),
                           backgroundColor: widget.isAffirmation
-                              ? AppColors.emeraldMuted.withOpacity(0.3)
+                              ? AppColors.emeraldMuted.withValues(alpha: 0.3)
                               : Colors.transparent,
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           visualDensity: VisualDensity.compact,

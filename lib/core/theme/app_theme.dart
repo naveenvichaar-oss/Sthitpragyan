@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_dimens.dart';
@@ -9,12 +10,18 @@ import '../constants/app_text_styles.dart';
 /// Stripped of unnecessary shadows, frivolous rounded pill shapes, or bright saturated fills.
 abstract class AppTheme {
   static ThemeData get darkTheme {
+    final devanagariTextTheme = GoogleFonts.notoSansDevanagariTextTheme(
+      ThemeData.dark().textTheme,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.shieldPrimary,
       canvasColor: AppColors.surface,
+      fontFamily: GoogleFonts.notoSansDevanagari().fontFamily,
+      textTheme: devanagariTextTheme,
 
       colorScheme: const ColorScheme.dark(
         primary: AppColors.shieldPrimary,
@@ -31,7 +38,7 @@ abstract class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        systemOverlayStyle: SystemUiOverlayStyle(
+        systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
           statusBarBrightness: Brightness.dark,
@@ -39,7 +46,7 @@ abstract class AppTheme {
           systemNavigationBarIconBrightness: Brightness.light,
         ),
         titleTextStyle: AppTextStyles.brandHeader,
-        iconTheme: IconThemeData(color: AppColors.textPrimary, size: 20),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary, size: 20),
       ),
 
       // Card Theme: Muted Zinc surface with razor-thin border
@@ -81,6 +88,9 @@ abstract class AppTheme {
         fillColor: AppColors.surface,
         hintStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textMuted,
+        ),
+        labelStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppDimens.space16,

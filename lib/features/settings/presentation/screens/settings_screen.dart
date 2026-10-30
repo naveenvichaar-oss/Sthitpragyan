@@ -9,8 +9,6 @@ import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/language_switcher_widget.dart';
 import '../../data/models/notification_slot_config.dart';
-import 'package:sthitaprajna/features/character_ledger/presentation/screens/character_ledger_screen.dart';
-import 'package:sthitaprajna/features/execution_trigger/presentation/screens/execution_trigger_screen.dart';
 import 'package:sthitaprajna/features/sharing/presentation/widgets/incoming_share_modal_sheet.dart';
 import '../widgets/slot_edit_modal_sheet.dart';
 
@@ -61,8 +59,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(
           content: Text(
             value
-                ? 'Executive Shield Notifications activated.'
-                : 'All background notifications paused.',
+                ? context.loc.executiveShieldNotificationsActivated
+                : context.loc.allBackgroundNotificationsPaused,
           ),
           duration: const Duration(seconds: 2),
           backgroundColor: value
@@ -110,7 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Dispatched test push for "${slot.slotName}" (${slot.formattedTime})',
+                  context.loc.dispatchedTestPush(slot.slotName, slot.formattedTime),
                   style: AppTextStyles.bodySmall,
                 ),
               ),
@@ -133,11 +131,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
         ),
         title: Text(
-          'Delete Checkpoint?',
+          context.loc.deleteCheckpointTitle,
           style: AppTextStyles.heading.copyWith(fontSize: 18),
         ),
         content: Text(
-          'Are you sure you want to remove "${slot.slotName}"? Its scheduled notifications will be cancelled.',
+          context.loc.deleteCheckpointConfirm(slot.slotName),
           style: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -145,9 +143,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppColors.textMuted),
+            child: Text(
+              context.loc.cancel.toUpperCase(),
+              style: const TextStyle(color: AppColors.textMuted),
             ),
           ),
           ElevatedButton(
@@ -156,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               backgroundColor: AppColors.roseDanger,
               foregroundColor: Colors.white,
             ),
-            child: const Text('DELETE'),
+            child: Text(context.loc.delete.toUpperCase()),
           ),
         ],
       ),
@@ -181,11 +179,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
         ),
         title: Text(
-          'Reset to Factory Blueprint?',
+          context.loc.resetFactoryBlueprintTitle,
           style: AppTextStyles.heading.copyWith(fontSize: 18),
         ),
         content: Text(
-          'This will restore the 4 default checkpoints (05:45 AM Morning Grounding, 09:00 AM Work Entry Shield, 02:00 PM Mid-Day Audit, and 09:30 PM Night Closure) from the dataset.',
+          context.loc.resetFactoryBlueprintContent,
           style: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -193,9 +191,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppColors.textMuted),
+            child: Text(
+              context.loc.cancel.toUpperCase(),
+              style: const TextStyle(color: AppColors.textMuted),
             ),
           ),
           ElevatedButton(
@@ -204,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               backgroundColor: AppColors.shieldPrimary,
               foregroundColor: AppColors.background,
             ),
-            child: const Text('RESET SCHEDULE'),
+            child: Text(context.loc.resetScheduleAction),
           ),
         ],
       ),
@@ -219,8 +217,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Factory notification schedule restored.'),
+          SnackBar(
+            content: Text(context.loc.factoryScheduleRestoredNotice),
             backgroundColor: AppColors.surfaceElevated,
           ),
         );
@@ -258,7 +256,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           IconButton(
             onPressed: () => _openSlotEditor(),
             icon: const Icon(Icons.add_rounded, color: AppColors.shieldPrimary),
-            tooltip: 'Add Custom Checkpoint',
+            tooltip: context.loc.addCustomCheckpointTooltip,
           ),
         ],
       ),
@@ -290,8 +288,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: Text(
                   _masterEnabled
-                      ? '$activeCount OF ${_slots.length} ACTIVE'
-                      : 'ALL MUTED (MASTER OFF)',
+                      ? context.loc.activeSlotsCount(activeCount, _slots.length)
+                      : context.loc.allMutedMasterOff,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: _masterEnabled
                         ? AppColors.shieldPrimary
@@ -352,10 +350,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Share Sheet Interceptor Preview
           _buildShareSheetSimulatorCard(),
-          const SizedBox(height: 16),
-
-          // Action-Trigger & Character Ledger Settings Card
-          _buildExecutionAndCharacterLedgerCard(),
           const SizedBox(height: 20),
 
           // Zero Telemetry Privacy Card
@@ -393,11 +387,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'SYSTEM SHARE SHEET (RECEIVE INTENT)',
+                      context.loc.systemShareSheetBadge,
                       style: AppTextStyles.labelBadge.copyWith(fontSize: 8.5),
                     ),
                     const SizedBox(height: 2),
-                    const Text('Save from Browser, YouTube & Notes', style: AppTextStyles.heading),
+                    Text(
+                      context.loc.yourSourcesTitle,
+                      style: AppTextStyles.heading,
+                    ),
                   ],
                 ),
               ),
@@ -405,7 +402,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Sthitaprajna appears directly in your system Share menu. You can share links, classical articles, or calming music and save them with personal trigger notes.',
+            context.loc.systemShareSheetDescription,
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11),
           ),
           const SizedBox(height: 12),
@@ -420,7 +417,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               },
               icon: const Icon(Icons.open_in_browser_rounded, size: 14),
-              label: const Text('TEST SHARE INTERCEPTOR MODAL', style: TextStyle(fontSize: 11)),
+              label: Text(
+                context.loc.testShareInterceptorButton,
+                style: const TextStyle(fontSize: 11),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.shieldPrimary,
                 side: const BorderSide(color: AppColors.shieldPrimary),
@@ -433,95 +433,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildExecutionAndCharacterLedgerCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppDimens.space14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Icon(
-                  Icons.notifications_active_outlined,
-                  size: 18,
-                  color: Color(0xFF10B981),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'EXECUTION & CHARACTER LEDGER',
-                      style: AppTextStyles.labelBadge.copyWith(
-                        color: const Color(0xFF10B981),
-                        fontSize: 8.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    const Text('Action-Triggers & Virtue Journal', style: AppTextStyles.heading),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Replace standard snooze-prone alarms with non-negotiable Execution Chimes (calm 108Hz gong), 5-minute micro-ignitions, and sovereign trait logs (Magnanimity, Gravitas, Joy, Restraint).',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    HapticService.selectionClick();
-                    ExecutionTriggerScreen.open(context);
-                  },
-                  icon: const Icon(Icons.bolt_rounded, size: 14),
-                  label: const Text('EXECUTION CHIME', style: TextStyle(fontSize: 10.5)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF10B981),
-                    side: const BorderSide(color: Color(0xFF10B981)),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    HapticService.selectionClick();
-                    CharacterLedgerScreen.open(context);
-                  },
-                  icon: const Icon(Icons.anchor_rounded, size: 14),
-                  label: const Text('CHARACTER LEDGER', style: TextStyle(fontSize: 10.5)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFF59E0B),
-                    side: const BorderSide(color: Color(0xFFF59E0B)),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildMasterSwitchCard() {
     return Container(
@@ -567,14 +478,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Global Notification Shield',
+                  context.loc.globalNotificationShieldTitle,
                   style: AppTextStyles.heading.copyWith(fontSize: 15),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   _masterEnabled
-                      ? 'Local scheduled alarms active across configured days'
-                      : 'All reminders silenced',
+                      ? context.loc.globalNotificationShieldSubActive
+                      : context.loc.globalNotificationShieldSubMuted,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 11,
@@ -586,7 +497,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Switch(
             value: _masterEnabled,
             onChanged: _toggleMasterSwitch,
-            activeColor: AppColors.shieldPrimary,
+            activeThumbColor: AppColors.shieldPrimary,
             activeTrackColor: AppColors.surfaceElevated,
             inactiveTrackColor: AppColors.surface,
           ),
@@ -608,7 +519,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         border: Border.all(
           color: isSlotActive
               ? AppColors.borderMedium
-              : AppColors.borderSubtle.withOpacity(0.5),
+              : AppColors.borderSubtle.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -702,7 +613,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: _masterEnabled
                     ? (val) => _toggleSlotEnabled(slot, val)
                     : null,
-                activeColor: AppColors.shieldPrimary,
+                activeThumbColor: AppColors.shieldPrimary,
                 activeTrackColor: AppColors.surfaceElevated,
                 inactiveTrackColor: AppColors.surface,
               ),
@@ -731,7 +642,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         height: 18,
                         decoration: BoxDecoration(
                           color: isActiveDay && isSlotActive
-                              ? AppColors.shieldPrimary.withOpacity(0.18)
+                              ? AppColors.shieldPrimary.withValues(alpha: 0.18)
                               : AppColors.surfaceElevated,
                           borderRadius: BorderRadius.circular(3),
                           border: Border.all(
@@ -775,21 +686,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: () => _dispatchTestNotification(slot),
                     icon: const Icon(Icons.send_rounded, size: 16),
                     color: AppColors.shieldPrimary,
-                    tooltip: 'Send Test Notification Now',
+                    tooltip: context.loc.sendTestNotificationTooltip,
                     visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
                     onPressed: () => _openSlotEditor(slot: slot),
                     icon: const Icon(Icons.edit_outlined, size: 16),
                     color: AppColors.textSecondary,
-                    tooltip: 'Edit Checkpoint',
+                    tooltip: context.loc.editCheckpointTooltip,
                     visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
                     onPressed: () => _confirmDeleteSlot(slot),
                     icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                    color: AppColors.roseDanger.withOpacity(0.8),
-                    tooltip: 'Delete Checkpoint',
+                    color: AppColors.roseDanger.withValues(alpha: 0.8),
+                    tooltip: context.loc.deleteCheckpointTooltip,
                     visualDensity: VisualDensity.compact,
                   ),
                 ],
@@ -818,13 +729,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             size: 32,
           ),
           const SizedBox(height: 8),
-          const Text(
-            'No Reminder Slots Configured',
+          Text(
+            context.loc.noReminderSlotsTitle,
             style: AppTextStyles.heading,
           ),
           const SizedBox(height: 4),
           Text(
-            'Add a custom checkpoint or tap "Reset to Factory Blueprint" below.',
+            context.loc.noReminderSlotsSub,
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
             textAlign: TextAlign.center,
           ),
@@ -854,7 +765,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '100% OFFLINE • ZERO TELEMETRY',
+                  context.loc.offlineZeroTelemetryBadge,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.shieldPrimary,
                     fontSize: 9,
@@ -862,7 +773,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'All reminder schedules reside in the device hardware alarm manager. Zero cloud pings.',
+                  context.loc.offlineZeroTelemetryDesc,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 10.5,

@@ -7,24 +7,42 @@ import '../../../../core/database/hive_storage.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/joy_item.dart';
+import '../../data/services/joy_audio_service.dart';
 import '../widgets/add_joy_item_modal_sheet.dart';
 import '../widgets/joy_item_card.dart';
 
 /// JoyReservoirScreen houses the user's Soul Sanctuary (आनंद कोष):
-/// Personal music, visual anchors, favorite reads, and grounding memories.
+/// Personal music, local offline audio anchors, visual memories,
+/// favorite reads, and grounding milestones.
 class JoyReservoirScreen extends StatefulWidget {
   final bool isEmbedded;
+  final JoyCategory? initialCategory;
+  final String? initialTitle;
+  final String? initialUrlOrPath;
 
   const JoyReservoirScreen({
     super.key,
     this.isEmbedded = false,
+    this.initialCategory,
+    this.initialTitle,
+    this.initialUrlOrPath,
   });
 
-  static Future<void> open(BuildContext context) {
+  static Future<void> open(
+    BuildContext context, {
+    JoyCategory? initialCategory,
+    String? initialTitle,
+    String? initialUrlOrPath,
+  }) {
     HapticService.selectionClick();
     return Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const JoyReservoirScreen(isEmbedded: false),
+        builder: (context) => JoyReservoirScreen(
+          isEmbedded: false,
+          initialCategory: initialCategory,
+          initialTitle: initialTitle,
+          initialUrlOrPath: initialUrlOrPath,
+        ),
       ),
     );
   }
@@ -42,6 +60,16 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
   void initState() {
     super.initState();
     _loadItems();
+
+    if (widget.initialTitle != null || widget.initialUrlOrPath != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openAddSheet(
+          category: widget.initialCategory ?? JoyCategory.music,
+          title: widget.initialTitle,
+          urlOrPath: widget.initialUrlOrPath,
+        );
+      });
+    }
   }
 
   void _loadItems() {
@@ -50,21 +78,37 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
     });
   }
 
-  void _openAddSheet() {
+  void _openAddSheet({
+    JoyCategory? category,
+    String? title,
+    String? urlOrPath,
+  }) {
     HapticService.selectionClick();
-    AddJoyItemModalSheet.show(context, onSaved: _loadItems);
+    AddJoyItemModalSheet.show(
+      context,
+      initialCategory: category,
+      initialTitle: title,
+      initialUrlOrPath: urlOrPath,
+      onSaved: _loadItems,
+    );
   }
 
   Future<void> _deleteItem(String id) async {
     HapticService.mediumImpact();
+    if (JoyAudioService().isActive(id)) {
+      await JoyAudioService().stop();
+    }
     await _storage.deleteJoyItem(id);
     _loadItems();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Anchor removed from Joy Reservoir.', style: TextStyle(fontSize: 12)),
+        SnackBar(
+          content: Text(
+            context.loc.anchorRemovedNotice,
+            style: const TextStyle(fontSize: 12),
+          ),
           backgroundColor: AppColors.surfaceElevated,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -148,26 +192,39 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: _openAddSheet,
-                icon: const Icon(
-                  Icons.add_circle_outline_rounded,
-                  color: AppColors.shieldPrimary,
-                  size: 24,
-                ),
-                tooltip: 'Add Personal Anchor',
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => _openAddSheet(category: JoyCategory.music),
+                    icon: const Icon(
+                      Icons.audio_file_rounded,
+                      color: AppColors.shieldPrimary,
+                      size: 22,
+                    ),
+                    tooltip: context.loc.selectLocalAudio,
+                  ),
+                  IconButton(
+                    onPressed: () => _openAddSheet(),
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: AppColors.shieldPrimary,
+                      size: 24,
+                    ),
+                    tooltip: context.loc.addJoyAnchor,
+                  ),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            'Your sacred repository of uplifting music, visual anchors, comforting words, and serene memories to recalibrate your mind.',
+            context.loc.joyReservoirDesc,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
         ],
 
         // Filter Chips Row
@@ -175,21 +232,21 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildFilterChip('all', 'ALL ANCHORS (${_items.length})'),
+              _buildFilterChip('all', '${context.loc.allAnchors} (${_items.length})'),
               const SizedBox(width: 6),
-              _buildFilterChip('music', 'MUSIC ($musicCount)'),
+              _buildFilterChip('music', '${context.loc.musicCategory} ($musicCount)'),
               const SizedBox(width: 6),
-              _buildFilterChip('visual', 'VISUALS ($visualCount)'),
+              _buildFilterChip('visual', '${context.loc.visualCategory} ($visualCount)'),
               const SizedBox(width: 6),
-              _buildFilterChip('quote', 'WORDS ($quoteCount)'),
+              _buildFilterChip('quote', '${context.loc.quoteCategory} ($quoteCount)'),
               const SizedBox(width: 6),
-              _buildFilterChip('memory', 'MEMORIES ($memoryCount)'),
+              _buildFilterChip('memory', '${context.loc.memoryCategory} ($memoryCount)'),
             ],
           ),
         ),
         const SizedBox(height: 14),
 
-        // Quick Add Banner
+        // Quick Add Banner with Local Audio Option
         Container(
           padding: const EdgeInsets.all(AppDimens.space12),
           decoration: BoxDecoration(
@@ -197,27 +254,65 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
             borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
             border: Border.all(color: AppColors.borderSubtle),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.favorite_rounded, size: 20, color: Color(0xFFF43F5E)),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Add personal uplifting music, photos of serene moments, or soothing quotes to ground yourself in moments of distress.',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
-                    fontSize: 11,
+              Row(
+                children: [
+                  const Icon(
+                    Icons.favorite_rounded,
+                    size: 18,
+                    color: Color(0xFFF43F5E),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      context.loc.quickAddBannerText,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              TextButton.icon(
-                onPressed: _openAddSheet,
-                icon: const Icon(Icons.add_rounded, size: 14),
-                label: const Text('ADD', style: TextStyle(fontSize: 11)),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.shieldPrimary,
-                  visualDensity: VisualDensity.compact,
-                ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => _openAddSheet(category: JoyCategory.music),
+                    icon: const Icon(Icons.audio_file_rounded, size: 14),
+                    label: Text(
+                      context.loc.selectLocalAudio,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.shieldPrimary,
+                      side: const BorderSide(color: AppColors.shieldPrimary, width: 0.8),
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: () => _openAddSheet(),
+                    icon: const Icon(Icons.add_rounded, size: 14),
+                    label: Text(
+                      context.loc.addButton,
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.shieldPrimary,
+                      foregroundColor: AppColors.background,
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -234,13 +329,17 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
               borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
               border: Border.all(color: AppColors.borderSubtle),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                const Icon(Icons.spa_rounded, size: 36, color: AppColors.textMuted),
+                const Icon(
+                  Icons.spa_rounded,
+                  size: 36,
+                  color: AppColors.textMuted,
+                ),
                 const SizedBox(height: 10),
-                const Text(
-                  'NO ANCHORS IN THIS CATEGORY',
-                  style: TextStyle(
+                Text(
+                  context.loc.noAnchorsInCategory,
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -248,9 +347,9 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Tap "+ ADD" above to preserve a peaceful memory, sound, or reflection.',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                Text(
+                  context.loc.tapAddPrompt,
+                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -288,24 +387,29 @@ class _JoyReservoirScreenState extends State<JoyReservoirScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'JOY RESERVOIR',
+          context.loc.joyReservoirTitle.toUpperCase(),
           style: AppTextStyles.heading.copyWith(fontSize: 16),
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.audio_file_rounded, color: AppColors.shieldPrimary),
+            onPressed: () => _openAddSheet(category: JoyCategory.music),
+            tooltip: context.loc.selectLocalAudio,
+          ),
+          IconButton(
             icon: const Icon(Icons.add_rounded, color: AppColors.shieldPrimary),
-            onPressed: _openAddSheet,
-            tooltip: 'Add Anchor',
+            onPressed: () => _openAddSheet(),
+            tooltip: context.loc.addJoyAnchor,
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openAddSheet,
+        onPressed: () => _openAddSheet(),
         backgroundColor: AppColors.shieldPrimary,
         foregroundColor: AppColors.background,
         icon: const Icon(Icons.favorite_rounded, size: 20),
         label: Text(
-          'ADD ANCHOR',
+          context.loc.addJoyAnchor.toUpperCase(),
           style: AppTextStyles.labelBadge.copyWith(
             color: AppColors.background,
             fontWeight: FontWeight.w700,

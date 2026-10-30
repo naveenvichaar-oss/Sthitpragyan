@@ -2,10 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../features/character_ledger/data/models/character_trait_entry.dart';
+import '../../features/cognition_vault/data/cognition_data_source.dart';
+import '../../features/cognition_vault/data/models/fallacy_and_model.dart';
 import '../../features/cognition_vault/data/models/local_html_tool.dart';
 import '../../features/execution_trigger/data/models/execution_trigger.dart';
 import '../../features/journal/data/models/journal_models.dart';
 import '../../features/journal/data/models/media_record_log.dart';
+import '../../features/journal/data/models/reflection_entry.dart';
 import '../../features/joy_reservoir/data/models/joy_item.dart';
 import '../../features/recovery/data/models/incident_slip_up_log.dart';
 import '../../features/settings/data/models/notification_slot_config.dart';
@@ -37,6 +40,9 @@ class HiveStorage {
   late Box<Map> _executionTriggersBox;
   late Box<Map> _htmlToolsBox;
   late Box<Map> _defensiveScriptsBox;
+  late Box<Map> _cognitionItemsBox;
+  late Box<Map> _reflectionsBox;
+  late Box _morningRoutineBox;
 
   /// Initializes Hive and registers custom TypeAdapters
   Future<void> init() async {
@@ -71,34 +77,43 @@ class HiveStorage {
       _htmlToolsBox = await Hive.openBox<Map>(HiveBoxes.htmlTools);
       _defensiveScriptsBox =
           await Hive.openBox<Map>(HiveBoxes.defensiveScripts);
+      _cognitionItemsBox =
+          await Hive.openBox<Map>(HiveBoxes.cognitionItems);
+      _reflectionsBox =
+          await Hive.openBox<Map>(HiveBoxes.reflections);
+      _morningRoutineBox =
+          await Hive.openBox(HiveBoxes.morningRoutine);
 
-      // Pre-seed default defensive scripts if empty
-      if (_defensiveScriptsBox.isEmpty) {
-        for (final script in DefensiveScriptsVault.scripts) {
+      // Pre-seed default cognition items (fallacies & mental models) if not present
+      for (final item in CognitionDataSource.items) {
+        if (!_cognitionItemsBox.containsKey(item.id)) {
+          await _cognitionItemsBox.put(item.id, item.toMap());
+        }
+      }
+
+      // Pre-seed default defensive scripts if not present
+      for (final script in DefensiveScriptsVault.scripts) {
+        if (!_defensiveScriptsBox.containsKey(script.id)) {
           await _defensiveScriptsBox.put(script.id, script.toMap());
         }
       }
 
-      // Pre-seed starter anchors for Joy Reservoir if empty
-      if (_joyReservoirBox.isEmpty) {
-        for (final item in JoyItem.starterAnchors()) {
+      // Pre-seed starter anchors for Joy Reservoir if not present
+      for (final item in JoyItem.starterAnchors()) {
+        if (!_joyReservoirBox.containsKey(item.id)) {
           await _joyReservoirBox.put(item.id, item.toMap());
         }
       }
 
-      // Pre-seed starter virtue entries for Character Ledger if empty
-      if (_characterLedgerBox.isEmpty) {
-        for (final item in CharacterTraitEntry.starterEntries()) {
+      // Pre-seed starter virtue entries for Character Ledger if not present
+      for (final item in CharacterTraitEntry.starterEntries()) {
+        if (!_characterLedgerBox.containsKey(item.id)) {
           await _characterLedgerBox.put(item.id, item.toMap());
         }
       }
 
-      // Pre-seed non-negotiable blocks for Execution Triggers if empty
-      if (_executionTriggersBox.isEmpty) {
-        for (final item in ExecutionTrigger.defaultTriggers()) {
-          await _executionTriggersBox.put(item.id, item.toMap());
-        }
-      }
+      // User-defined Daily Focus Blocks (daily_blocks_box)
+      // Dynamic user-controlled schedule (no hardcoded routines)
 
       // Pre-seed starter interactive HTML dashboard if empty
       if (_htmlToolsBox.isEmpty) {
@@ -394,6 +409,37 @@ class HiveStorage {
 
   Future<void> resetNotificationSlotsToDefault() async {
     await saveNotificationSlots(NotificationSlotConfig.defaultSlots());
+  }
+
+  // ---------------------------------------------------------
+  // Daily Trigger Overrides (My Day Today / आज का दिन)
+  // ---------------------------------------------------------
+
+  Map<String, dynamic>? getCustomTriggerOverride(int triggerId) {
+    final raw = _settingsBox.get('trigger_override_$triggerId');
+    if (raw != null) {
+      return Map<String, dynamic>.from(raw);
+    }
+    return null;
+  }
+
+  Future<void> saveCustomTriggerOverride(
+    int triggerId,
+    Map<String, dynamic> data,
+  ) async {
+    await _settingsBox.put('trigger_override_$triggerId', data);
+  }
+
+  Future<void> clearCustomTriggerOverride(int triggerId) async {
+    await _settingsBox.delete('trigger_override_$triggerId');
+  }
+
+  bool isTriggerReminderEnabled(int triggerId) {
+    return _settingsBox.get('trigger_reminder_enabled_$triggerId', defaultValue: true) as bool;
+  }
+
+  Future<void> setTriggerReminderEnabled(int triggerId, bool enabled) async {
+    await _settingsBox.put('trigger_reminder_enabled_$triggerId', enabled);
   }
 
   // ---------------------------------------------------------
@@ -716,6 +762,172 @@ class HiveStorage {
     for (final script in DefensiveScriptsVault.scripts) {
       await _defensiveScriptsBox.put(script.id, script.toMap());
     }
+  }
+
+  // ---------------------------------------------------------
+  // Cognition Items (Mental Models & Fallacies) CRUD & Attachments
+  // ---------------------------------------------------------
+
+  List<CognitionItem> getAllCognitionItems({CognitionType? type}) {
+    if (!_initialized) return CognitionDataSource.items;
+    // Auto-sync any newly added default items (Case studies, new fallacies)
+    for (final def in CognitionDataSource.items) {
+      if (!_cognitionItemsBox.containsKey(def.id)) {
+        _cognitionItemsBox.put(def.id, def.toMap());
+      }
+    }
+    final list = <CognitionItem>[];
+    for (final raw in _cognitionItemsBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        final item = CognitionItem.fromMap(map);
+        if (type != null && item.type != type) continue;
+        list.add(item);
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing CognitionItem: $e');
+      }
+    }
+    if (list.isEmpty && _cognitionItemsBox.isEmpty) {
+      return type != null
+          ? CognitionDataSource.items.where((i) => i.type == type).toList()
+          : CognitionDataSource.items;
+    }
+    return list;
+  }
+
+  // ---------------------------------------------------------
+  // Morning Grounding Commitments (3-Second Pause & Unapologetic No)
+  // ---------------------------------------------------------
+
+  bool isTodayPauseRuleCommitted() {
+    if (!_initialized) return false;
+    final today = DateTime.now().toIso8601String().split('T').first;
+    return _affirmationsBox.get('pause_rule_$today', defaultValue: false) as bool;
+  }
+
+  Future<void> setTodayPauseRuleCommitted(bool committed) async {
+    if (!_initialized) return;
+    final today = DateTime.now().toIso8601String().split('T').first;
+    await _affirmationsBox.put('pause_rule_$today', committed);
+  }
+
+  bool isTodayUnapologeticNoCommitted() {
+    if (!_initialized) return false;
+    final today = DateTime.now().toIso8601String().split('T').first;
+    return _affirmationsBox.get('unapologetic_no_$today', defaultValue: false) as bool;
+  }
+
+  Future<void> setTodayUnapologeticNoCommitted(bool committed) async {
+    if (!_initialized) return;
+    final today = DateTime.now().toIso8601String().split('T').first;
+    await _affirmationsBox.put('unapologetic_no_$today', committed);
+  }
+
+  // ---------------------------------------------------------
+  // Morning Grounding Routine Protocol (morning_routine_box)
+  // ---------------------------------------------------------
+
+  bool isMorningRoutineStepCompleted(int stepIndex, [String? dateKey]) {
+    if (!_initialized) return false;
+    final today = dateKey ?? DateTime.now().toIso8601String().split('T').first;
+    return _morningRoutineBox.get('step_${stepIndex}_$today', defaultValue: false) as bool;
+  }
+
+  Future<void> setMorningRoutineStepCompleted(int stepIndex, bool completed, [String? dateKey]) async {
+    if (!_initialized) return;
+    final today = dateKey ?? DateTime.now().toIso8601String().split('T').first;
+    await _morningRoutineBox.put('step_${stepIndex}_$today', completed);
+    await _morningRoutineBox.flush();
+  }
+
+  bool isMorningRoutineCollapsed([String? dateKey]) {
+    if (!_initialized) return false;
+    final today = dateKey ?? DateTime.now().toIso8601String().split('T').first;
+    return _morningRoutineBox.get('collapsed_$today', defaultValue: false) as bool;
+  }
+
+  Future<void> setMorningRoutineCollapsed(bool collapsed, [String? dateKey]) async {
+    if (!_initialized) return;
+    final today = dateKey ?? DateTime.now().toIso8601String().split('T').first;
+    await _morningRoutineBox.put('collapsed_$today', collapsed);
+    await _morningRoutineBox.flush();
+  }
+
+  int getCompletedMorningStepsCount([String? dateKey]) {
+    int count = 0;
+    if (isMorningRoutineStepCompleted(1, dateKey)) count++;
+    if (isMorningRoutineStepCompleted(2, dateKey)) count++;
+    if (isMorningRoutineStepCompleted(3, dateKey)) count++;
+    return count;
+  }
+
+  Future<void> saveCognitionItem(CognitionItem item) async {
+    if (!_initialized) return;
+    await _cognitionItemsBox.put(item.id, item.toMap());
+    await _cognitionItemsBox.flush();
+  }
+
+  Future<void> deleteCognitionItem(String id) async {
+    if (!_initialized) return;
+    await _cognitionItemsBox.delete(id);
+    await _cognitionItemsBox.flush();
+  }
+
+  // ---------------------------------------------------------
+  // Universal Categorized Reflections (Pillar 3: Cognition)
+  // ---------------------------------------------------------
+
+  List<ReflectionEntry> getAllReflections({
+    ReflectionCategory? category,
+    String? searchQuery,
+  }) {
+    if (!_initialized) return [];
+    final list = <ReflectionEntry>[];
+    for (final raw in _reflectionsBox.values) {
+      try {
+        final map = Map<String, dynamic>.from(raw);
+        final entry = ReflectionEntry.fromMap(map);
+        if (category != null && entry.category != category) continue;
+        if (searchQuery != null && !entry.matchesQuery(searchQuery)) continue;
+        list.add(entry);
+      } catch (e) {
+        debugPrint('[HiveStorage] Error parsing ReflectionEntry: $e');
+      }
+    }
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
+  }
+
+  Future<void> saveReflection(ReflectionEntry entry) async {
+    if (!_initialized) return;
+    await _reflectionsBox.put(entry.id, entry.toMap());
+    await _reflectionsBox.flush();
+  }
+
+  Future<void> deleteReflection(String id) async {
+    if (!_initialized) return;
+    await _reflectionsBox.delete(id);
+    await _reflectionsBox.flush();
+  }
+
+  // ---------------------------------------------------------
+  // Composure Counter (Today's 3-Second Pause Tally)
+  // ---------------------------------------------------------
+
+  /// Returns the number of successful 3-second pauses logged today.
+  int getTodayComposureCount([String? dateKey]) {
+    if (!_initialized) return 0;
+    final today = dateKey ?? DateTime.now().toIso8601String().split('T').first;
+    return _morningRoutineBox.get('composure_count_$today', defaultValue: 0) as int;
+  }
+
+  /// Increments today's composure pause count by 1.
+  Future<void> incrementTodayComposureCount([String? dateKey]) async {
+    if (!_initialized) return;
+    final today = dateKey ?? DateTime.now().toIso8601String().split('T').first;
+    final current = getTodayComposureCount(today);
+    await _morningRoutineBox.put('composure_count_$today', current + 1);
+    await _morningRoutineBox.flush();
   }
 }
 

@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/notification_slot_config.dart';
@@ -28,15 +29,19 @@ class SlotEditModalSheet extends StatefulWidget {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: AppColors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+      builder: (context) => SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SlotEditModalSheet(existingSlot: existingSlot, onSaved: onSaved),
         ),
-        child: SlotEditModalSheet(existingSlot: existingSlot, onSaved: onSaved),
       ),
     );
   }
@@ -151,10 +156,15 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
   Future<void> _saveSlot() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
+      HapticService.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a slot name (e.g. "Work Entry Shield")'),
+        SnackBar(
+          content: Text(
+            context.loc.slotNameRequiredNotice,
+            style: const TextStyle(color: Colors.white),
+          ),
           backgroundColor: AppColors.roseDanger,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -197,6 +207,17 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
     if (mounted) {
       widget.onSaved();
       Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.loc.checkpointSavedNotice,
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: AppColors.emeraldSuccess,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -212,13 +233,24 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
     if (mounted) {
       widget.onSaved();
       Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.loc.checkpointRemovedNotice,
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: AppColors.surfaceElevated,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.existingSlot != null;
-    const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    final dayNames = context.loc.dayAbbrList;
 
     return Container(
       constraints: BoxConstraints(
@@ -251,7 +283,9 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isEditing ? 'EDIT CHECKPOINT' : 'NEW CHECKPOINT',
+                      isEditing
+                          ? context.loc.editCheckpointBadge
+                          : context.loc.newCheckpointBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
                       ),
@@ -259,8 +293,8 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                     const SizedBox(height: 2),
                     Text(
                       isEditing
-                          ? 'Customize Reminder Slot'
-                          : 'Add Strategic Reminder',
+                          ? context.loc.customizeReminderSlotTitle
+                          : context.loc.addStrategicReminderTitle,
                       style: AppTextStyles.heading,
                     ),
                   ],
@@ -277,13 +311,16 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
             const SizedBox(height: 14),
 
             // Slot Name Input
-            Text('CHECKPOINT NAME', style: AppTextStyles.labelBadge),
+            Text(
+              context.loc.checkpointNameBadge,
+              style: AppTextStyles.labelBadge,
+            ),
             const SizedBox(height: 6),
             TextField(
               controller: _nameController,
               style: AppTextStyles.bodyMedium,
               decoration: InputDecoration(
-                hintText: 'e.g. Work Entry Shield, Deep Work Anchor',
+                hintText: context.loc.checkpointNameHint,
                 hintStyle: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textMuted,
                 ),
@@ -319,7 +356,10 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('DISPATCH TIME', style: AppTextStyles.labelBadge),
+                      Text(
+                        context.loc.dispatchTimeBadge,
+                        style: AppTextStyles.labelBadge,
+                      ),
                       const SizedBox(height: 6),
                       InkWell(
                         onTap: _pickTime,
@@ -365,7 +405,10 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('ACTIVE STATUS', style: AppTextStyles.labelBadge),
+                    Text(
+                      context.loc.activeStatusBadge,
+                      style: AppTextStyles.labelBadge,
+                    ),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -382,7 +425,9 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                       child: Row(
                         children: [
                           Text(
-                            _isEnabled ? 'ACTIVE' : 'MUTED',
+                            _isEnabled
+                                ? context.loc.statusActiveBadge
+                                : context.loc.statusMutedBadge,
                             style: AppTextStyles.labelBadge.copyWith(
                               color: _isEnabled
                                   ? AppColors.shieldPrimary
@@ -397,7 +442,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                               HapticService.selectionClick();
                               setState(() => _isEnabled = val);
                             },
-                            activeColor: AppColors.shieldPrimary,
+                            activeThumbColor: AppColors.shieldPrimary,
                             activeTrackColor: AppColors.surfaceElevated,
                             inactiveTrackColor: AppColors.surface,
                             materialTapTargetSize:
@@ -413,7 +458,10 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
             const SizedBox(height: 16),
 
             // Category Chips
-            Text('CATEGORY / THEME', style: AppTextStyles.labelBadge),
+            Text(
+              context.loc.categoryThemeBadge,
+              style: AppTextStyles.labelBadge,
+            ),
             const SizedBox(height: 6),
             Wrap(
               spacing: 8,
@@ -421,7 +469,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
               children: _categories.map((cat) {
                 final isSelected = _selectedCategory == cat;
                 return ChoiceChip(
-                  label: Text(cat),
+                  label: Text(context.loc.getSlotCategoryName(cat)),
                   selected: isSelected,
                   onSelected: (val) {
                     if (val) {
@@ -453,9 +501,12 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('ACTIVE DAYS (SCHEDULE)', style: AppTextStyles.labelBadge),
                 Text(
-                  '${_selectedDays.length} OF 7 DAYS',
+                  context.loc.activeDaysScheduleBadge,
+                  style: AppTextStyles.labelBadge,
+                ),
+                Text(
+                  context.loc.activeDaysFraction(_selectedDays.length),
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.shieldPrimary,
                     fontSize: 9.5,
@@ -469,13 +520,13 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
             Row(
               children: [
                 _buildPresetButton(
-                  'EVERY DAY',
+                  context.loc.presetEveryDay,
                   isActive: _selectedDays.length == 7,
                   onTap: () => _applyDayPreset([1, 2, 3, 4, 5, 6, 7]),
                 ),
                 const SizedBox(width: 8),
                 _buildPresetButton(
-                  'WEEKDAYS (M–F)',
+                  context.loc.presetWeekdays,
                   isActive:
                       _selectedDays.length == 5 &&
                       !_selectedDays.contains(6) &&
@@ -484,7 +535,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                 ),
                 const SizedBox(width: 8),
                 _buildPresetButton(
-                  'WEEKENDS (S–S)',
+                  context.loc.presetWeekends,
                   isActive:
                       _selectedDays.length == 2 &&
                       _selectedDays.contains(6) &&
@@ -545,7 +596,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
 
             // Custom Notification Title (Optional)
             Text(
-              'CUSTOM NOTIFICATION TITLE (OPTIONAL)',
+              context.loc.customNotificationTitleBadge,
               style: AppTextStyles.labelBadge,
             ),
             const SizedBox(height: 6),
@@ -553,7 +604,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
               controller: _titleController,
               style: AppTextStyles.bodyMedium,
               decoration: InputDecoration(
-                hintText: 'Defaults to slot name or daily Hindi rule',
+                hintText: context.loc.customNotificationTitleHint,
                 hintStyle: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textMuted,
                 ),
@@ -584,7 +635,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
 
             // Custom Body (Optional)
             Text(
-              'CUSTOM NOTIFICATION MESSAGE (OPTIONAL)',
+              context.loc.customNotificationMessageBadge,
               style: AppTextStyles.labelBadge,
             ),
             const SizedBox(height: 6),
@@ -593,7 +644,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
               maxLines: 2,
               style: AppTextStyles.bodyMedium,
               decoration: InputDecoration(
-                hintText: 'Defaults to day-wise Stoic prompt or custom mantra',
+                hintText: context.loc.customNotificationMessageHint,
                 hintStyle: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textMuted,
                 ),
@@ -630,7 +681,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                     onPressed: _deleteSlot,
                     icon: const Icon(Icons.delete_outline_rounded),
                     color: AppColors.roseDanger,
-                    tooltip: 'Delete Checkpoint',
+                    tooltip: context.loc.deleteCheckpointTooltip,
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -647,7 +698,7 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                         ),
                       ),
                     ),
-                    child: const Text('CANCEL'),
+                    child: Text(context.loc.cancelButton),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -667,7 +718,9 @@ class _SlotEditModalSheetState extends State<SlotEditModalSheet> {
                       ),
                     ),
                     child: Text(
-                      isEditing ? 'SAVE CHANGES' : 'CREATE CHECKPOINT',
+                      isEditing
+                          ? context.loc.saveChangesButton
+                          : context.loc.createCheckpointButton,
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),

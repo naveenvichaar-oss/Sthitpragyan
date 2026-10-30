@@ -8,9 +8,10 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
-enum BreathingPhase { inhale, hold, exhale }
+enum BreathingPhase { inhale, holdFull, exhale, holdEmpty }
 
-/// BreathingPulseVisualizer runs a rhythmic 3-second breathing cycle
+/// BreathingPulseVisualizer runs an authentic 4-4-4-4 Box Breathing somatic cycle
+/// (4s Inhale -> 4s Hold Full -> 4s Exhale -> 4s Hold Empty = 16s total)
 /// with expanding and contracting concentric rings and haptic pulses.
 class BreathingPulseVisualizer extends StatefulWidget {
   const BreathingPulseVisualizer({super.key});
@@ -34,31 +35,33 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
   void initState() {
     super.initState();
 
-    // 3-second cycle per phase (Inhale: 3s -> Hold: 3s -> Exhale: 3s = 9s total)
+    // 4-4-4-4 Box Breathing: 4s per phase = 16,000ms total
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 9000),
+      duration: const Duration(milliseconds: 16000),
     );
 
     _scaleAnimation = TweenSequence<double>([
-      // 0.0 -> 0.33: Inhale (Expand from 0.65 to 1.0)
+      // Phase 1 (0.00 -> 0.25): Inhale (Expand from 0.65 to 1.0)
       TweenSequenceItem(
         tween: Tween<double>(
           begin: 0.65,
           end: 1.0,
         ).chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 33.3,
+        weight: 25.0,
       ),
-      // 0.33 -> 0.66: Hold (Stay at 1.0)
-      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 33.3),
-      // 0.66 -> 1.0: Exhale (Contract from 1.0 to 0.65)
+      // Phase 2 (0.25 -> 0.50): Hold Full (Stay at 1.0)
+      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 25.0),
+      // Phase 3 (0.50 -> 0.75): Exhale (Contract from 1.0 to 0.65)
       TweenSequenceItem(
         tween: Tween<double>(
           begin: 1.0,
           end: 0.65,
         ).chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 33.4,
+        weight: 25.0,
       ),
+      // Phase 4 (0.75 -> 1.00): Hold Empty (Stay at 0.65)
+      TweenSequenceItem(tween: ConstantTween<double>(0.65), weight: 25.0),
     ]).animate(_controller);
 
     _opacityAnimation = TweenSequence<double>([
@@ -66,20 +69,22 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
       TweenSequenceItem(
         tween: Tween<double>(
           begin: 0.3,
-          end: 0.85,
+          end: 0.9,
         ).chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 33.3,
+        weight: 25.0,
       ),
-      // Hold
-      TweenSequenceItem(tween: ConstantTween<double>(0.85), weight: 33.3),
+      // Hold Full
+      TweenSequenceItem(tween: ConstantTween<double>(0.9), weight: 25.0),
       // Exhale
       TweenSequenceItem(
         tween: Tween<double>(
-          begin: 0.85,
+          begin: 0.9,
           end: 0.3,
         ).chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 33.4,
+        weight: 25.0,
       ),
+      // Hold Empty
+      TweenSequenceItem(tween: ConstantTween<double>(0.35), weight: 25.0),
     ]).animate(_controller);
 
     _controller.addListener(_handleAnimationProgress);
@@ -101,12 +106,14 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
     final val = _controller.value;
     BreathingPhase nextPhase;
 
-    if (val < 0.33) {
+    if (val < 0.25) {
       nextPhase = BreathingPhase.inhale;
-    } else if (val < 0.66) {
-      nextPhase = BreathingPhase.hold;
-    } else {
+    } else if (val < 0.50) {
+      nextPhase = BreathingPhase.holdFull;
+    } else if (val < 0.75) {
       nextPhase = BreathingPhase.exhale;
+    } else {
+      nextPhase = BreathingPhase.holdEmpty;
     }
 
     if (nextPhase != _currentPhase) {
@@ -129,11 +136,13 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
   String _getPhaseTitle(BuildContext context) {
     switch (_currentPhase) {
       case BreathingPhase.inhale:
-        return context.loc.breathInhaleVisual;
-      case BreathingPhase.hold:
-        return context.loc.breathHoldVisual;
+        return context.loc.boxBreathInhaleVisual;
+      case BreathingPhase.holdFull:
+        return context.loc.boxBreathHoldFullVisual;
       case BreathingPhase.exhale:
-        return context.loc.breathExhaleVisual;
+        return context.loc.boxBreathExhaleVisual;
+      case BreathingPhase.holdEmpty:
+        return context.loc.boxBreathHoldEmptyVisual;
     }
   }
 
@@ -141,10 +150,12 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
     switch (_currentPhase) {
       case BreathingPhase.inhale:
         return context.loc.breathNavelExpand;
-      case BreathingPhase.hold:
-        return context.loc.breathSteadfastObserver;
+      case BreathingPhase.holdFull:
+        return context.loc.boxBreathingHoldFullGuidance;
       case BreathingPhase.exhale:
-        return context.loc.breathReleaseCortisol;
+        return context.loc.boxBreathingExhaleGuidance;
+      case BreathingPhase.holdEmpty:
+        return context.loc.boxBreathingHoldEmptyGuidance;
     }
   }
 
@@ -152,11 +163,20 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
     switch (_currentPhase) {
       case BreathingPhase.inhale:
         return AppColors.shieldPrimary;
-      case BreathingPhase.hold:
+      case BreathingPhase.holdFull:
         return const Color(0xFF818CF8); // Indigo / composure
       case BreathingPhase.exhale:
         return AppColors.emeraldSuccess;
+      case BreathingPhase.holdEmpty:
+        return const Color(0xFFF59E0B); // Amber / still awareness
     }
+  }
+
+  int get _secondsLeftInPhase {
+    final val = _controller.value;
+    final phaseProgress = (val % 0.25) / 0.25;
+    final remaining = 4 - (phaseProgress * 4).floor();
+    return remaining.clamp(1, 4);
   }
 
   @override
@@ -189,13 +209,13 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'PARASYMPATHETIC PACER',
+                    context.loc.parasympatheticPacerBadge,
                     style: AppTextStyles.labelBadge.copyWith(fontSize: 9.5),
                   ),
                 ],
               ),
               Text(
-                '${_secondsGrounded}s GROUNDED',
+                context.loc.secondsGroundedLabel(_secondsGrounded),
                 style: AppTextStyles.metricSmall.copyWith(
                   color: AppColors.textPrimary,
                   fontSize: 11,
@@ -226,9 +246,9 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
                         height: 180,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _phaseAccent.withOpacity(opacity * 0.12),
+                          color: _phaseAccent.withValues(alpha: (opacity * 0.12).clamp(0.0, 1.0)),
                           border: Border.all(
-                            color: _phaseAccent.withOpacity(opacity * 0.4),
+                            color: _phaseAccent.withValues(alpha: (opacity * 0.4).clamp(0.0, 1.0)),
                             width: 1.5,
                           ),
                         ),
@@ -242,9 +262,9 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
                         height: 130,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _phaseAccent.withOpacity(opacity * 0.2),
+                          color: _phaseAccent.withValues(alpha: (opacity * 0.2).clamp(0.0, 1.0)),
                           border: Border.all(
-                            color: _phaseAccent.withOpacity(opacity * 0.6),
+                            color: _phaseAccent.withValues(alpha: (opacity * 0.6).clamp(0.0, 1.0)),
                             width: 1.5,
                           ),
                         ),
@@ -260,19 +280,36 @@ class _BreathingPulseVisualizerState extends State<BreathingPulseVisualizer>
                         border: Border.all(color: _phaseAccent, width: 2.0),
                         boxShadow: [
                           BoxShadow(
-                            color: _phaseAccent.withOpacity(0.4),
+                            color: _phaseAccent.withValues(alpha: 0.4),
                             blurRadius: 18,
                             spreadRadius: 2,
                           ),
                         ],
                       ),
                       child: Center(
-                        child: Icon(
-                          _currentPhase == BreathingPhase.hold
-                              ? Icons.lock_outline_rounded
-                              : Icons.air_rounded,
-                          size: 32,
-                          color: _phaseAccent,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              (_currentPhase == BreathingPhase.holdFull)
+                                  ? Icons.lock_clock_rounded
+                                  : (_currentPhase == BreathingPhase.holdEmpty)
+                                      ? Icons.spa_rounded
+                                      : Icons.air_rounded,
+                              size: 24,
+                              color: _phaseAccent,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${_secondsLeftInPhase}s',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: _phaseAccent,
+                                fontFamily: 'Noto Sans Devanagari',
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

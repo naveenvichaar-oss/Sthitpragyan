@@ -6,21 +6,24 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
-import '../../../joy_reservoir/presentation/screens/joy_reservoir_screen.dart';
-import '../../../joy_reservoir/presentation/widgets/add_joy_item_modal_sheet.dart';
 import '../../../wisdom/data/models/resource_link.dart';
 import '../../../wisdom/data/models/wisdom_entry.dart';
 import '../../../wisdom/data/services/wisdom_vault_service.dart';
 import '../../../wisdom/presentation/widgets/add_resource_modal_sheet.dart';
 import '../../../wisdom/presentation/widgets/resource_hub_card.dart';
 import '../../../wisdom/presentation/widgets/wisdom_card.dart';
-import '../../data/cognition_data_source.dart';
 import '../../data/models/fallacy_and_model.dart';
 import '../../data/models/local_html_tool.dart';
+import '../../data/services/html_tool_storage_service.dart';
 import '../widgets/cognition_search_bar.dart';
 import '../widgets/expandable_micro_card.dart';
 import '../widgets/html_tool_card.dart';
 import '../widgets/import_html_tool_modal_sheet.dart';
+import '../widgets/add_cognition_item_modal_sheet.dart';
+import '../../../joy_reservoir/data/models/joy_item.dart';
+import '../../../joy_reservoir/data/services/joy_audio_service.dart';
+import '../../../joy_reservoir/presentation/widgets/add_joy_item_modal_sheet.dart';
+import '../../../joy_reservoir/presentation/widgets/joy_item_card.dart';
 
 /// CognitionVaultScreen hosts the unified Wisdom Vault & Resource Sanctuary:
 /// 1. Wisdom Cards: Gita & Sthitaprajna, Western Stoicism, Behavioral Psychology.
@@ -35,14 +38,14 @@ class CognitionVaultScreen extends StatefulWidget {
   });
 
   @override
-  State<CognitionVaultScreen> createState() => _CognitionVaultScreenState();
+  State<CognitionVaultScreen> createState() => CognitionVaultScreenState();
 }
 
-class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
+class CognitionVaultScreenState extends State<CognitionVaultScreen> {
   final HiveStorage _storage = HiveStorage();
   final WisdomVaultService _wisdomService = WisdomVaultService();
 
-  // Top Segment Control: 0 = Wisdom Cards, 1 = Resource Hub, 2 = Mental Models
+  // Top Segment Control: 0 = Mental Models, 1 = Wisdom Cards, 2 = Resource Hub, 3 = HTML Tools, 4 = Joy Box
   int _selectedMainSegment = 0;
 
   // Search controllers
@@ -59,8 +62,8 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   String _selectedResourceFilter = 'all';
 
   // Mental Models Tab State
-  int _selectedModelFilterIndex = 0; // 0: All, 1: Fallacies, 2: Stoic Models
-  List<CognitionItem> _filteredModels = [];
+  int _selectedModelFilterIndex = 0; // 0: All, 1: Stoic Models, 2: Rules of Engagement, 3: Case Studies
+  String _selectedFallacyTag = 'all';
 
   // Offline HTML Tools State
   List<LocalHtmlTool> _htmlTools = [];
@@ -73,6 +76,24 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
     _loadAllData();
   }
 
+  @override
+  void didUpdateWidget(CognitionVaultScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialSegment != oldWidget.initialSegment) {
+      _selectedMainSegment = widget.initialSegment;
+    }
+  }
+
+  /// Public method to seamlessly switch tabs from external controllers (e.g. Dashboard)
+  void switchToSegment(int segmentIndex) {
+    if (mounted && _selectedMainSegment != segmentIndex) {
+      HapticService.selectionClick();
+      setState(() {
+        _selectedMainSegment = segmentIndex;
+      });
+    }
+  }
+
   void _loadAllData() {
     // 1. Wisdom entries
     _applyWisdomFilters();
@@ -81,10 +102,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
     // 2. Resource links
     _loadResources();
 
-    // 3. Mental models
-    _applyModelFilters();
-
-    // 4. Offline HTML Tools
+    // 3. Offline HTML Tools
     _loadHtmlTools();
   }
 
@@ -117,22 +135,6 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         query,
         category: _selectedWisdomCategory,
       );
-    });
-  }
-
-  void _applyModelFilters() {
-    final query = _modelSearchController.text.trim();
-    CognitionType? filterType;
-    if (_selectedModelFilterIndex == 1) {
-      filterType = CognitionType.rulesOfEngagement;
-    } else if (_selectedModelFilterIndex == 2) {
-      filterType = CognitionType.fallacy;
-    } else if (_selectedModelFilterIndex == 3) {
-      filterType = CognitionType.mentalModel;
-    }
-
-    setState(() {
-      _filteredModels = CognitionDataSource.search(query, filterType);
     });
   }
 
@@ -174,12 +176,16 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
       backgroundColor: AppColors.background,
       floatingActionButton: _selectedMainSegment == 1
           ? FloatingActionButton.extended(
-              onPressed: _openAddResourceSheet,
+              onPressed: () => AddCognitionItemModalSheet.show(
+                context,
+                initialType: CognitionType.mentalModel,
+                onSaved: (item) => setState(() {}),
+              ),
               backgroundColor: AppColors.shieldPrimary,
               foregroundColor: AppColors.background,
-              icon: const Icon(Icons.add_link_rounded, size: 20),
+              icon: const Icon(Icons.add_rounded, size: 20),
               label: Text(
-                'ADD LINK',
+                context.loc.addModelAction,
                 style: AppTextStyles.labelBadge.copyWith(
                   color: AppColors.background,
                   fontWeight: FontWeight.w700,
@@ -187,17 +193,18 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                 ),
               ),
             )
-          : _selectedMainSegment == 3
+          : _selectedMainSegment == 2
               ? FloatingActionButton.extended(
-                  onPressed: () => AddJoyItemModalSheet.show(
+                  onPressed: () => AddCognitionItemModalSheet.show(
                     context,
-                    onSaved: () => setState(() {}),
+                    initialType: CognitionType.fallacy,
+                    onSaved: (item) => setState(() {}),
                   ),
                   backgroundColor: AppColors.shieldPrimary,
                   foregroundColor: AppColors.background,
-                  icon: const Icon(Icons.favorite_rounded, size: 20),
+                  icon: const Icon(Icons.add_rounded, size: 20),
                   label: Text(
-                    'ADD ANCHOR',
+                    context.loc.addFallacyAction,
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.background,
                       fontWeight: FontWeight.w700,
@@ -205,22 +212,55 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                     ),
                   ),
                 )
-              : _selectedMainSegment == 4
+              : _selectedMainSegment == 3
                   ? FloatingActionButton.extended(
                       onPressed: _openImportHtmlSheet,
                       backgroundColor: const Color(0xFF10B981),
                       foregroundColor: Colors.black,
                       icon: const Icon(Icons.add_rounded, size: 20),
-                      label: const Text(
-                        'IMPORT HTML',
-                        style: TextStyle(
+                      label: Text(
+                        context.loc.importHtmlAction,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.8,
                         ),
                       ),
                     )
-                  : null,
+                  : _selectedMainSegment == 4
+                      ? FloatingActionButton.extended(
+                          onPressed: () => AddJoyItemModalSheet.show(
+                            context,
+                            onSaved: () => setState(() {}),
+                          ),
+                          backgroundColor: const Color(0xFFF43F5E),
+                          foregroundColor: Colors.white,
+                          icon: const Icon(Icons.favorite_rounded, size: 20),
+                          label: Text(
+                            context.loc.addAnchorAction,
+                            style: AppTextStyles.labelBadge.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 11,
+                            ),
+                          ),
+                        )
+                      : _selectedMainSegment == 5
+                          ? FloatingActionButton.extended(
+                              onPressed: _openAddResourceSheet,
+                              backgroundColor: AppColors.shieldPrimary,
+                              foregroundColor: AppColors.background,
+                              icon: const Icon(Icons.add_link_rounded, size: 20),
+                              label: Text(
+                                context.loc.addResourceAction,
+                                style: AppTextStyles.labelBadge.copyWith(
+                                  color: AppColors.background,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            )
+                          : null,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -252,28 +292,33 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                 ),
                 if (_selectedMainSegment == 1)
                   IconButton(
-                    onPressed: _openAddResourceSheet,
+                    onPressed: () => AddCognitionItemModalSheet.show(
+                      context,
+                      initialType: CognitionType.mentalModel,
+                      onSaved: (item) => setState(() {}),
+                    ),
                     icon: const Icon(
                       Icons.add_circle_outline_rounded,
                       color: AppColors.shieldPrimary,
                       size: 24,
                     ),
-                    tooltip: 'Add Custom Resource',
+                    tooltip: 'Add Mental Model',
+                  )
+                else if (_selectedMainSegment == 2)
+                  IconButton(
+                    onPressed: () => AddCognitionItemModalSheet.show(
+                      context,
+                      initialType: CognitionType.fallacy,
+                      onSaved: (item) => setState(() {}),
+                    ),
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: AppColors.shieldPrimary,
+                      size: 24,
+                    ),
+                    tooltip: 'Add Logical Fallacy',
                   )
                 else if (_selectedMainSegment == 3)
-                  IconButton(
-                    onPressed: () => AddJoyItemModalSheet.show(
-                      context,
-                      onSaved: () => setState(() {}),
-                    ),
-                    icon: const Icon(
-                      Icons.add_circle_outline_rounded,
-                      color: AppColors.shieldPrimary,
-                      size: 24,
-                    ),
-                    tooltip: 'Add Personal Anchor',
-                  )
-                else if (_selectedMainSegment == 4)
                   IconButton(
                     onPressed: _openImportHtmlSheet,
                     icon: const Icon(
@@ -282,6 +327,29 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                       size: 24,
                     ),
                     tooltip: 'Import Offline HTML Tool',
+                  )
+                else if (_selectedMainSegment == 4)
+                  IconButton(
+                    onPressed: () => AddJoyItemModalSheet.show(
+                      context,
+                      onSaved: () => setState(() {}),
+                    ),
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: Color(0xFFF43F5E),
+                      size: 24,
+                    ),
+                    tooltip: 'Add Joy Anchor',
+                  )
+                else if (_selectedMainSegment == 5)
+                  IconButton(
+                    onPressed: _openAddResourceSheet,
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: AppColors.shieldPrimary,
+                      size: 24,
+                    ),
+                    tooltip: 'Add Custom Resource',
                   ),
               ],
             ),
@@ -295,7 +363,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Top Segmented Switcher (Wisdom Cards / Resource Hub / Mental Models / Joy Reservoir / HTML Tools)
+            // Top Segmented Switcher (Wisdom Cards / Mental Models / Logical Fallacies / HTML Tools / Joy Box / Resources)
             _buildMainSegmentBar(),
             const SizedBox(height: 16),
 
@@ -303,13 +371,17 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             if (_selectedMainSegment == 0)
               _buildWisdomCardsView()
             else if (_selectedMainSegment == 1)
-              _buildResourceHubView()
+              _buildMentalModelsOnlyView()
             else if (_selectedMainSegment == 2)
-              _buildMentalModelsView()
+              _buildLogicalFallaciesOnlyView()
             else if (_selectedMainSegment == 3)
-              const JoyReservoirScreen(isEmbedded: true)
+              _buildHtmlToolsView()
+            else if (_selectedMainSegment == 4)
+              _buildJoyBoxView()
+            else if (_selectedMainSegment == 5)
+              _buildResourceHubView()
             else
-              _buildHtmlToolsView(),
+              _buildWisdomCardsView(),
 
             const SizedBox(height: 60),
           ],
@@ -319,7 +391,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   }
 
   // ---------------------------------------------------------
-  // Main Segment Bar (Wisdom Cards / Resource Hub / Models / Joy / HTML Tools)
+  // Main Segment Bar (Wisdom Cards / Mental Models / Fallacies / HTML Tools / Joy Box / Resource Hub)
   // ---------------------------------------------------------
   Widget _buildMainSegmentBar() {
     return Container(
@@ -333,15 +405,17 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildSegmentButton(0, context.loc.wisdomCardsTab, Icons.auto_stories_rounded),
+            _buildSegmentButton(0, context.loc.segmentWisdom, Icons.auto_stories_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(1, context.loc.resourceHubTab, Icons.hub_rounded),
+            _buildSegmentButton(1, context.loc.segmentMentalModels, Icons.psychology_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(2, context.loc.segmentFallacies, Icons.psychology_rounded),
+            _buildSegmentButton(2, context.loc.segmentLogicalFallacies, Icons.rule_folder_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(3, context.loc.joyReservoirTitle.toUpperCase(), Icons.spa_rounded),
+            _buildSegmentButton(3, context.loc.segmentHtmlTools, Icons.html_rounded),
             const SizedBox(width: 4),
-            _buildSegmentButton(4, context.loc.segmentHtmlTools, Icons.html_rounded),
+            _buildSegmentButton(4, context.loc.joyBoxSegmentTitle, Icons.spa_rounded),
+            const SizedBox(width: 4),
+            _buildSegmentButton(5, context.loc.resourceHubTab, Icons.hub_rounded),
           ],
         ),
       ),
@@ -350,44 +424,51 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
 
   Widget _buildSegmentButton(int index, String label, IconData icon) {
     final isSelected = _selectedMainSegment == index;
-    return GestureDetector(
-      onTap: () {
-        HapticService.selectionClick();
-        setState(() {
-          _selectedMainSegment = index;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: isSelected ? AppColors.shieldPrimary : Colors.transparent,
-            width: 1.0,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedMainSegment = index;
+          });
+        },
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: isSelected ? AppColors.shieldPrimary : Colors.transparent,
+              width: 1.2,
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 13,
-              color: isSelected ? AppColors.shieldPrimary : AppColors.textMuted,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              label,
-              style: AppTextStyles.labelBadge.copyWith(
-                fontSize: 9.0,
-                color: isSelected
-                    ? AppColors.shieldPrimary
-                    : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 14,
+                color: isSelected ? AppColors.shieldPrimary : AppColors.textMuted,
               ),
-              maxLines: 1,
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: AppTextStyles.labelBadge.copyWith(
+                  fontSize: 10.0,
+                  color: isSelected
+                      ? AppColors.shieldPrimary
+                      : AppColors.textSecondary,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+                maxLines: 1,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -463,29 +544,36 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
 
   Widget _buildWisdomCategoryChip(String catKey, String label) {
     final isSelected = _selectedWisdomCategory == catKey;
-    return GestureDetector(
-      onTap: () {
-        HapticService.selectionClick();
-        setState(() {
-          _selectedWisdomCategory = catKey;
-          _applyWisdomFilters();
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-          border: Border.all(
-            color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedWisdomCategory = catKey;
+            _applyWisdomFilters();
+          });
+        },
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(
+              color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+              width: isSelected ? 1.2 : 1.0,
+            ),
           ),
-        ),
-        child: Text(
-          label,
-          style: AppTextStyles.labelBadge.copyWith(
-            fontSize: 9.0,
-            color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          child: Text(
+            label,
+            style: AppTextStyles.labelBadge.copyWith(
+              fontSize: 9.5,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            ),
           ),
         ),
       ),
@@ -493,7 +581,165 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   }
 
   // ---------------------------------------------------------
-  // View 2: Resource Hub (Public Domain & Personal Links)
+  // View 4: Joy Box / Soul Sanctuary (आनंद कोष)
+  // ---------------------------------------------------------
+  Widget _buildJoyBoxView() {
+    final joyItems = _storage.getAllJoyItems();
+
+    final musicCount = joyItems.where((i) => i.category == JoyCategory.music).length;
+    final visualCount = joyItems.where((i) => i.category == JoyCategory.visual).length;
+    final quoteCount = joyItems.where((i) => i.category == JoyCategory.quote).length;
+    final memoryCount = joyItems.where((i) => i.category == JoyCategory.memory).length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Quick Action Banner
+        Container(
+          padding: const EdgeInsets.all(AppDimens.space12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(color: AppColors.borderSubtle),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.loc.soulSanctuaryHeader,
+                      style: AppTextStyles.heading.copyWith(fontSize: 13),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      context.loc.joyItemsSummary(
+                        joyItems.length,
+                        musicCount,
+                        visualCount,
+                        quoteCount + memoryCount,
+                      ),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 10.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      HapticService.selectionClick();
+                      AddJoyItemModalSheet.show(
+                        context,
+                        initialCategory: JoyCategory.music,
+                        onSaved: () => setState(() {}),
+                      );
+                    },
+                    icon: const Icon(Icons.audio_file_rounded, size: 14),
+                    label: Text(
+                      context.loc.localAudioStatus,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.shieldPrimary,
+                      side: const BorderSide(color: AppColors.shieldPrimary, width: 0.8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      HapticService.selectionClick();
+                      AddJoyItemModalSheet.show(
+                        context,
+                        onSaved: () => setState(() {}),
+                      );
+                    },
+                    icon: const Icon(Icons.add_rounded, size: 14),
+                    label: Text(
+                      context.loc.addTextButton,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF43F5E),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        if (joyItems.isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.spa_rounded,
+                  size: 36,
+                  color: Color(0xFFF43F5E),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  context.loc.noAnchorsInCategory,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  context.loc.tapAddPrompt,
+                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: joyItems.length,
+            itemBuilder: (context, index) {
+              final joy = joyItems[index];
+              return JoyItemCard(
+                item: joy,
+                onDelete: () async {
+                  HapticService.mediumImpact();
+                  if (JoyAudioService().isActive(joy.id)) {
+                    await JoyAudioService().stop();
+                  }
+                  await _storage.deleteJoyItem(joy.id);
+                  if (mounted) setState(() {});
+                },
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------
+  // View 5: Resource Hub (Public Domain & Personal Links)
   // ---------------------------------------------------------
   Widget _buildResourceHubView() {
     var displayList = _resources;
@@ -525,19 +771,28 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildResourceFilterChip('all', 'ALL RESOURCES (${_resources.length})'),
+              _buildResourceFilterChip(
+                'all',
+                context.loc.allResourcesCategory(_resources.length),
+              ),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('YouTube', 'YOUTUBE ($ytCount)'),
+              _buildResourceFilterChip('YouTube', 'YouTube ($ytCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('DrivePDF', 'DRIVE PDF ($driveCount)'),
+              _buildResourceFilterChip('DrivePDF', 'Drive PDF ($driveCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('GoogleKeep', 'GOOGLE KEEP ($keepCount)'),
+              _buildResourceFilterChip('GoogleKeep', 'Google Keep ($keepCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('Substack', 'SUBSTACK ($substackCount)'),
+              _buildResourceFilterChip('Substack', 'Substack ($substackCount)'),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('SocialMedia', 'SOCIAL MEDIA ($socialCount)'),
+              _buildResourceFilterChip(
+                'SocialMedia',
+                context.loc.socialMediaCategory(socialCount),
+              ),
               const SizedBox(width: 6),
-              _buildResourceFilterChip('WebLink', 'WEB ARCHIVE ($webCount)'),
+              _buildResourceFilterChip(
+                'WebLink',
+                context.loc.webArchiveCategory(webCount),
+              ),
             ],
           ),
         ),
@@ -557,7 +812,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Tap any resource to open classical texts, Drive PDFs, or YouTube videos seamlessly inside the app.',
+                  context.loc.sanctuaryResourceTapBanner,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                     fontSize: 11,
@@ -567,7 +822,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               TextButton.icon(
                 onPressed: _openAddResourceSheet,
                 icon: const Icon(Icons.add_rounded, size: 14),
-                label: const Text('ADD', style: TextStyle(fontSize: 11)),
+                label: Text(context.loc.addTextButton, style: const TextStyle(fontSize: 11)),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.shieldPrimary,
                   visualDensity: VisualDensity.compact,
@@ -581,8 +836,8 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
         // List
         if (displayList.isEmpty)
           _buildEmptyPlaceholder(
-            'NO RESOURCES IN THIS CLUSTER',
-            'Tap "+ ADD LINK" to add custom YouTube, Drive, or Keep notes.',
+            context.loc.noResourcesInCluster,
+            context.loc.emptyJoyReservoirDesc,
           )
         else
           ListView.builder(
@@ -603,28 +858,35 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
 
   Widget _buildResourceFilterChip(String filterKey, String label) {
     final isSelected = _selectedResourceFilter == filterKey;
-    return GestureDetector(
-      onTap: () {
-        HapticService.selectionClick();
-        setState(() {
-          _selectedResourceFilter = filterKey;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-          border: Border.all(
-            color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedResourceFilter = filterKey;
+          });
+        },
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(
+              color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+              width: isSelected ? 1.2 : 1.0,
+            ),
           ),
-        ),
-        child: Text(
-          label,
-          style: AppTextStyles.labelBadge.copyWith(
-            fontSize: 9.0,
-            color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          child: Text(
+            label,
+            style: AppTextStyles.labelBadge.copyWith(
+              fontSize: 9.5,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            ),
           ),
         ),
       ),
@@ -632,84 +894,259 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
   }
 
   // ---------------------------------------------------------
-  // View 3: Mental Models & Fallacies
+  // View 1: Mental Models (Timeless frameworks & systems thinking)
   // ---------------------------------------------------------
-  Widget _buildMentalModelsView() {
+  Widget _buildMentalModelsOnlyView() {
+    final query = _modelSearchController.text.trim();
+    var allItems = _storage.getAllCognitionItems().where((i) =>
+        i.type == CognitionType.mentalModel ||
+        i.type == CognitionType.rulesOfEngagement).toList();
+
+    if (query.isNotEmpty) {
+      allItems = allItems.where((i) => i.matchesQuery(query)).toList();
+    }
+
+    final caseStudyItems = allItems.where((i) =>
+        i.tags.any((t) => t.toLowerCase() == 'case study') ||
+        i.id.startsWith('case_')).toList();
+    final caseCount = caseStudyItems.length;
+
+    final roeCount = allItems.where((i) => i.type == CognitionType.rulesOfEngagement).length;
+    final stoicModelCount = allItems.where((i) =>
+        i.type == CognitionType.mentalModel &&
+        !i.tags.any((t) => t.toLowerCase() == 'case study') &&
+        !i.id.startsWith('case_')).length;
+
+    var items = allItems;
+    if (_selectedModelFilterIndex == 1) {
+      items = allItems.where((i) =>
+          i.type == CognitionType.mentalModel &&
+          !i.tags.any((t) => t.toLowerCase() == 'case study') &&
+          !i.id.startsWith('case_')).toList();
+    } else if (_selectedModelFilterIndex == 2) {
+      items = allItems.where((i) => i.type == CognitionType.rulesOfEngagement).toList();
+    } else if (_selectedModelFilterIndex == 3) {
+      items = caseStudyItems;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CognitionSearchBar(
           controller: _modelSearchController,
-          hintText: 'Search strawman, gaslighting, ad hominem...',
-          onChanged: (_) => _applyModelFilters(),
+          hintText: context.loc.searchMentalModelsHint,
+          onChanged: (_) => setState(() {}),
           onClear: () {
             _modelSearchController.clear();
-            _applyModelFilters();
+            setState(() {});
           },
         ),
         const SizedBox(height: 12),
-
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildModelFilterChip(0, 'ALL (${CognitionDataSource.items.length})'),
+              _buildMentalModelFilterChip(
+                0,
+                context.loc.allModelsCategory(allItems.length),
+              ),
               const SizedBox(width: 6),
-              _buildModelFilterChip(1, 'RULES OF ENGAGEMENT (${CognitionDataSource.getRulesOfEngagement().length})'),
+              _buildMentalModelFilterChip(
+                1,
+                context.loc.stoicModelsCategory(stoicModelCount),
+              ),
               const SizedBox(width: 6),
-              _buildModelFilterChip(2, 'FALLACIES (${CognitionDataSource.getFallacies().length})'),
+              _buildMentalModelFilterChip(
+                2,
+                context.loc.rulesOfEngagementCategory(roeCount),
+              ),
               const SizedBox(width: 6),
-              _buildModelFilterChip(3, 'STOIC MODELS (${CognitionDataSource.getMentalModels().length})'),
+              _buildMentalModelFilterChip(
+                3,
+                context.loc.caseStudiesCategory(caseCount),
+              ),
             ],
           ),
         ),
         const SizedBox(height: 16),
-
-        if (_filteredModels.isEmpty)
-          _buildEmptyPlaceholder('NO COGNITION MODELS FOUND', 'Try adjusting your search terms.')
+        if (items.isEmpty)
+          _buildEmptyPlaceholder(
+            context.loc.noMentalModelsFound,
+            context.loc.tryAdjustingSearch,
+          )
         else
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: _filteredModels.length,
+            itemCount: items.length,
             separatorBuilder: (context, index) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              return ExpandableMicroCard(item: _filteredModels[index]);
+              final model = items[index];
+              return ExpandableMicroCard(
+                item: model,
+                onItemUpdated: (_) => setState(() {}),
+                onDelete: () => setState(() {}),
+              );
             },
           ),
       ],
     );
   }
 
-  Widget _buildModelFilterChip(int index, String label) {
+  Widget _buildMentalModelFilterChip(int index, String label) {
     final isSelected = _selectedModelFilterIndex == index;
-    return GestureDetector(
-      onTap: () {
-        HapticService.selectionClick();
-        setState(() {
-          _selectedModelFilterIndex = index;
-          _applyModelFilters();
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-          border: Border.all(
-            color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedModelFilterIndex = index;
+          });
+        },
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(
+              color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+              width: isSelected ? 1.2 : 1.0,
+            ),
+          ),
+          child: Text(
+            label,
+            style: AppTextStyles.labelBadge.copyWith(
+              fontSize: 9.5,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        child: Text(
-          label,
-          style: AppTextStyles.labelBadge.copyWith(
-            fontSize: 9.0,
-            color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------
+  // View 2: Logical Fallacies & Cognitive Biases
+  // ---------------------------------------------------------
+  Widget _buildLogicalFallaciesOnlyView() {
+    final query = _modelSearchController.text.trim();
+    var allItems = _storage.getAllCognitionItems().where((i) =>
+        i.type == CognitionType.fallacy).toList();
+
+    if (query.isNotEmpty) {
+      allItems = allItems.where((i) => i.matchesQuery(query)).toList();
+    }
+
+    var items = allItems;
+    if (_selectedFallacyTag != 'all') {
+      final tagMatch = _selectedFallacyTag.replaceAll('_', ' ').toLowerCase();
+      items = allItems.where((i) {
+        final title = i.title.toLowerCase();
+        final tags = i.tags.map((t) => t.toLowerCase()).toList();
+        return title.contains(tagMatch) ||
+            tags.any((t) => t.contains(tagMatch)) ||
+            i.latinName.toLowerCase().contains(tagMatch);
+      }).toList();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CognitionSearchBar(
+          controller: _modelSearchController,
+          hintText: context.loc.searchFallaciesHint,
+          onChanged: (_) => setState(() {}),
+          onClear: () {
+            _modelSearchController.clear();
+            setState(() {});
+          },
+        ),
+        const SizedBox(height: 12),
+        // Fallacy Tracker Quick-Reference Tag Filter Chips
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFallacyTagChip('all', context.loc.filterAllFallacies),
+              const SizedBox(width: 6),
+              _buildFallacyTagChip('ad_hominem', 'Ad Hominem'),
+              const SizedBox(width: 6),
+              _buildFallacyTagChip('straw_man', 'Straw Man'),
+              const SizedBox(width: 6),
+              _buildFallacyTagChip('appeal_to_emotion', context.loc.appealToEmotionTag),
+              const SizedBox(width: 6),
+              _buildFallacyTagChip('false_dilemma', 'False Dilemma'),
+              const SizedBox(width: 6),
+              _buildFallacyTagChip('sunk_cost', 'Sunk Cost'),
+            ],
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 16),
+        if (items.isEmpty)
+          _buildEmptyPlaceholder(
+            context.loc.noLogicalFallaciesFound,
+            context.loc.tryAdjustingSearch,
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final model = items[index];
+              return ExpandableMicroCard(
+                item: model,
+                onItemUpdated: (_) => setState(() {}),
+                onDelete: () => setState(() {}),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildFallacyTagChip(String tagKey, String label) {
+    final isSelected = _selectedFallacyTag == tagKey;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticService.selectionClick();
+          setState(() {
+            _selectedFallacyTag = tagKey;
+          });
+        },
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 38),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.surfaceElevated : AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(
+              color: isSelected ? AppColors.shieldPrimary : AppColors.borderSubtle,
+              width: isSelected ? 1.2 : 1.0,
+            ),
+          ),
+          child: Text(
+            label,
+            style: AppTextStyles.labelBadge.copyWith(
+              fontSize: 9.5,
+              color: isSelected ? AppColors.shieldPrimary : AppColors.textSecondary,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     );
@@ -791,7 +1228,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'OFFLINE SOVEREIGN SANDBOX',
+                        context.loc.offlineSovereignSandboxBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: const Color(0xFF10B981),
                           fontSize: 9,
@@ -800,7 +1237,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                     ],
                   ),
                   Text(
-                    '${_htmlTools.length} TOOLS',
+                    context.loc.toolsCountBadge(_htmlTools.length),
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 9.5,
@@ -809,13 +1246,13 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Personal HTML Tools & Dashboards',
+              Text(
+                context.loc.htmlToolsTitle,
                 style: AppTextStyles.heading,
               ),
               const SizedBox(height: 4),
               Text(
-                'Import your private single-page tools, calculators, and interactive decision matrices. Stored 100% offline with zero cloud telemetry and full JavaScript execution.',
+                context.loc.offlineToolsDescription,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                   fontSize: 11,
@@ -836,9 +1273,9 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.add_rounded, size: 18),
-                  label: const Text(
-                    'IMPORT HTML FILE (+)',
-                    style: TextStyle(
+                  label: Text(
+                    context.loc.importHtmlButton.toUpperCase(),
+                    style: const TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.8,
@@ -900,7 +1337,7 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
               children: [
                 const Icon(Icons.code_off_rounded, size: 36, color: AppColors.textMuted),
                 const SizedBox(height: 8),
-                const Text('No HTML tools found in this category', style: AppTextStyles.bodyMedium),
+                Text(context.loc.noHtmlToolsFound, style: AppTextStyles.bodyMedium),
               ],
             ),
           )
@@ -909,8 +1346,17 @@ class _CognitionVaultScreenState extends State<CognitionVaultScreen> {
             return HtmlToolCard(
               tool: tool,
               onDelete: () async {
-                await _storage.deleteHtmlTool(tool.id);
+                await HtmlToolStorageService().deleteTool(tool);
                 _loadHtmlTools();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${context.loc.toolDeletedNotice} ("${tool.title}")'),
+                      backgroundColor: AppColors.surfaceElevated,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
               },
               onUpdated: (_) => _loadHtmlTools(),
             );

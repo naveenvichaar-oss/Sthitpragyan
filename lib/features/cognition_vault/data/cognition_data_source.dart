@@ -19,7 +19,7 @@ class CognitionDataSource {
       corporateManifestation: '"You\'ve only been at this company for six months, so you don\'t understand how complex our culture is."',
       antidoteProtocol: 'Separate the person from the data: "My tenure doesn\'t alter the telemetry on latency. Let\'s evaluate the benchmark numbers directly."',
       quickMaxim: 'Disregard the speaker\'s identity; audit the arithmetic.',
-      tags: ['Defense', 'Boardroom', 'Tenure', 'Meetings'],
+      tags: ['Defense', 'Discussion', 'Tenure', 'Communication'],
     ),
     CognitionItem(
       id: 'fal_02',
@@ -93,6 +93,19 @@ class CognitionDataSource {
       antidoteProtocol: 'Pin down the exact policy: "We all agree on quality. We are discussing the specific mechanism: 80-hour weeks vs sustainable automated testing."',
       quickMaxim: 'Agree with the obvious virtue; isolate the abusive policy.',
       tags: ['Manipulation', 'Leadership', 'Overwork'],
+    ),
+
+    CognitionItem(
+      id: 'fal_08',
+      type: CognitionType.fallacy,
+      title: 'Appeal to Emotion (भावुकता का सहारा)',
+      subtitle: 'Manipulating feelings instead of presenting valid evidence',
+      latinName: 'Argumentum Ad Misericordiam',
+      definition: 'Subverting rational decision-making by weaponizing sympathy, fear, pity, guilt, or outrage to force compliance without empirical merit.',
+      corporateManifestation: '"If you don\'t approve this budget variance today, think about how demoralized the team will feel after all their sacrifices."',
+      antidoteProtocol: 'Acknowledge the emotion; demand the empirical merit: "I recognize the hard work of the team. However, financial variance requires justification on ROI and contractual scope, not sentiment."',
+      quickMaxim: 'Compassion guides intent; cold empirical data approves resources.',
+      tags: ['Manipulation', 'Appeal to Emotion', 'Guilt', 'Boundaries'],
     ),
 
     // ------------------------------------------------------------------
@@ -170,6 +183,43 @@ class CognitionDataSource {
       antidoteProtocol: 'Observe them like an actor performing on a stage. Their yelling is merely sound waves vibrating air. Your citadel remains impregnable.',
       quickMaxim: 'They can touch the project; they cannot touch the mind.',
       tags: ['Invulnerability', 'Poise', 'High Tension'],
+    ),
+
+    CognitionItem(
+      id: 'case_01',
+      type: CognitionType.mentalModel,
+      title: 'Twelve Angry Men: Forensic Prejudice Breakdown',
+      subtitle: 'Dismantling mass groupthink and bias through calm critical inquiry',
+      latinName: '12 Angry Men • Lumet / Rose',
+      definition: 'Juror 8 stands alone against 11 men convinced of guilt. Through quiet patience, reasonable doubt, and empirical timing (measuring the old witness\'s walking speed), he systematically unmasks emotional prejudice without raising his voice.',
+      corporateManifestation: 'In an executive meeting where everyone hastily rubber-stamps a flawed launch to appease an intimidating VP, one composed leader asks: "Can we test the core failure telemetry before signing off?"',
+      antidoteProtocol: 'Never counter aggressive groupthink with anger. Disarm it with forensic questions: "Let us review the raw timestamps step by step. What are the hard facts versus our assumptions?"',
+      quickMaxim: 'One calm, analytical mind can dissolve the hysteria of eleven.',
+      tags: ['Case Study', 'Twelve Angry Men', 'Critical Thinking', 'Prejudice', 'Logic'],
+    ),
+    CognitionItem(
+      id: 'case_02',
+      type: CognitionType.mentalModel,
+      title: 'Sherlock Mind Palace: Deductive Elimination',
+      subtitle: 'Spatial memory indexing and cold deductive elimination of the impossible',
+      latinName: 'Method of Loci • Holmesian Deduction',
+      definition: 'Organizing mental frameworks, objective facts, and telemetry into an indexed internal spatial palace. Observing micro-details that others merely "see", then applying the core axiom: "When you have eliminated the impossible, whatever remains, however improbable, must be the truth."',
+      corporateManifestation: 'During a system outage or strategic ambiguity, instead of panicking in noisy Slack channels, retire to your mental architecture, isolate verified data from speculation, and trace the logical chain of causality.',
+      antidoteProtocol: 'Categorize into two mental rooms: Verified Observations vs Inferred Narratives. Systematically test and discard each impossible hypothesis until only the truth remains.',
+      quickMaxim: 'You see, but you do not observe; index the facts, eliminate the impossible.',
+      tags: ['Case Study', 'Sherlock Mind Palace', 'Deduction', 'Logic', 'Mind Palace'],
+    ),
+    CognitionItem(
+      id: 'case_03',
+      type: CognitionType.mentalModel,
+      title: 'Bridge of Spies: "Would It Help?" Protocol',
+      subtitle: 'Radical Stoic equanimity in the face of maximum existential pressure',
+      latinName: 'Bridge of Spies • Rudolf Abel / Donovan',
+      definition: 'When facing imminent execution or severe crisis, attorney Donovan asks captured spy Rudolf Abel: "You don\'t seem nervous." Abel serenely responds: "Would it help?" The absolute refusal to waste neural bandwidth or adrenaline on uncontrollable outcomes.',
+      corporateManifestation: 'When an organization faces severe unexpected disruption, budget cuts, or hostile public critique, panicked managers doom-spiral and demand frantic emergency meetings.',
+      antidoteProtocol: 'Ask the sovereign clarifying question: "Does panicking, catastrophizing, or losing sleep alter the physical trajectory of this event?" If no, return immediately to composed execution.',
+      quickMaxim: '"Would it help?"—If anxiety changes nothing, discard it completely.',
+      tags: ['Case Study', 'Bridge of Spies', 'Stoic Control', 'Equanimity', 'Would It Help'],
     ),
 
     // ------------------------------------------------------------------

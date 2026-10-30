@@ -54,6 +54,52 @@ class NotificationTrigger {
         return category;
     }
   }
+
+  NotificationTrigger copyWith({
+    int? id,
+    int? hour,
+    int? minute,
+    String? title,
+    String? body,
+    String? category,
+    String? titleEn,
+    String? bodyEn,
+  }) {
+    return NotificationTrigger(
+      id: id ?? this.id,
+      hour: hour ?? this.hour,
+      minute: minute ?? this.minute,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      category: category ?? this.category,
+      titleEn: titleEn ?? this.titleEn,
+      bodyEn: bodyEn ?? this.bodyEn,
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'hour': hour,
+    'minute': minute,
+    'title': title,
+    'body': body,
+    'category': category,
+    'titleEn': titleEn,
+    'bodyEn': bodyEn,
+  };
+
+  factory NotificationTrigger.fromMap(Map<String, dynamic> map) {
+    return NotificationTrigger(
+      id: map['id'] as int? ?? 0,
+      hour: map['hour'] as int? ?? 5,
+      minute: map['minute'] as int? ?? 45,
+      title: map['title'] as String? ?? '',
+      body: map['body'] as String? ?? '',
+      category: map['category'] as String? ?? '',
+      titleEn: map['titleEn'] as String?,
+      bodyEn: map['bodyEn'] as String?,
+    );
+  }
 }
 
 /// NotificationService coordinates local scheduled notifications at 4 executive checkpoints.

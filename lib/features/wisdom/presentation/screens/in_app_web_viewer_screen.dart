@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 
 /// InAppWebViewerScreen opens external web articles, classical texts,
@@ -370,7 +371,7 @@ class _InAppWebViewerScreenState extends State<InAppWebViewerScreen> {
                     _webViewController?.reload();
                   },
                   icon: const Icon(Icons.refresh_rounded, size: 16),
-                  label: const Text('RETRY'),
+                  label: Text(context.loc.retryAction),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.borderMedium),
@@ -380,7 +381,7 @@ class _InAppWebViewerScreenState extends State<InAppWebViewerScreen> {
                 ElevatedButton.icon(
                   onPressed: _launchExternalBrowser,
                   icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                  label: const Text('OPEN IN CHROME'),
+                  label: Text(context.loc.openInChromeAction),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.shieldPrimary,
                     foregroundColor: AppColors.background,
@@ -426,7 +427,7 @@ class _InAppWebViewerScreenState extends State<InAppWebViewerScreen> {
               ElevatedButton.icon(
                 onPressed: _launchExternalBrowser,
                 icon: const Icon(Icons.open_in_browser_rounded, size: 16),
-                label: const Text('LAUNCH WEB RESOURCE'),
+                label: Text(context.loc.launchWebResource),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.shieldPrimary,
                   foregroundColor: AppColors.background,

@@ -109,7 +109,7 @@ class WisdomVaultService {
         title: 'Equanimity in Turmoil',
         titleHi: 'दुःखेष्वनुद्विग्नमनाः (विपत्ति में स्थिरता)',
         source: 'Bhagavad Gita 2.56',
-        sourceHi: 'श्रीमद्भगवद्गीता २.५६',
+        sourceHi: 'श्रीमद्भगवद्गीता 2.56',
         originalText:
             'दुःखेष्वनुद्विग्नमनाः सुखेषु विगतस्पृहः।\nवीतरागभयक्रोधः स्थितधीर्मुनि रुच्यते॥',
         translation:
@@ -130,7 +130,7 @@ class WisdomVaultService {
         title: 'Neutralizing Insults & Public Put-Downs',
         titleHi: 'अपमान व प्रहार का निष्प्रभावीकरण',
         source: 'Epictetus • Enchiridion 20',
-        sourceHi: 'एपिक्टेटस • एनकिरीडियन २०',
+        sourceHi: 'एपिक्टेटस • एनकिरीडियन 20',
         originalText:
             'Remember that what insults you is not the person who abuses you, but your judgment that these things are insulting.',
         translation:

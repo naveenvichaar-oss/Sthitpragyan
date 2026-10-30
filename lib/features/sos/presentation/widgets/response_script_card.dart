@@ -6,6 +6,7 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../../../shared/widgets/voice_tts_button.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/defensive_scripts_vault.dart';
 
 /// ResponseScriptCard renders an actionable verbatim executive deflection script.
@@ -45,7 +46,9 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Script copied to clipboard: "${widget.script.category}"',
+            context.loc.scriptCopiedNotice(
+              context.loc.getDefensiveCategoryName(widget.script.category),
+            ),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.background,
             ),
@@ -101,7 +104,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                     border: Border.all(color: AppColors.borderSubtle),
                   ),
                   child: Text(
-                    widget.script.category.toUpperCase(),
+                    context.loc.getDefensiveCategoryName(widget.script.category).toUpperCase(),
                     style: AppTextStyles.labelBadge.copyWith(
                       color: AppColors.shieldPrimary,
                       fontSize: 9.5,
@@ -117,7 +120,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                       audioTopicKey: 'sos_script_${widget.script.id}',
                       size: 19,
                       color: AppColors.textMuted,
-                      tooltip: 'Listen to deflection script',
+                      tooltip: context.loc.listenDeflectionTooltip,
                     ),
                     const SizedBox(width: 4),
                     IconButton(
@@ -135,7 +138,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                             : AppColors.textMuted,
                       ),
                       splashRadius: 18,
-                      tooltip: 'Bookmark Script',
+                      tooltip: context.loc.bookmarkScriptTooltip,
                     ),
                     if (widget.onEdit != null)
                       IconButton(
@@ -149,7 +152,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                           color: AppColors.textSecondary,
                         ),
                         splashRadius: 18,
-                        tooltip: 'Edit Script',
+                        tooltip: context.loc.editScriptTooltip,
                       ),
                     if (widget.onDelete != null)
                       IconButton(
@@ -163,7 +166,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                           color: AppColors.roseDanger,
                         ),
                         splashRadius: 18,
-                        tooltip: 'Delete Script',
+                        tooltip: context.loc.deleteScriptTooltip,
                       ),
                     IconButton(
                       onPressed: _copyScriptToClipboard,
@@ -177,7 +180,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                             : AppColors.textSecondary,
                       ),
                       splashRadius: 18,
-                      tooltip: 'Copy Script',
+                      tooltip: context.loc.copyScriptTooltip,
                     ),
                   ],
                 ),
@@ -192,7 +195,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'HOSTILE TRIGGER',
+                  context.loc.hostileTriggerBadge,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.roseDanger,
                     fontSize: 9.0,
@@ -228,7 +231,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'VERBATIM SCRIPT',
+                      context.loc.verbatimScriptBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.shieldPrimary,
                         fontSize: 9.0,
@@ -236,7 +239,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                     ),
                     if (_justCopied)
                       Text(
-                        'COPIED TO CLIPBOARD',
+                        context.loc.copiedToClipboardBadge,
                         style: AppTextStyles.labelBadge.copyWith(
                           color: AppColors.emeraldSuccess,
                           fontSize: 9.0,
@@ -269,7 +272,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'WHY IT WORKS: ',
+                      context.loc.whyItWorksLabel,
                       style: AppTextStyles.labelBadge.copyWith(
                         fontSize: 9.5,
                         color: AppColors.shieldPrimary,
@@ -293,7 +296,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'DELIVERY: ',
+                      context.loc.deliveryLabel,
                       style: AppTextStyles.labelBadge.copyWith(
                         fontSize: 9.0,
                         color: AppColors.amberWarning,

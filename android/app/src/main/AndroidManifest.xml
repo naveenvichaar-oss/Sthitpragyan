@@ -15,11 +15,13 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
-    <!-- Safe intent/URL launching for external web links, YouTube, Google Drive, Google Keep -->
+    <!-- Safe intent/URL launching for external web links, YouTube, YouTube Music, Google Drive, Google Keep -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -30,6 +32,7 @@
             <data android:scheme="http" />
         </intent>
         <package android:name="com.google.android.youtube" />
+        <package android:name="com.google.android.apps.youtube.music" />
         <package android:name="com.google.android.apps.docs" />
         <package android:name="com.google.android.keep" />
     </queries>

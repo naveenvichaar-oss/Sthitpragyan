@@ -10,10 +10,17 @@ import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/journal/presentation/screens/journal_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/sharing/services/sharing_intent_service.dart';
-import '../../features/sos/presentation/screens/sos_modal_sheet.dart';
+import '../../features/mukti/presentation/screens/mukti_hub_screen.dart';
+import '../../features/sos/presentation/screens/sos_screen.dart';
 
 /// ResponsiveScaffold provides adaptive layout for both Mobile and Tablet screens.
-/// Features zero clutter, instant tab response (<50ms), and pure dark zinc aesthetics.
+/// Features 4 strictly ordered tabs with Tab 1 (ठहराव / SOS) promoted as the primary first tab on app launch.
+///
+/// Order of Navigation:
+/// - Tab 1: ठहराव / SOS (Immediate Neural Brake)
+/// - Tab 2: प्रारंभ / Dashboard (Daily Routine & Execution)
+/// - Tab 3: कोष / Vault (Knowledge, Courses, HTML Tools)
+/// - Tab 4: संज्ञान / Cognition (Self-Audit & Journal)
 class ResponsiveScaffold extends StatefulWidget {
   const ResponsiveScaffold({super.key});
 
@@ -22,9 +29,12 @@ class ResponsiveScaffold extends StatefulWidget {
 }
 
 class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
+  // Tab 0 is now ठहराव / SOS (First Tab on launch)
   int _currentIndex = 0;
   final GlobalKey<DashboardScreenState> _dashboardKey =
       GlobalKey<DashboardScreenState>();
+  final GlobalKey<CognitionVaultScreenState> _vaultKey =
+      GlobalKey<CognitionVaultScreenState>();
 
   @override
   void initState() {
@@ -46,22 +56,41 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
       setState(() {
         _currentIndex = index;
       });
-      if (index == 0) {
+      // When switching to Dashboard (Tab 1), refresh metrics and triggers
+      if (index == 1) {
         _dashboardKey.currentState?.refreshData();
       }
     }
   }
 
-  void _navigateToJournal() {
-    _onTabSelected(1);
+  void _navigateToSos() {
+    _onTabSelected(0);
+  }
+
+  void _navigateToCognition() {
+    _onTabSelected(3);
+  }
+
+  void _navigateToVaultSegment(int segmentIndex) {
+    _onTabSelected(2);
+    if (_vaultKey.currentState != null) {
+      _vaultKey.currentState!.switchToSegment(segmentIndex);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _vaultKey.currentState?.switchToSegment(segmentIndex);
+      });
+    }
   }
 
   void _handleDebriefSaved() {
     _dashboardKey.currentState?.refreshData();
   }
 
-  void _openSOSShieldModal() {
-    SOSModalSheet.show(context);
+  void _openSettings() {
+    HapticService.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
   }
 
   @override
@@ -69,16 +98,24 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
     final width = MediaQuery.of(context).size.width;
     final isTablet = width >= AppDimens.tabletBreakpoint;
 
+    // 4 Ordered Tabs:
+    // Index 0: ठहराव / SOS (First Tab — Immediate Somatic Neural Brake)
+    // Index 1: प्रारंभ / Dashboard (Daily Routine & Execution Engine)
+    // Index 2: कोष / Vault (Knowledge, Courses, HTML Tools)
+    // Index 3: संज्ञान / Cognition (Self-Audit & Journal)
     final screens = [
+      const SOSScreen(),
       DashboardScreen(
         key: _dashboardKey,
-        onNavigateToJournal: _navigateToJournal,
+        onNavigateToJournal: _navigateToCognition,
         onNavigateToVault: () => _onTabSelected(2),
-        onNavigateToSettings: () => _onTabSelected(3),
+        onNavigateToVaultSegment: _navigateToVaultSegment,
+        onNavigateToSettings: _openSettings,
+        onNavigateToSos: _navigateToSos,
       ),
+      CognitionVaultScreen(key: _vaultKey),
       JournalScreen(onEntrySaved: _handleDebriefSaved),
-      const CognitionVaultScreen(),
-      const SettingsScreen(),
+      const MuktiHubScreen(),
     ];
 
     if (isTablet) {
@@ -103,26 +140,27 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                         color: AppColors.surfaceElevated,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.shieldPrimary,
+                          color: AppColors.borderSubtle,
                           width: 1.5,
                         ),
                       ),
                       child: IconButton(
                         icon: const Icon(
-                          Icons.shield_rounded,
-                          color: AppColors.shieldPrimary,
-                          size: 22,
+                          Icons.settings_outlined,
+                          color: AppColors.textSecondary,
+                          size: 20,
                         ),
-                        tooltip: 'SOS Emergency Equanimity',
-                        onPressed: _openSOSShieldModal,
+                        tooltip: 'Settings / सेटिंग्स',
+                        onPressed: _openSettings,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'SOS',
+                      context.loc.brandMarker,
                       style: AppTextStyles.labelBadge.copyWith(
-                        fontSize: 9,
-                        color: AppColors.roseDanger,
+                        fontSize: 8.5,
+                        letterSpacing: 1.5,
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
@@ -144,24 +182,30 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
               ),
               destinations: [
                 NavigationRailDestination(
+                  icon: const Icon(Icons.shield_outlined),
+                  selectedIcon: const Icon(Icons.shield_rounded, color: AppColors.roseDanger),
+                  label: Text(context.loc.navSos.toUpperCase()),
+                ),
+                NavigationRailDestination(
                   icon: const Icon(Icons.dashboard_outlined),
                   selectedIcon: const Icon(Icons.dashboard_rounded),
                   label: Text(context.loc.navDashboard.toUpperCase()),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.edit_note_outlined),
-                  selectedIcon: const Icon(Icons.edit_note_rounded),
-                  label: Text(context.loc.navDebrief.toUpperCase()),
+                  icon: const Icon(Icons.auto_stories_outlined),
+                  selectedIcon: const Icon(Icons.auto_stories_rounded),
+                  label: Text(context.loc.navVault.toUpperCase()),
                 ),
                 NavigationRailDestination(
                   icon: const Icon(Icons.psychology_outlined),
                   selectedIcon: const Icon(Icons.psychology_rounded),
-                  label: Text(context.loc.navVault.toUpperCase()),
+                  label: Text(context.loc.navCognition.toUpperCase()),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.tune_outlined),
-                  selectedIcon: const Icon(Icons.tune_rounded),
-                  label: Text(context.loc.navSettings.toUpperCase()),
+                  icon: const Icon(Icons.self_improvement_outlined),
+                  selectedIcon: const Icon(Icons.self_improvement_rounded,
+                      color: AppColors.emeraldSuccess),
+                  label: Text(context.loc.navMukti.toUpperCase()),
                 ),
               ],
             ),
@@ -180,7 +224,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
       );
     }
 
-    // Mobile Phone Layout
+    // Mobile Phone Layout (4 Bottom Tabs)
     return Scaffold(
       backgroundColor: AppColors.background,
       body: IndexedStack(index: _currentIndex, children: screens),
@@ -202,6 +246,17 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
             destinations: [
               NavigationDestination(
                 icon: const Icon(
+                  Icons.shield_outlined,
+                  color: AppColors.textMuted,
+                ),
+                selectedIcon: const Icon(
+                  Icons.shield_rounded,
+                  color: AppColors.roseDanger,
+                ),
+                label: context.loc.navSos,
+              ),
+              NavigationDestination(
+                icon: const Icon(
                   Icons.dashboard_outlined,
                   color: AppColors.textMuted,
                 ),
@@ -213,14 +268,14 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
               ),
               NavigationDestination(
                 icon: const Icon(
-                  Icons.edit_note_outlined,
+                  Icons.auto_stories_outlined,
                   color: AppColors.textMuted,
                 ),
                 selectedIcon: const Icon(
-                  Icons.edit_note_rounded,
+                  Icons.auto_stories_rounded,
                   color: AppColors.shieldPrimary,
                 ),
-                label: context.loc.navDebrief,
+                label: context.loc.navVault,
               ),
               NavigationDestination(
                 icon: const Icon(
@@ -231,15 +286,18 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   Icons.psychology_rounded,
                   color: AppColors.shieldPrimary,
                 ),
-                label: context.loc.navVault,
+                label: context.loc.navCognition,
               ),
               NavigationDestination(
-                icon: const Icon(Icons.tune_outlined, color: AppColors.textMuted),
-                selectedIcon: const Icon(
-                  Icons.tune_rounded,
-                  color: AppColors.shieldPrimary,
+                icon: const Icon(
+                  Icons.self_improvement_outlined,
+                  color: AppColors.textMuted,
                 ),
-                label: context.loc.navSettings,
+                selectedIcon: const Icon(
+                  Icons.self_improvement_rounded,
+                  color: AppColors.emeraldSuccess,
+                ),
+                label: context.loc.navMukti,
               ),
             ],
           ),

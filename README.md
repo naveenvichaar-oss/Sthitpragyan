@@ -15,86 +15,119 @@ Combined with Roman Stoicism (*Marcus Aurelius, Seneca, Epictetus*), this app se
 
 ---
 
-## 📱 Core Features & Screens
+## 📱 The 4 Core Sovereign Pillars & Feature Matrix
 
-### 1. Dashboard (The Command Center)
-- **Big Floating "SOS Shield" Button**: Positioned centrally with a pulsing breathing glow and heavy tactile haptic response. One tap triggers immediate emergency equanimity (<50ms response).
-- **Today's Core Rule Card**: Features daily actionable Stoic imperatives curated from Epictetus, Marcus Aurelius, Seneca, and the Bhagavad Gita, paired with direct corporate action directives (e.g., *"Wait 4 full seconds before answering any hostile question"*). Rules cycle deterministically by day-of-year or on demand.
-- **Daily Streak Tracker**: Tracks consecutive days of evening audits, features a 7-day visual dot matrix, and reports your weekly Boundary Retention Index.
-- **Evening Debrief Status Bar**: Real-time indicator showing if today's 60-second debrief is logged or pending.
+Sthitaprajna organizes all executive functions into **4 strictly ordered, distraction-free pillars** accessible via tactile bottom navigation on mobile and an adaptive `NavigationRail` on tablet/desktop:
 
-### 2. SOS Screen (Emergency Equanimity Modal)
-Triggered instantaneously by the SOS Shield button:
-- **3-Second Breathing Pulse Visualizer**:
-  - Paced cycle: **Inhale (3s)** $\rightarrow$ **Hold & Detach (3s)** $\rightarrow$ **Exhale Cortisol (3s)**.
-  - Concentric pulsing rings with fluid easing curves and synchronized tactile haptic taps on each transition.
-  - Grounding duration timer (*Seconds Grounded*).
-- **Somatic Grounding Anchor**:
-  - *"Feet flat on floor. Tongue on roof of mouth behind upper teeth. Drop shoulders 2 inches. Unclench jaw."*
-  - Neuro-biological vagal stimulation rationale that halts adrenaline dumping.
-- **Swipeable Defensive Response Scripts**:
-  - Battle-tested, non-reactive executive deflections across 6 corporate hostility categories:
-    1. *Interruption & Over-talking*
-    2. *Gaslighting & Reality Inversion*
-    3. *Blame Shifting & Scapegoating*
-    4. *Passive Aggression & Sarcasm*
-    5. *Scope Creep & Manufactured Urgency*
-    6. *Emotional Baiting & Derailment*
-  - Each card provides the **Hostile Trigger**, the verbatim **Executive Script**, the **Tactical Rationale**, **Tone Guidance**, and a one-touch **Copy to Clipboard** button.
+### 1. Pillar 1: ठहराव / SOS (Immediate Neural Brake & Somatic Armor)
+*Promoted as the primary default Tab on application launch for zero-latency crisis response:*
+- **3-Second Tactile Somatic Brake (<50ms Response)**:
+  - High-contrast central circular trigger (`3-सेकंड ठहराव / Pause Now`) with ambient breathing glow.
+  - One-tap engagement initiates a mandatory 3-second lock with heavy haptic impact (`HapticService.heavyImpact()`).
+  - **Step 1: Neuro-Vagal Grounding Banner**: *"जीभ को तालू से सटाएं और जबड़ा ढीला छोड़ें। पैर जमीन पर।"*
+  - **Step 2: Animated Circular Countdown**: 3... 2... 1... with rhythmic haptic ticks to break amygdala hijacking.
+  - **Step 3: Core Armor Rule Revelation**: *"प्रतिक्रिया देकर अपनी शक्ति मत गंवाओ। मौन ही तुम्हारा नियंत्रण है।"*
+- **4-4-4-4 Box Breathing Visualizer**:
+  - Calming Navy-Seal box breathing rhythm: Inhale (4s) $\rightarrow$ Hold Full (4s) $\rightarrow$ Exhale (4s) $\rightarrow$ Hold Empty (4s).
+  - Concentric animated rings with real-time phase counters and localized guidance.
+- **Tactical Defensive Deflection Scripts**:
+  - Battle-tested, non-reactive executive deflections across 10 corporate threat categories (*Unjust Accusation, Intimidation, Impossible Deadlines, Interruption, Gaslighting, Blame Shifting, Passive Aggression, Scope Creep*).
+  - Verbatim scripts, subtext rationale, tone & posture directives, one-touch clipboard copy, text-to-speech, bookmarking, and custom script addition/editing with offline Hive persistence.
+  - One-tap incident slip-up logging routing to **Post-Incident Recovery**.
 
-### 3. 3-Index Journal (60-Second Evening Debrief)
-Designed for high-tempo executives with zero tolerance for friction or rambling:
-- **Index 01 — Reaction Control Slider (0.0 to 10.0)**:
-  - *"How well did you refrain from impulsive emotional reactions when provoked?"*
-  - Dynamic status indicator (*Absolute Sthitaprajna*, *High Executive Poise*, *Controlled Grounding*, *Internal Turbulence*, *Amygdala Hijacked*).
-- **Index 02 — Boundary Retained Slider (0.0 to 10.0)**:
-  - *"How firmly did you protect your calendar, personal hours, and professional scope?"*
-  - Dynamic status indicator (*Impenetrable Fortress*, *Firm Professional Pushback*, *Contained Compromise*, *Permeable Perimeter*, *Total Boundary Breach*).
-- **Index 03 — Core Output (Single-Line Text Input)**:
-  - Strict single-line input capped at 140 characters. Prohibits rumination and forces the extraction of one decisive win, lesson, or boundary preserved today.
-- **Audit History**: Chronological log of past debriefs with composite equanimity percentage calculations and instant deletion.
+### 2. Pillar 2: प्रारंभ / Dashboard (Daily Routine & Execution Engine)
+- **Morning Grounding Protocol (05:30 – 07:00 AM)**:
+  - 3 structured daily steps:
+    1. *डिजिटल स्क्रीन वर्जित (0–15 मिनट)* — Natural sunlight & grounding.
+    2. *बाह्य भ्रमण व सॉक्रेटिक संवाद (15 मिनट)* — Brisk walk & mental inoculation.
+    3. *द एंकर ऑफ काम (चाय का समय)* — Single-point sensory anchor.
+  - Daily Stoic Commitments: *3-सेकंड ठहराव नियम* & *संकोचहीन 'ना' की मर्यादा*.
+- **Day Focus Block (09:30 AM)**:
+  - Single-task deep execution commitment with distraction avoidance logging.
+  - **5-Minute Micro-Ignition Timer**: Overcomes cognitive friction at the start threshold with single-tap instant countdown.
+  - Customizable Daily Focus Blocks with 108Hz Tibetan singing bowl chime alerts (`GongAudioService`).
+- **Soul Sanctuary / Joy Box Preview**:
+  - Rapid emotional grounding widget with offline music audio tracks, visual anchors, and inspiring quotes.
+- **Unified Daily Wisdom & Core Rule Card**:
+  - Curated daily imperatives from Epictetus, Marcus Aurelius, Seneca, and the Bhagavad Gita.
+  - Full text-to-speech with **Gravitas Cadence** and **Custom Voice Memo Override Priority**.
+- **7-Day Visual Dot Matrix Streak Tracker**:
+  - Continuous tracking of evening closure audits and Boundary Retention Index.
 
-### 4. Cognition Vault (Intellectual Defense)
-Expandable micro-cards partitioned into two strategic tabs:
+### 3. Pillar 3: कोष / Vault (Knowledge, Literature & Sandboxed Tools)
+Unified repository partitioned into 5 strategic segments:
+- **Mental Models & Rules of Engagement**:
+  - *First Principles, Circle of Competence, Systems Thinking, Inversion, Pareto, etc.*
+  - Custom model creation with audio explainer attachments and Latin/Devanagari nomenclature.
 - **Logical Fallacies in Corporate Warfare**:
-  - *Ad Hominem (Personal Attack)*
-  - *Strawman Distortion*
-  - *False Dilemma / Hobson's Trap*
-  - *Moving Goalposts*
-  - *Kafka-Trapping*
-  - *Sunk Cost Guilt-Trip*
-  - *Motte-and-Bailey Maneuver*
-  - Each card details the Latin origin, mechanism, boardroom trap, and the exact step-by-step **Counter-Move Protocol**.
-- **Stoic Mental Models for Executive Equanimity**:
-  - *Dichotomy of Control (Epictetus)*
-  - *Premeditatio Malorum (Seneca)*
-  - *The View from Above (Marcus Aurelius)*
-  - *Amor Fati (Transmuting the Obstacle)*
-  - *Cognitive Distancing / Solomon's Paradox*
-  - *The Inner Citadel (Apatheia)*
-  - Each card provides the Core Maxim, Workplace Manifestation, and a **30-Second Reset Drill**.
-- **Instant Search & Filter Bar**: Real-time query execution across titles, Latin terms, mechanisms, and tags with zero perceptible latency (<5ms).
+  - *Ad Hominem, Strawman, False Dilemma, Moving Goalposts, Kafka-Trapping, Motte-and-Bailey, etc.*
+  - Exact boardroom counter-move protocols.
+- **Wisdom Cards**:
+  - Gita & Sthitaprajna, Western Stoicism, and Behavioral Psychology.
+  - **60-Second Emergency Perspective Modals** with audio playback for acute ego detachment.
+- **Resource Hub**:
+  - Pre-seeded public domain classics (Meditations, Enchiridion, Gita, Seneca).
+  - External resource launcher supporting YouTube embedded player, Google Drive/Docs normalized previewer, and Google Keep links.
+- **Offline HTML Sandbox Tools**:
+  - Import, sanitize, and permanently embed standalone HTML dashboards, decision calculators, and interactive single-file web apps.
+  - Native offline rendering via platform-specific webview and Web iframe fallback.
+
+### 4. Pillar 4: संज्ञान / Cognition (Universal Authoring & Multimodal Audit)
+- **4 Universal Categories**:
+  1. *दैनिक व्यवहार समीक्षा (Daily Review & Composure Audit)*: Reaction Control score (1-5), Boundary Integrity check (Yes/No), and Solid Deliverable summary.
+  2. *1:3 इनपुट-आउटपुट (1:3 Input-Output Logger)*: Read/listen to 1 external input and synthesize 3 structured executive takeaways.
+  3. *व्यक्तिगत डायरी व उद्गार (Personal Journal / Freeform Thoughts)*: Unfiltered self-talk with tag categorization.
+  4. *सामग्री संचयन (Save to Sthitaprajna / Vault Ingest)*: Ingest resources directly into Training Reference, Vault, or Joy Reservoir.
+- **Multimodal Capture Suite**:
+  - **Audio Voice Memos**: Record, persist, playback, and attach voice notes to entries.
+  - **Video Reflection Drills**: Front-camera self-talk practice with **Stealth 4-Digit PIN Lock** and biometric security for sensitive reflections.
+  - **Speech-to-Text Voice Dictation**: Hands-free thought capture with Hindi & English acoustic recognition.
+- **Dynamic History Timeline**: Full-text instant search across titles, contents, tags, audio memos, and dates.
+- **Executive Auxiliary Systems**:
+  - **Character Ledger**: Weekly virtue and trait tracking.
+  - **Execution Trigger**: High-velocity single-screen action commitment board.
+  - **Post-Incident Recovery**: 30-second equanimity review, damage control scripts, and box breathing reset.
+
+---
+
+## 🔗 System Sharing Intent Integration
+
+Sthitaprajna integrates with Android & iOS system share sheets via `receive_sharing_intent`:
+- Share any text, article, YouTube video, or Google Drive link directly into Sthitaprajna from WhatsApp, Slack, Browser, Twitter, or YouTube.
+- **Incoming Share Sheet** auto-detects media type and allows immediate categorization into 4 targets:
+  1. *Training & Recovery Reference (अभ्यास)*
+  2. *Cognition Vault Resource (ज्ञान कोष)*
+  3. *Joy Reservoir (आनंद संचय)*
+  4. *Quick Journal Reflection (त्वरित चिंतन)*
+
+---
+
+## 🌐 Full Reactive Bilingual Architecture (English & Hindi)
+
+- **100% Bilingual**: Zero hardcoded strings. Every label, button, badge, modal, script, fallacy, and notification trigger is dynamically localized.
+- **Reactive Locale Controller**: Switch instantly between English and Hindi in Settings without restarting the app.
+- **Typography**: Tailored typography via Google Fonts (Inter / Outfit / Noto Sans Devanagari) maintaining strict visual hierarchy.
 
 ---
 
 ## ⏰ Scheduled Daily Notifications
 
-Predefined local notification triggers scheduled directly into the device's exact alarm manager via `flutter_local_notifications` and `timezone`:
+Predefined local notification triggers scheduled directly into the device's alarm manager via `flutter_local_notifications` and `timezone`:
 
-| Time | Title | Tactical Intent |
+| Time | Title (EN / HI) | Tactical Intent |
 |---|---|---|
-| **05:45 AM** | *Morning Premeditatio Malorum* | Armor your mind before the workday begins. Inoculates against difficult, deceptive, and arrogant individuals. |
-| **09:30 AM** | *Pre-Battle Equanimity* | Dichotomy of Control checkpoint before the morning meeting onslaught. Reminds you to own only your pause and tone. |
-| **02:00 PM** | *Physiological Cortisol Reset* | Midday vagal grounding reminder: tongue on roof of mouth, drop shoulders, disconnect urgency from panic. |
-| **09:30 PM** | *60-Second Sthitaprajna Debrief* | Evening perimeter closure reminder: log your 3 indices and discharge corporate residue. |
+| **05:45 AM** | *Morning Premeditatio Malorum / प्रातःकालीन लंगर* | Armor your mind before the workday begins. Inoculates against difficult, deceptive, and arrogant individuals. |
+| **09:00 AM** | *Pre-Battle Equanimity / कार्य-प्रवेश कवच* | Dichotomy of Control checkpoint before morning meetings. Reminds you to own only your pause and tone. |
+| **02:00 PM** | *Physiological Reset / मध्याह्न आत्म-समीक्षा* | Midday vagal grounding reminder: tongue on roof of mouth, drop shoulders, disconnect urgency from panic. |
+| **09:30 PM** | *60-Second Debrief / रात्रि विश्राम व समापन* | Evening perimeter closure reminder: log your 3 indices and discharge corporate residue. |
 
-> *A built-in Notification Tester panel allows executives to trigger and verify each of the 4 notifications immediately on-device.*
+> *Built-in Custom Notification Slots editor allows executives to customize trigger times and toggles.*
 
 ---
 
 ## 📐 Architecture & Project Structure
 
-Organized following a clean, feature-first modular architecture:
+Organized following a feature-first, offline-first modular architecture:
 
 ```
 lib/
@@ -106,63 +139,54 @@ lib/
 │   │   ├── app_dimens.dart            # Standardized dimensional grid & breakpoints
 │   │   └── app_text_styles.dart       # Executive typography & monospace metrics
 │   ├── database/
-│   │   ├── hive_boxes.dart            # Local storage box constants
-│   │   └── hive_storage.dart          # Typed, offline-first local storage engine
+│   │   ├── hive_boxes.dart            # 12+ Local storage box constants
+│   │   └── hive_storage.dart          # Typed, offline-first Hive storage engine
+│   ├── localization/
+│   │   ├── app_localizations.dart     # Comprehensive bilingual dictionary (EN & HI)
+│   │   └── locale_controller.dart     # Reactive locale ChangeNotifier
+│   ├── navigation/
+│   │   └── app_navigator.dart         # Global navigation key for system intents
 │   ├── notifications/
-│   │   └── notification_service.dart  # 4 daily recurring triggers & test dispatches
+│   │   ├── notification_service.dart  # 4 daily recurring triggers & alarm coordinator
+│   │   └── notifications_dataset_service.dart # notifications_dataset.json loader
+│   ├── services/
+│   │   ├── gong_audio_service.dart    # 108Hz Tibetan singing bowl focus chime
+│   │   ├── voice_stt_service.dart     # Speech-to-text dictation service
+│   │   └── voice_tts_service.dart     # Gravitas cadence speech synthesis
 │   ├── theme/
 │   │   └── app_theme.dart             # Pure Dark ThemeData with zinc components
 │   └── utils/
 │       ├── date_helpers.dart          # Temporal keys, streak validation, formatting
 │       └── haptic_service.dart        # Tactile haptic feedback patterns
 ├── features/
-│   ├── dashboard/
+│   ├── character_ledger/              # Virtue & trait tracking ledger
+│   ├── cognition_vault/               # Mental models, fallacies, and offline HTML sandbox
 │   │   ├── data/
-│   │   │   ├── daily_rules_vault.dart # 10 curated Stoic executive rules & actions
-│   │   │   └── models/
-│   │   │       ├── daily_rule.dart
-│   │   │       └── streak_data.dart
-│   │   └── presentation/
-│   │       ├── screens/
-│   │       │   └── dashboard_screen.dart
-│   │       └── widgets/
-│   │           ├── core_rule_card.dart
-│   │           ├── executive_header.dart
-│   │           ├── sos_shield_button.dart
-│   │           └── streak_badge.dart
-│   ├── sos/
-│   │   ├── data/
-│   │   │   └── defensive_scripts_vault.dart # 10+ categorized corporate defensive scripts
-│   │   └── presentation/
-│   │       ├── screens/
-│   │       │   └── sos_modal_sheet.dart
-│   │       └── widgets/
-│   │           ├── breathing_pulse_visualizer.dart # 3s Inhale-Hold-Exhale animation
-│   │           ├── grounding_banner.dart           # Vagus nerve physiological reminder
-│   │           └── response_script_card.dart       # Swipeable verbatim script with copy
-│   ├── journal/
-│   │   ├── data/
-│   │   │   ├── models/journal_entry.dart
-│   │   │   └── repositories/journal_repository.dart
-│   │   └── presentation/
-│   │       ├── screens/journal_screen.dart
-│   │       └── widgets/
-│   │           ├── index_slider.dart
-│   │           ├── past_debriefs_list.dart
-│   │           └── single_line_output_input.dart
-│   └── cognition_vault/
-│       ├── data/
-│       │   ├── cognition_data_source.dart
-│       │   └── models/fallacy_and_model.dart
-│       └── presentation/
-│           ├── screens/cognition_vault_screen.dart
-│           └── widgets/
-│               ├── cognition_search_bar.dart
-│               └── expandable_micro_card.dart
+│   │   │   ├── models/fallacy_and_model.dart
+│   │   │   ├── models/local_html_tool.dart
+│   │   │   └── services/html_tool_storage_service.dart
+│   │   └── presentation/screens/cognition_vault_screen.dart
+│   ├── dashboard/                     # Pillar 2: Morning Routine, Focus Block & Rules
+│   │   ├── data/daily_rules_vault.dart
+│   │   └── presentation/screens/dashboard_screen.dart
+│   ├── execution_trigger/             # Action commitment and micro-ignition
+│   ├── journal/                       # Pillar 4: 4-category authoring & dynamic timeline
+│   │   ├── data/models/reflection_entry.dart
+│   │   ├── data/models/journal_models.dart
+│   │   ├── data/models/media_record_log.dart
+│   │   └── presentation/screens/journal_screen.dart
+│   ├── joy_reservoir/                 # Soul Sanctuary offline audio & quotes
+│   ├── recovery/                      # Post-incident slip-up review & damage control
+│   ├── settings/                      # Notification slot editor & locale toggle
+│   ├── sharing/                       # System share intent receiver & routing
+│   ├── sos/                           # Pillar 1: 3s Somatic Brake, Box Breathing & Scripts
+│   │   ├── data/defensive_scripts_vault.dart
+│   │   └── presentation/screens/sos_screen.dart
+│   └── wisdom/                        # Wisdom cards, shlokas & public domain resource hub
 └── shared/
     └── widgets/
-        ├── executive_notification_tester.dart # On-device notification inspection panel
-        └── responsive_scaffold.dart          # Mobile BottomNav vs Tablet NavigationRail
+        ├── responsive_scaffold.dart   # 4-Tab BottomNav vs Tablet NavigationRail
+        └── voice_dictation_button.dart
 ```
 
 ---

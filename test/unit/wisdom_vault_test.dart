@@ -45,7 +45,7 @@ void main() {
         },
         'subtitle': {
           'en': 'Bhagavad Gita 2.56',
-          'hi': 'श्रीमद्भगवद्गीता २.५६',
+          'hi': 'श्रीमद्भगवद्गीता 2.56',
         },
         'source': 'Bhagavad Gita 2.56',
         'shlokaText':
@@ -69,7 +69,7 @@ void main() {
       expect(entry.getTitle(false), 'Equanimity in Turmoil');
       expect(entry.getTitle(true), 'दुःखेष्वनुद्विग्नमनाः (विपत्ति में स्थिरता)');
       expect(entry.getSubtitle(false), 'Bhagavad Gita 2.56');
-      expect(entry.getSubtitle(true), 'श्रीमद्भगवद्गीता २.५६');
+      expect(entry.getSubtitle(true), 'श्रीमद्भगवद्गीता 2.56');
       expect(entry.shlokaText, contains('स्थितधीर्मुनि रुच्यते॥'));
       expect(entry.shlokaText, isNot(contains('Nichols')));
       expect(entry.getTranslation(true), startsWith('जिसका मन'));

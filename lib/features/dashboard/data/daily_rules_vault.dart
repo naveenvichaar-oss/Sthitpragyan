@@ -72,7 +72,7 @@ class DailyRulesVault {
       aphorism: 'One whose mind is untroubled by sorrow, who has no longing for pleasure, and is free from passion, fear, and anger—such a sage is called of steady intellect.',
       source: 'Bhagavad Gita • 2.56',
       tacticalAction: 'When praised, do not swell; when scapegoated, do not shrink. Ground your reality in the empirical log of your code and contracts.',
-      corporateContext: 'Boardroom politics, public praise or blame games.',
+      corporateContext: 'Social pressure, public praise or blame games.',
     ),
     DailyRule(
       id: 9,

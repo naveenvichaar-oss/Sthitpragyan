@@ -101,8 +101,8 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
 
     if (behavior.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please describe the trait observation or restraint.'),
+        SnackBar(
+          content: Text(context.loc.describeTraitPrompt),
           backgroundColor: AppColors.surfaceElevated,
         ),
       );
@@ -140,7 +140,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Recorded to Character Ledger: "${entry.title}" [${_selectedCategory.displayName}]',
+            context.loc.traitRecordedNotice(entry.title, _selectedCategory.displayName),
             style: const TextStyle(fontSize: 12),
           ),
           backgroundColor: AppColors.surfaceElevated,
@@ -194,7 +194,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text('Record Character Trait', style: AppTextStyles.heading),
+                    Text(context.loc.recordCharacterTraitTitle, style: AppTextStyles.heading),
                   ],
                 ),
                 IconButton(
@@ -207,7 +207,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
 
             // 2. Category Selector Chips
             Text(
-              'SELECT VIRTUE CATEGORY',
+              context.loc.selectVirtueCategoryBadge,
               style: AppTextStyles.labelBadge.copyWith(
                 color: AppColors.textMuted,
                 fontSize: 9,
@@ -280,9 +280,9 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
             TextField(
               controller: _titleController,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Headline / Trait Summary',
-                hintText: 'e.g., Maintained low monotone voice during confrontation',
+              decoration: InputDecoration(
+                labelText: context.loc.headlineTraitSummaryLabel,
+                hintText: context.loc.headlineTraitSummaryHint,
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
               ),
@@ -293,9 +293,9 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
             TextField(
               controller: _situationController,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Arena / Trigger Context (Optional)',
-                hintText: 'e.g., Q3 Executive Standup with VP of Engineering',
+              decoration: InputDecoration(
+                labelText: context.loc.arenaTriggerContextLabel,
+                hintText: context.loc.arenaTriggerContextHint,
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
               ),
@@ -307,7 +307,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'OBSERVATION & EMBODIED ACTION',
+                  context.loc.observationEmbodiedActionBadge,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 9,
@@ -317,7 +317,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Voice Dictate',
+                      context.loc.voiceDictateLabel,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: AppColors.textSecondary,
                         fontSize: 9,
@@ -337,8 +337,8 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
               controller: _behaviorController,
               maxLines: 4,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                hintText: 'What did you observe in yourself? How did you respond or refrain from reacting? Speak or type...',
+              decoration: InputDecoration(
+                hintText: context.loc.behaviorObservationHint,
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
               ),
@@ -350,9 +350,9 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
               controller: _reflectionController,
               maxLines: 2,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Key Realization / Anchor (Optional)',
-                hintText: 'e.g., Silence gave me instant leverage. The room followed my pacing.',
+              decoration: InputDecoration(
+                labelText: context.loc.keyRealizationAnchorLabel,
+                hintText: context.loc.keyRealizationAnchorHint,
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
               ),
@@ -363,8 +363,8 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
             TextField(
               controller: _tagsController,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Custom Tags (Comma-separated)',
+              decoration: InputDecoration(
+                labelText: context.loc.customTagsLabel,
                 hintText: '#StrategicSilence, #ExecutiveVoice',
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
@@ -393,7 +393,7 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'GRAVITAS / COMPOSURE RATING',
+                  context.loc.gravitasRatingBadge,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 9,
@@ -438,9 +438,9 @@ class _AddCharacterEntryModalSheetState extends State<AddCharacterEntryModalShee
                   ),
                 ),
                 icon: const Icon(Icons.check, size: 18),
-                label: const Text(
-                  'SAVE TO CHARACTER LEDGER',
-                  style: TextStyle(
+                label: Text(
+                  context.loc.saveToCharacterLedgerButton,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.0,

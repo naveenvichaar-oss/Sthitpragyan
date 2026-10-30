@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'core/localization/app_localizations.dart';
 import 'core/localization/locale_controller.dart';
+import 'core/navigation/app_navigator.dart';
 import 'core/theme/app_theme.dart';
 import 'shared/widgets/responsive_scaffold.dart';
 
@@ -20,7 +21,7 @@ class SthitaprajnaApp extends StatelessWidget {
         final isHindi = LocaleController.instance.isHindi;
 
         return MaterialApp(
-          key: ValueKey('app_root_${locale.languageCode}'),
+          navigatorKey: AppNavigator.navigatorKey,
           title: isHindi ? 'स्थितप्रज्ञ' : 'Sthitaprajna',
           debugShowCheckedModeBanner: false,
           themeMode: ThemeMode.dark,

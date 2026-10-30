@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 /// VoiceSttService provides zero-latency on-device speech-to-text dictation
-/// for the 3-Index Evening Journal and Slip-Up Post-Mortem debriefs.
+/// for the 3-Index Evening Journal and Slip-Up Equanimity debriefs.
 class VoiceSttService {
   static final VoiceSttService _instance = VoiceSttService._internal();
   factory VoiceSttService() => _instance;

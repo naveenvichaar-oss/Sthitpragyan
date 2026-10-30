@@ -275,7 +275,7 @@ class _InAppYouTubePlayerScreenState extends State<InAppYouTubePlayerScreen> {
                           );
                         },
                         icon: const Icon(Icons.language_rounded, size: 16),
-                        label: const Text('OPEN IN WEBVIEW'),
+                        label: Text(context.loc.openInWebViewAction),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.textPrimary,
                           side: const BorderSide(color: AppColors.borderMedium),
@@ -288,7 +288,7 @@ class _InAppYouTubePlayerScreenState extends State<InAppYouTubePlayerScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _launchExternalYouTube,
                         icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                        label: const Text('YOUTUBE APP'),
+                        label: Text(context.loc.youtubeAppAction),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.surfaceElevated,
                           foregroundColor: AppColors.shieldPrimary,
@@ -369,7 +369,7 @@ class _InAppYouTubePlayerScreenState extends State<InAppYouTubePlayerScreen> {
                       );
                     },
                     icon: const Icon(Icons.language_rounded, size: 16),
-                    label: const Text('OPEN IN WEBVIEW'),
+                    label: Text(context.loc.openInWebViewAction),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
                       side: const BorderSide(color: AppColors.borderMedium),
@@ -379,7 +379,7 @@ class _InAppYouTubePlayerScreenState extends State<InAppYouTubePlayerScreen> {
                   ElevatedButton.icon(
                     onPressed: _launchExternalYouTube,
                     icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                    label: const Text('OPEN IN YOUTUBE'),
+                    label: Text(context.loc.openInYouTubeAction),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFEF4444),
                       foregroundColor: Colors.white,

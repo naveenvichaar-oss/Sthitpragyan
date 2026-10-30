@@ -84,5 +84,30 @@ void main() {
       );
       expect(yesterdayTrigger.isExecutedToday, isFalse);
     });
+
+    test('User-defined daily focus blocks create and toggle smoothly', () {
+      final customBlock = ExecutionTrigger(
+        id: 'custom_${DateTime.now().millisecondsSinceEpoch}',
+        title: 'Sprint Planning',
+        devanagariSubtitle: 'योजना निर्माण',
+        timeOfDay: '11:15',
+        intent: 'Daily Block',
+        category: 'Deep Work',
+        isEnabled: true,
+      );
+
+      expect(customBlock.title, equals('Sprint Planning'));
+      expect(customBlock.timeOfDay, equals('11:15'));
+      expect(customBlock.isEnabled, isTrue);
+
+      final toggled = customBlock.copyWith(isEnabled: false);
+      expect(toggled.isEnabled, isFalse);
+      expect(toggled.title, equals('Sprint Planning'));
+
+      final renamed = toggled.copyWith(title: 'High Priority Feature', timeOfDay: '14:00');
+      expect(renamed.title, equals('High Priority Feature'));
+      expect(renamed.timeOfDay, equals('14:00'));
+    });
   });
 }
+

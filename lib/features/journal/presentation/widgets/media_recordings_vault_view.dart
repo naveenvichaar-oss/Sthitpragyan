@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/media_record_log.dart';
 import '../../data/services/media_vault_service.dart';
@@ -196,7 +197,7 @@ class _MediaRecordingsVaultViewState extends State<MediaRecordingsVaultView> {
           borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
           side: const BorderSide(color: AppColors.borderMedium),
         ),
-        title: const Text('DELETE RECORDING?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+        title: Text(context.loc.deleteRecordingTitle, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
         content: Text(
           'Permanently deletes "${record.displayName}" from local storage. This action cannot be reversed.',
           style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -204,7 +205,7 @@ class _MediaRecordingsVaultViewState extends State<MediaRecordingsVaultView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted)),
+            child: Text(context.loc.cancel, style: const TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -212,7 +213,7 @@ class _MediaRecordingsVaultViewState extends State<MediaRecordingsVaultView> {
               backgroundColor: AppColors.roseDanger,
               foregroundColor: Colors.white,
             ),
-            child: const Text('DELETE'),
+            child: Text(context.loc.deleteAction),
           ),
         ],
       ),
@@ -701,13 +702,13 @@ class _MediaRecordingsVaultViewState extends State<MediaRecordingsVaultView> {
                 }
               },
               itemBuilder: (ctx) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'rename',
                   child: Row(
                     children: [
-                      Icon(Icons.edit_outlined, size: 16, color: AppColors.shieldPrimary),
-                      SizedBox(width: 10),
-                      Text('Rename', style: TextStyle(fontSize: 12.5)),
+                      const Icon(Icons.edit_outlined, size: 16, color: AppColors.shieldPrimary),
+                      const SizedBox(width: 10),
+                      Text(context.loc.renameToolAction, style: const TextStyle(fontSize: 12.5)),
                     ],
                   ),
                 ),
@@ -729,13 +730,13 @@ class _MediaRecordingsVaultViewState extends State<MediaRecordingsVaultView> {
                   ),
                 ),
                 const PopupMenuDivider(),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.roseDanger),
-                      SizedBox(width: 10),
-                      Text('Delete', style: TextStyle(fontSize: 12.5, color: AppColors.roseDanger)),
+                      const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.roseDanger),
+                      const SizedBox(width: 10),
+                      Text(context.loc.deleteAction, style: const TextStyle(fontSize: 12.5, color: AppColors.roseDanger)),
                     ],
                   ),
                 ),

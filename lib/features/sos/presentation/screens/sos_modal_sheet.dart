@@ -411,7 +411,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                     BoxShadow(
                       color: canPop
                           ? AppColors.shieldGlow
-                          : AppColors.amberWarning.withOpacity(0.5),
+                          : AppColors.amberWarning.withValues(alpha: 0.5),
                       blurRadius: 6,
                       spreadRadius: 1,
                     ),
@@ -518,7 +518,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                 color: AppColors.surfaceElevated,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: AppColors.amberWarning.withOpacity(0.4),
+                  color: AppColors.amberWarning.withValues(alpha: 0.4),
                 ),
               ),
               child: Row(
@@ -571,7 +571,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
               color: AppColors.amberMuted,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: AppColors.amberWarning.withOpacity(0.6),
+                color: AppColors.amberWarning.withValues(alpha: 0.6),
               ),
             ),
             child: Text(
@@ -668,9 +668,9 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                         height: 200,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.shieldPrimary.withOpacity(0.06),
+                          color: AppColors.shieldPrimary.withValues(alpha: 0.06),
                           border: Border.all(
-                            color: AppColors.shieldPrimary.withOpacity(0.2),
+                            color: AppColors.shieldPrimary.withValues(alpha: 0.2),
                             width: 1.0,
                           ),
                         ),
@@ -1223,7 +1223,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                 child: OutlinedButton.icon(
                   onPressed: () => _handleCopyScript(script.executiveScript),
                   icon: const Icon(Icons.copy_rounded, size: 16),
-                  label: const Text('COPY TEXT'),
+                  label: Text(context.loc.copyTextAction),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.borderMedium),
@@ -1241,7 +1241,7 @@ class _SOSModalSheetState extends State<SOSModalSheet>
                 child: ElevatedButton.icon(
                   onPressed: () => _handleHandledNeutral(script),
                   icon: const Icon(Icons.check_rounded, size: 16),
-                  label: const Text('HANDLED (NEUTRAL)'),
+                  label: Text(context.loc.handledNeutralAction),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.textPrimary,
                     foregroundColor: AppColors.background,

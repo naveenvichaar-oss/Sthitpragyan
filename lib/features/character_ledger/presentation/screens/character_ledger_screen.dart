@@ -97,20 +97,20 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Delete Trait Record?', style: AppTextStyles.heading),
+        title: Text(context.loc.deleteTraitTitle, style: AppTextStyles.heading),
         content: Text(
-          'Are you sure you want to remove "${entry.title}" from your Character Ledger?',
+          context.loc.deleteTraitRecordConfirm(entry.title),
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted)),
+            child: Text(context.loc.cancelButton, style: const TextStyle(color: AppColors.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.roseDanger),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('DELETE', style: TextStyle(color: Colors.white)),
+            child: Text(context.loc.deleteButton, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -176,7 +176,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
       body: ListView(
         padding: const EdgeInsets.all(AppDimens.space16),
         children: [
-          // 1. Virtue Distribution Metric Cards
+          // 1. Virtue Distribution Metric Cards (Interactive Category Filter)
           Container(
             padding: const EdgeInsets.all(AppDimens.space14),
             decoration: BoxDecoration(
@@ -190,18 +190,61 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      context.loc.totalVirtueRecords(_allEntries.length),
-                      style: AppTextStyles.labelBadge.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 9.5,
-                        letterSpacing: 1.1,
+                    InkWell(
+                      onTap: () {
+                        if (_selectedCategoryFilter != null) {
+                          HapticService.selectionClick();
+                          setState(() {
+                            _selectedCategoryFilter = null;
+                            _applyFilters();
+                          });
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              context.loc.totalVirtueRecords(_allEntries.length),
+                              style: AppTextStyles.labelBadge.copyWith(
+                                color: AppColors.textSecondary,
+                                fontSize: 9.5,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                            if (_selectedCategoryFilter != null) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  color: AppColors.shieldPrimary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: AppColors.shieldPrimary.withValues(alpha: 0.3)),
+                                ),
+                                child: Text(
+                                  context.loc.allClearFilter,
+                                  style: const TextStyle(
+                                    fontSize: 8.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.shieldPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                     Text(
-                      context.loc.sovereignEquanimityBadge,
+                      _selectedCategoryFilter != null
+                          ? _selectedCategoryFilter!.displayName.toUpperCase()
+                          : context.loc.sovereignEquanimityBadge,
                       style: AppTextStyles.labelBadge.copyWith(
-                        color: const Color(0xFFF59E0B),
+                        color: _selectedCategoryFilter != null
+                            ? _selectedCategoryFilter!.accentColor
+                            : const Color(0xFFF59E0B),
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                       ),
@@ -211,26 +254,50 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    _buildStatPill(context.loc.virtueMagnanimity, context.loc.virtueSubMagnanimity, magnanimityCount, const Color(0xFFF59E0B)),
+                    _buildStatPill(
+                      category: CharacterTraitCategory.magnanimity,
+                      devanagari: context.loc.virtueMagnanimity,
+                      name: context.loc.virtueSubMagnanimity,
+                      count: magnanimityCount,
+                      color: const Color(0xFFF59E0B),
+                    ),
                     const SizedBox(width: 6),
-                    _buildStatPill(context.loc.virtueGravitas, context.loc.virtueSubGravitas, gravitasCount, const Color(0xFF38BDF8)),
+                    _buildStatPill(
+                      category: CharacterTraitCategory.gravitas,
+                      devanagari: context.loc.virtueGravitas,
+                      name: context.loc.virtueSubGravitas,
+                      count: gravitasCount,
+                      color: const Color(0xFF38BDF8),
+                    ),
                     const SizedBox(width: 6),
-                    _buildStatPill(context.loc.virtueJoy, context.loc.virtueSubJoy, joyCount, const Color(0xFF10B981)),
+                    _buildStatPill(
+                      category: CharacterTraitCategory.joy,
+                      devanagari: context.loc.virtueJoy,
+                      name: context.loc.virtueSubJoy,
+                      count: joyCount,
+                      color: const Color(0xFF10B981),
+                    ),
                     const SizedBox(width: 6),
-                    _buildStatPill(context.loc.virtueRestraint, context.loc.virtueSubRestraint, restraintCount, const Color(0xFF818CF8)),
+                    _buildStatPill(
+                      category: CharacterTraitCategory.restraint,
+                      devanagari: context.loc.virtueRestraint,
+                      name: context.loc.virtueSubRestraint,
+                      count: restraintCount,
+                      color: const Color(0xFF818CF8),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // 2. Search Bar
           TextField(
             controller: _searchController,
             style: AppTextStyles.bodyMedium,
             decoration: InputDecoration(
-              hintText: 'Search situations, tags (#Silence), or reflections...',
+              hintText: context.loc.searchCharacterLedgerHint,
               hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
               prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.textMuted),
               suffixIcon: _searchController.text.isNotEmpty
@@ -248,42 +315,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-
-          // 3. Category Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildFilterChip('${context.loc.all.toUpperCase()} (${_allEntries.length})', null),
-                const SizedBox(width: 6),
-                _buildFilterChip(
-                  context.loc.virtueMagnanimity,
-                  CharacterTraitCategory.magnanimity,
-                  const Color(0xFFF59E0B),
-                ),
-                const SizedBox(width: 6),
-                _buildFilterChip(
-                  context.loc.virtueGravitas,
-                  CharacterTraitCategory.gravitas,
-                  const Color(0xFF38BDF8),
-                ),
-                const SizedBox(width: 6),
-                _buildFilterChip(
-                  context.loc.virtueJoy,
-                  CharacterTraitCategory.joy,
-                  const Color(0xFF10B981),
-                ),
-                const SizedBox(width: 6),
-                _buildFilterChip(
-                  context.loc.virtueRestraint,
-                  CharacterTraitCategory.restraint,
-                  const Color(0xFF818CF8),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // 4. Entries List or Empty State
           if (_filteredEntries.isEmpty)
@@ -294,10 +326,10 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                 children: [
                   const Icon(Icons.shield_outlined, size: 48, color: AppColors.textMuted),
                   const SizedBox(height: 12),
-                  const Text('No Character Records Found', style: AppTextStyles.heading),
+                  Text(context.loc.noCharacterRecordsFound, style: AppTextStyles.heading),
                   const SizedBox(height: 6),
                   Text(
-                    'Record everyday arenas where you embodied composure, strategic silence, or big-hearted magnanimity.',
+                    context.loc.recordEverydayArenasSub,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                   ),
@@ -308,7 +340,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                       foregroundColor: Colors.black,
                     ),
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text('RECORD FIRST TRAIT'),
+                    label: Text(context.loc.recordFirstTrait),
                     onPressed: () => _openAddModal(),
                   ),
                 ],
@@ -327,74 +359,110 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
     );
   }
 
-  Widget _buildStatPill(String devanagari, String name, int count, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              devanagari,
-              style: TextStyle(
-                color: color,
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '$count',
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              name,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 7.5,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, CharacterTraitCategory? category, [Color? color]) {
+  Widget _buildStatPill({
+    required CharacterTraitCategory category,
+    required String devanagari,
+    required String name,
+    required int count,
+    required Color color,
+  }) {
     final isSelected = _selectedCategoryFilter == category;
-    final chipColor = color ?? AppColors.shieldPrimary;
+    final isAnySelected = _selectedCategoryFilter != null;
 
-    return ChoiceChip(
-      selected: isSelected,
-      label: Text(label),
-      selectedColor: chipColor.withValues(alpha: 0.2),
-      backgroundColor: AppColors.surfaceElevated,
-      side: BorderSide(
-        color: isSelected ? chipColor : AppColors.borderSubtle,
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            HapticService.selectionClick();
+            setState(() {
+              if (_selectedCategoryFilter == category) {
+                _selectedCategoryFilter = null; // Toggle off -> Show All
+              } else {
+                _selectedCategoryFilter = category; // Select
+              }
+              _applyFilters();
+            });
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? color.withValues(alpha: 0.24)
+                  : (isAnySelected
+                      ? color.withValues(alpha: 0.04)
+                      : color.withValues(alpha: 0.10)),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected
+                    ? color
+                    : color.withValues(alpha: isAnySelected ? 0.15 : 0.35),
+                width: isSelected ? 2.0 : 1.0,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        devanagari,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : color,
+                          fontSize: 9.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    if (isSelected) ...[
+                      const SizedBox(width: 3),
+                      Icon(Icons.check_circle_rounded, size: 10, color: color),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '$count',
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  name,
+                  style: TextStyle(
+                    color: isSelected ? color.withValues(alpha: 0.95) : AppColors.textMuted,
+                    fontSize: 8.0,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
-      labelStyle: TextStyle(
-        fontSize: 10.5,
-        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-        color: isSelected ? chipColor : AppColors.textSecondary,
-      ),
-      onSelected: (val) {
-        HapticService.selectionClick();
-        setState(() {
-          _selectedCategoryFilter = val ? category : null;
-          _applyFilters();
-        });
-      },
     );
   }
 }

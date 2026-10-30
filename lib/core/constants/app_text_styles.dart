@@ -3,51 +3,67 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 /// AppTextStyles defines the typographic scale for Sthitaprajna.
-/// Characterized by tight letter-spacing for headers, generous line-heights
-/// for readability, and monospace styling for indices and temporal tracking.
+/// Backed by Google Fonts "Noto Sans Devanagari" & "Poppins" for flawless
+/// Devanagari rendering, fully preserving conjuncts (संयुक्ताक्षर) and upper/lower matras.
 abstract class AppTextStyles {
+  static const String devanagariFont = 'Noto Sans Devanagari';
+  static const List<String> fontFallback = [
+    'Noto Sans Devanagari',
+    'Poppins',
+    'sans-serif',
+  ];
+
   // Brand & High-Status Headers
   static const TextStyle brandHeader = TextStyle(
     fontSize: 14.0,
     fontWeight: FontWeight.w700,
-    letterSpacing: 3.5,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 2.5,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle displayLarge = TextStyle(
-    fontSize: 28.0,
+    fontSize: 26.0,
     fontWeight: FontWeight.w700,
-    letterSpacing: -0.8,
-    height: 1.2,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.0,
+    height: 1.35,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle displayMedium = TextStyle(
-    fontSize: 22.0,
+    fontSize: 21.0,
     fontWeight: FontWeight.w600,
-    letterSpacing: -0.5,
-    height: 1.25,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.0,
+    height: 1.35,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle heading = TextStyle(
-    fontSize: 17.0,
+    fontSize: 16.5,
     fontWeight: FontWeight.w600,
-    letterSpacing: -0.3,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.0,
+    height: 1.35,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle subhead = TextStyle(
     fontSize: 14.0,
     fontWeight: FontWeight.w500,
-    letterSpacing: -0.1,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.0,
+    height: 1.35,
     color: AppColors.textSecondary,
   );
 
   static const TextStyle titleSmall = TextStyle(
     fontSize: 14.0,
     fontWeight: FontWeight.w600,
-    letterSpacing: -0.2,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.0,
+    height: 1.35,
     color: AppColors.textPrimary,
   );
 
@@ -55,6 +71,8 @@ abstract class AppTextStyles {
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 15.0,
     fontWeight: FontWeight.w400,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.1,
     height: 1.5,
     color: AppColors.textPrimary,
   );
@@ -62,6 +80,8 @@ abstract class AppTextStyles {
   static const TextStyle bodyMedium = TextStyle(
     fontSize: 13.5,
     fontWeight: FontWeight.w400,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.1,
     height: 1.45,
     color: AppColors.textSecondary,
   );
@@ -69,15 +89,25 @@ abstract class AppTextStyles {
   static const TextStyle bodySmall = TextStyle(
     fontSize: 12.0,
     fontWeight: FontWeight.w400,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.1,
     height: 1.4,
     color: AppColors.textMuted,
   );
+
+  /// Alias for [bodyLarge] — use for general body copy in new screens.
+  static const TextStyle body = bodyLarge;
+
+  /// Alias for [bodySmall] — use for metadata, timestamps, and small labels.
+  static const TextStyle caption = bodySmall;
 
   // Verbatim Script & Tactical Quotations
   static const TextStyle scriptVerbatim = TextStyle(
     fontSize: 15.0,
     fontWeight: FontWeight.w500,
     fontStyle: FontStyle.italic,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.1,
     height: 1.55,
     color: AppColors.textPrimary,
   );
@@ -86,23 +116,25 @@ abstract class AppTextStyles {
   static const TextStyle labelBadge = TextStyle(
     fontSize: 10.5,
     fontWeight: FontWeight.w700,
-    letterSpacing: 1.4,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 1.2,
     color: AppColors.textMuted,
   );
 
   static const TextStyle button = TextStyle(
     fontSize: 14.0,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
+    fontFamilyFallback: fontFallback,
+    letterSpacing: 0.2,
     color: AppColors.textPrimary,
   );
 
-  // Numeric Monospace Metrics
+  // Numeric Monospace Metrics (Strictly Western Arabic Numerals)
   static const TextStyle metricLarge = TextStyle(
     fontSize: 32.0,
     fontWeight: FontWeight.w700,
     fontFamily: 'monospace',
-    letterSpacing: -1.0,
+    letterSpacing: 0.0,
     color: AppColors.textPrimary,
   );
 
@@ -120,3 +152,4 @@ abstract class AppTextStyles {
     color: AppColors.textSecondary,
   );
 }
+

@@ -4,12 +4,13 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/local_html_tool.dart';
 import '../screens/local_html_viewer_screen.dart';
 
 /// HtmlToolCard renders an offline HTML tool item with metadata,
-/// file size badge, launch action, and deletion capability.
+/// file size badge, launch action, and discreet deletion capability.
 class HtmlToolCard extends StatelessWidget {
   final LocalHtmlTool tool;
   final VoidCallback? onDelete;
@@ -21,6 +22,41 @@ class HtmlToolCard extends StatelessWidget {
     this.onDelete,
     this.onUpdated,
   });
+
+  void _confirmDelete(BuildContext context) {
+    HapticService.mediumImpact();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(context.loc.deleteToolTitle, style: AppTextStyles.heading),
+        content: Text(
+          '${context.loc.deleteToolConfirm}\n\n"${tool.title}" (${tool.fileName})',
+          style: AppTextStyles.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              context.loc.cancelButton,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              onDelete?.call();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.roseDanger,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(context.loc.deleteAction),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +94,7 @@ class HtmlToolCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header: Category, Size, Delete Icon
+                // Header: Category, Size, Discreet Delete Action
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -103,16 +139,22 @@ class HtmlToolCard extends StatelessWidget {
                       ],
                     ),
                     if (onDelete != null)
-                      IconButton(
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.textMuted,
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          visualDensity: VisualDensity.compact,
+                        ),
                         icon: const Icon(
                           Icons.delete_outline_rounded,
-                          size: 18,
+                          size: 15,
                           color: AppColors.textMuted,
                         ),
-                        tooltip: 'Delete Tool',
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: onDelete,
+                        label: Text(
+                          context.loc.deleteAction,
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        onPressed: () => _confirmDelete(context),
                       ),
                   ],
                 ),
@@ -158,27 +200,31 @@ class HtmlToolCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${tool.fileName} • $formattedDate',
-                      style: AppTextStyles.labelBadge.copyWith(
-                        color: AppColors.textMuted,
-                        fontSize: 8.5,
+                    Expanded(
+                      child: Text(
+                        '${tool.fileName} • $formattedDate',
+                        style: AppTextStyles.labelBadge.copyWith(
+                          color: AppColors.textMuted,
+                          fontSize: 8.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Row(
+                    Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'LAUNCH',
-                          style: TextStyle(
+                          context.loc.launchAction,
+                          style: const TextStyle(
                             color: Color(0xFF10B981),
                             fontSize: 9.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.0,
                           ),
                         ),
-                        SizedBox(width: 4),
-                        Icon(
+                        const SizedBox(width: 4),
+                        const Icon(
                           Icons.arrow_forward_rounded,
                           size: 13,
                           color: Color(0xFF10B981),

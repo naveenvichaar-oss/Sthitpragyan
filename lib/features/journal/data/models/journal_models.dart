@@ -98,6 +98,30 @@ class DailyJournalEntry extends HiveObject {
     };
   }
 
+  DailyJournalEntry copyWith({
+    String? id,
+    String? entryDate,
+    DateTime? createdAt,
+    int? reactionControlScore,
+    bool? boundaryMaintained,
+    String? coreOutputSummary,
+    String? provocationHandled,
+    String? audioMemoPath,
+    String? videoReflectionPath,
+  }) {
+    return DailyJournalEntry(
+      id: id ?? this.id,
+      entryDate: entryDate ?? this.entryDate,
+      createdAt: createdAt ?? this.createdAt,
+      reactionControlScore: reactionControlScore ?? this.reactionControlScore,
+      boundaryMaintained: boundaryMaintained ?? this.boundaryMaintained,
+      coreOutputSummary: coreOutputSummary ?? this.coreOutputSummary,
+      provocationHandled: provocationHandled ?? this.provocationHandled,
+      audioMemoPath: audioMemoPath ?? this.audioMemoPath,
+      videoReflectionPath: videoReflectionPath ?? this.videoReflectionPath,
+    );
+  }
+
   factory DailyJournalEntry.fromMap(Map<String, dynamic> map) {
     return DailyJournalEntry(
       id: map['id'] as String? ?? '',

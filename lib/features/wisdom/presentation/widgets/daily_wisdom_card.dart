@@ -103,7 +103,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
         borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
         border: Border.all(
           color: isAffirmation
-              ? AppColors.emeraldSuccess.withOpacity(0.5)
+              ? AppColors.emeraldSuccess.withValues(alpha: 0.5)
               : AppColors.borderSubtle,
           width: 1.0,
         ),
@@ -228,7 +228,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
             decoration: BoxDecoration(
               color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
+              border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
             ),
             child: Text(
               _currentWisdom.originalText,
@@ -237,7 +237,7 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
                 height: 1.4,
-                color: AppColors.textPrimary.withOpacity(0.9),
+                color: AppColors.textPrimary.withValues(alpha: 0.9),
               ),
             ),
           ),
@@ -276,11 +276,11 @@ class _DailyWisdomCardState extends State<DailyWisdomCard> {
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
                   color: isAffirmation
-                      ? AppColors.emeraldSuccess.withOpacity(0.5)
-                      : AppColors.shieldPrimary.withOpacity(0.5),
+                      ? AppColors.emeraldSuccess.withValues(alpha: 0.5)
+                      : AppColors.shieldPrimary.withValues(alpha: 0.5),
                 ),
                 backgroundColor: isAffirmation
-                    ? AppColors.emeraldMuted.withOpacity(0.2)
+                    ? AppColors.emeraldMuted.withValues(alpha: 0.2)
                     : Colors.transparent,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 visualDensity: VisualDensity.compact,

@@ -115,6 +115,30 @@ class JoyItem {
     required this.timestamp,
   });
 
+  /// True if the media path references an offline audio file stored on device
+  bool get isLocalAudio {
+    if (mediaUrlOrPath == null) return false;
+    final trimmed = mediaUrlOrPath!.trim();
+    if (trimmed.isEmpty) return false;
+    return !trimmed.startsWith('http://') && !trimmed.startsWith('https://');
+  }
+
+  /// True if the media URL points to YouTube or YouTube Music
+  bool get isYouTube {
+    if (mediaUrlOrPath == null) return false;
+    final lower = mediaUrlOrPath!.toLowerCase();
+    return lower.contains('youtube.com') ||
+        lower.contains('youtu.be') ||
+        lower.contains('music.youtube.com');
+  }
+
+  /// True specifically if the media URL is from YouTube Music
+  bool get isYouTubeMusic {
+    if (mediaUrlOrPath == null) return false;
+    final lower = mediaUrlOrPath!.toLowerCase();
+    return lower.contains('music.youtube.com');
+  }
+
   JoyItem copyWith({
     String? id,
     String? title,
@@ -173,7 +197,7 @@ class JoyItem {
         title: 'Morning Sunlight over Eternal Peaks',
         category: JoyCategory.visual,
         mediaUrlOrPath: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800',
-        note: 'Silent, unchanging majesty. When boardroom chaos surges, remember the eternal mountain peak remains completely undisturbed.',
+        note: 'Silent, unchanging majesty. When worldly chaos surges, remember the eternal mountain peak remains completely undisturbed.',
         timestamp: DateTime(2026, 1, 2),
       ),
       JoyItem(

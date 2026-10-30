@@ -74,16 +74,16 @@ class DamageControlCard extends StatelessWidget {
     HapticService.selectionClick();
     Clipboard.setData(ClipboardData(text: script.verbatimScript));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle_rounded,
               color: AppColors.emeraldSuccess,
               size: 18,
             ),
-            const SizedBox(width: 8),
-            const Expanded(
+            SizedBox(width: 8),
+            Expanded(
               child: Text(
                 'Damage Control Script copied to clipboard.',
                 style: TextStyle(fontSize: 12),
@@ -92,7 +92,7 @@ class DamageControlCard extends StatelessWidget {
           ],
         ),
         backgroundColor: AppColors.surfaceElevated,
-        duration: const Duration(seconds: 2),
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -157,7 +157,7 @@ class DamageControlCard extends StatelessWidget {
               color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: AppColors.shieldPrimary.withOpacity(0.3),
+                color: AppColors.shieldPrimary.withValues(alpha: 0.3),
                 width: 1.0,
               ),
             ),

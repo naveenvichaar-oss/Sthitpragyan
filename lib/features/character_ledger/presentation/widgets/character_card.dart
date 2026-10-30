@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/models/character_trait_entry.dart';
 
 /// CharacterCard renders an individual virtue/trait record in the Character Ledger.
@@ -74,7 +75,7 @@ class CharacterCard extends StatelessWidget {
                     size: 18,
                     color: AppColors.textMuted,
                   ),
-                  tooltip: 'Delete Entry',
+                  tooltip: context.loc.deleteEntryTooltip,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   onPressed: onDelete,
@@ -99,7 +100,7 @@ class CharacterCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'ARENA: ',
+                  context.loc.arenaLabel,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 8.5,

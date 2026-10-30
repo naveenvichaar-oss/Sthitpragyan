@@ -98,7 +98,7 @@ class IndexSlider extends StatelessWidget {
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: statusColor,
               thumbColor: AppColors.textPrimary,
-              overlayColor: statusColor.withOpacity(0.2),
+              overlayColor: statusColor.withValues(alpha: 0.2),
             ),
             child: Slider(
               value: value,
@@ -128,9 +128,9 @@ class IndexSlider extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: statusColor.withOpacity(0.4)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   statusLabel.toUpperCase(),

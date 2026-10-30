@@ -33,12 +33,24 @@ abstract class HiveBoxes {
   /// Box containing structured virtue & magnetic trait notes for personal gravitas
   static const String characterLedger = 'sthitaprajna_character_ledger';
 
+  /// Box containing user-defined daily execution blocks
+  static const String dailyBlocks = 'daily_blocks_box';
+
   /// Box containing execution commitment blocks and action trigger configurations
-  static const String executionTriggers = 'sthitaprajna_execution_triggers';
+  static const String executionTriggers = 'daily_blocks_box';
 
   /// Box containing imported offline HTML tools, interactive dashboards, and standalone calculators
   static const String htmlTools = 'sthitaprajna_html_tools';
 
   /// Box containing customizable and user-authored tactical defensive response scripts
   static const String defensiveScripts = 'sthitaprajna_defensive_scripts';
+
+  /// Box containing customized and user-created mental models and fallacies
+  static const String cognitionItems = 'sthitaprajna_cognition_items';
+
+  /// Box containing user-authored reflections across 4 universal categories
+  static const String reflections = 'sthitaprajna_reflections';
+
+  /// Box containing daily morning grounding routine step check-offs and state
+  static const String morningRoutine = 'morning_routine_box';
 }

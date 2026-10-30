@@ -102,7 +102,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: AppColors.amberWarning.withOpacity(0.15),
+                      color: AppColors.amberWarning.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Icon(
@@ -184,7 +184,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
                 border: Border.all(
-                  color: AppColors.amberWarning.withOpacity(0.3),
+                  color: AppColors.amberWarning.withValues(alpha: 0.3),
                   width: 1.0,
                 ),
               ),
@@ -248,7 +248,7 @@ class _EmergencyPerspectiveModalState extends State<EmergencyPerspectiveModal> {
                       color: AppColors.surfaceElevated,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: AppColors.amberWarning.withOpacity(0.2),
+                        color: AppColors.amberWarning.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Text(

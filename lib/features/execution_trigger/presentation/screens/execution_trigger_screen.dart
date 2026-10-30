@@ -5,17 +5,18 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/services/gong_audio_service.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/execution_trigger.dart';
 import '../widgets/micro_ignition_timer_dialog.dart';
-import '../widgets/zero_snooze_anchor_modal.dart';
 
-/// ExecutionTriggerScreen manages non-negotiable daily commitment blocks,
-/// zero-snooze philosophy anchors, and 5-minute micro-ignition friction breakers.
+/// ExecutionTriggerScreen provides a minimal, compact, and fully customizable dashboard
+/// for daily focus blocks, instant 108Hz chime testing, and 5-minute kickstarts.
 class ExecutionTriggerScreen extends StatefulWidget {
   const ExecutionTriggerScreen({super.key});
 
   static void open(BuildContext context) {
+    HapticService.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const ExecutionTriggerScreen(),
@@ -30,7 +31,6 @@ class ExecutionTriggerScreen extends StatefulWidget {
 class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
   final HiveStorage _storage = HiveStorage();
   List<ExecutionTrigger> _triggers = [];
-  int _microIgnitionCount = 0;
 
   @override
   void initState() {
@@ -41,7 +41,6 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
   void _loadData() {
     setState(() {
       _triggers = _storage.getAllExecutionTriggers();
-      _microIgnitionCount = _storage.getMicroIgnitionCount();
     });
   }
 
@@ -52,11 +51,23 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
     _loadData();
   }
 
-  void _triggerChimeNow(ExecutionTrigger trigger) {
-    HapticService.selectionClick();
-    ZeroSnoozeAnchorModal.show(context, trigger).then((_) {
-      _loadData();
-    });
+  void _testChime(ExecutionTrigger trigger) {
+    HapticService.heavyImpact();
+    GongAudioService().playDeepGong();
+    if (mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${trigger.title}: ${context.loc.chimeTriggeredNotice}',
+            style: const TextStyle(fontSize: 12),
+          ),
+          backgroundColor: AppColors.surfaceElevated,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _openMicroIgnition() {
@@ -66,141 +77,206 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
     });
   }
 
-  void _showAddCustomBlockDialog() {
-    HapticService.selectionClick();
-    final titleController = TextEditingController();
-    final timeController = TextEditingController(text: '11:00');
-    final intentController = TextEditingController();
-    String category = 'Deep Work';
+  void _showAddBlockDialog() {
+    _showBlockFormDialog(null);
+  }
 
-    showModalBottomSheet(
+  void _showEditBlockDialog(ExecutionTrigger trigger) {
+    _showBlockFormDialog(trigger);
+  }
+
+  void _showBlockFormDialog(ExecutionTrigger? existing) {
+    HapticService.selectionClick();
+    final isEditing = existing != null;
+
+    final titleController = TextEditingController(text: existing?.title ?? '');
+    TimeOfDay selectedTime = const TimeOfDay(hour: 9, minute: 30);
+
+    if (existing != null) {
+      final parsed = _parseTimeOfDay(existing.timeOfDay);
+      if (parsed != null) selectedTime = parsed;
+    }
+
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radiusLarge)),
-      ),
       builder: (ctx) {
+        TimeOfDay modalTime = selectedTime;
         return StatefulBuilder(
-          builder: (ctx, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: AppDimens.space20,
-                right: AppDimens.space20,
-                top: AppDimens.space20,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + AppDimens.space24,
+          builder: (dialogContext, setDialogState) {
+            final formattedTime = _formatTimeOfDay(dialogContext, modalTime);
+
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+                side: const BorderSide(color: AppColors.borderSubtle),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Add Execution Block', style: AppTextStyles.heading),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 20, color: AppColors.textMuted),
-                        onPressed: () => Navigator.of(ctx).pop(),
+              title: Text(
+                isEditing
+                    ? context.loc.editTimeBlock
+                    : context.loc.addTimeBlock,
+                style: AppTextStyles.heading.copyWith(fontSize: 16),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title field
+                    Text(
+                      context.loc.blockTitleLabel,
+                      style: AppTextStyles.labelBadge.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 9.5,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: titleController,
-                    style: AppTextStyles.bodyMedium,
-                    decoration: const InputDecoration(
-                      labelText: 'Block Title (e.g., Strategic Review)',
-                      filled: true,
-                      fillColor: AppColors.surfaceElevated,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: timeController,
-                          style: AppTextStyles.bodyMedium,
-                          decoration: const InputDecoration(
-                            labelText: 'Scheduled Time (HH:mm)',
-                            filled: true,
-                            fillColor: AppColors.surfaceElevated,
-                          ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: titleController,
+                      style: AppTextStyles.bodyMedium,
+                      autofocus: !isEditing,
+                      decoration: InputDecoration(
+                        hintText: context.loc.blockTitleHint,
+                        hintStyle: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: category,
-                          dropdownColor: AppColors.surfaceElevated,
-                          style: AppTextStyles.bodyMedium,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
-                            filled: true,
-                            fillColor: AppColors.surfaceElevated,
-                          ),
-                          items: const [
-                            DropdownMenuItem(value: 'Deep Work', child: Text('Deep Work')),
-                            DropdownMenuItem(value: 'Grounding', child: Text('Grounding')),
-                            DropdownMenuItem(value: 'Friction Clear', child: Text('Friction Clear')),
-                            DropdownMenuItem(value: 'Evening Audit', child: Text('Evening Audit')),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) setModalState(() => category = val);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: intentController,
-                    maxLines: 2,
-                    style: AppTextStyles.bodyMedium,
-                    decoration: const InputDecoration(
-                      labelText: 'Stoic Intent / Mandate',
-                      hintText: 'What is the non-negotiable standard for this block?',
-                      filled: true,
-                      fillColor: AppColors.surfaceElevated,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.shieldPrimary,
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
+                        filled: true,
+                        fillColor: AppColors.surfaceElevated,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.borderSubtle),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.borderSubtle),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Color(0xFF10B981)),
                         ),
                       ),
-                      onPressed: () async {
-                        final title = titleController.text.trim();
-                        if (title.isEmpty) return;
-                        final newBlock = ExecutionTrigger(
-                          id: 'exec_${DateTime.now().millisecondsSinceEpoch}',
-                          title: title,
-                          devanagariSubtitle: ctx.loc.isHindi ? 'संकल्पित कर्म' : 'Committed Block',
-                          timeOfDay: timeController.text.trim(),
-                          intent: intentController.text.trim().isEmpty
-                              ? 'Zero hesitation. Execute with pure presence.'
-                              : intentController.text.trim(),
-                          category: category,
-                        );
-                        await _storage.saveExecutionTrigger(newBlock);
-                        if (ctx.mounted) Navigator.of(ctx).pop();
-                        _loadData();
-                      },
-                      child: const Text(
-                        'SAVE NON-NEGOTIABLE BLOCK',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Time Picker row
+                    Text(
+                      context.loc.scheduledTimeLabel,
+                      style: AppTextStyles.labelBadge.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 9.5,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    InkWell(
+                      onTap: () async {
+                        HapticService.selectionClick();
+                        final picked = await showTimePicker(
+                          context: dialogContext,
+                          initialTime: modalTime,
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: const ColorScheme.dark(
+                                  primary: Color(0xFF10B981),
+                                  onPrimary: Colors.black,
+                                  surface: AppColors.surface,
+                                  onSurface: AppColors.textPrimary,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (picked != null) {
+                          setDialogState(() {
+                            modalTime = picked;
+                          });
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceElevated,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.borderSubtle),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF10B981)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                formattedTime,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'monospace',
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              context.loc.changeTimeButton,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF10B981),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(
+                    context.loc.cancelButton,
+                    style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: () async {
+                    final title = titleController.text.trim();
+                    if (title.isEmpty) return;
+
+                    final timeString = formattedTime;
+                    final block = ExecutionTrigger(
+                      id: existing?.id ?? 'block_${DateTime.now().millisecondsSinceEpoch}',
+                      title: title,
+                      devanagariSubtitle: context.loc.dailyBlockSubtitle,
+                      timeOfDay: timeString,
+                      intent: existing?.intent ?? '',
+                      category: existing?.category ?? 'Deep Work',
+                      isEnabled: existing?.isEnabled ?? true,
+                      streakCount: existing?.streakCount ?? 0,
+                      lastExecutedAt: existing?.lastExecutedAt,
+                    );
+
+                    await _storage.saveExecutionTrigger(block);
+                    if (ctx.mounted) Navigator.of(ctx).pop();
+                    _loadData();
+                  },
+                  child: Text(
+                    context.loc.saveAction,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -208,166 +284,232 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
     );
   }
 
+  void _confirmDeleteBlock(ExecutionTrigger trigger) {
+    HapticService.mediumImpact();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+          side: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        title: Text(
+          context.loc.deleteTimeBlock,
+          style: AppTextStyles.heading.copyWith(fontSize: 16),
+        ),
+        content: Text(
+          context.loc.removeTimeBlockConfirm(trigger.title),
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontSize: 12.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              context.loc.cancelButton,
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.roseDanger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              visualDensity: VisualDensity.compact,
+            ),
+            onPressed: () async {
+              await _storage.deleteExecutionTrigger(trigger.id);
+              if (ctx.mounted) Navigator.of(ctx).pop();
+              _loadData();
+            },
+            child: Text(
+              context.loc.removeButton,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  TimeOfDay? _parseTimeOfDay(String timeStr) {
+    try {
+      final trimmed = timeStr.trim().toUpperCase();
+      final isPM = trimmed.contains('PM');
+      final isAM = trimmed.contains('AM');
+      final clean = trimmed.replaceAll('AM', '').replaceAll('PM', '').trim();
+      final parts = clean.split(':');
+      if (parts.length >= 2) {
+        int hour = int.parse(parts[0].trim());
+        final int minute = int.parse(parts[1].trim());
+        if (isPM && hour < 12) hour += 12;
+        if (isAM && hour == 12) hour = 0;
+        return TimeOfDay(hour: hour, minute: minute);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  String _formatTimeOfDay(BuildContext context, TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    final hourStr = hour.toString().padLeft(2, '0');
+    return '$hourStr:$minute $period';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isHindi = context.loc.isHindi;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.loc.actionTriggerBadge,
-              style: AppTextStyles.labelBadge.copyWith(
-                color: const Color(0xFF10B981),
-                fontSize: 9.5,
-                letterSpacing: 1.2,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              context.loc.actionTriggerTitle,
-              style: AppTextStyles.heading,
-            ),
-          ],
+        title: Text(
+          context.loc.executionChimeHeader,
+          style: AppTextStyles.heading.copyWith(fontSize: 16),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded, color: AppColors.shieldPrimary),
-            tooltip: 'Add Execution Block',
-            onPressed: _showAddCustomBlockDialog,
+            icon: const Icon(Icons.add_rounded, color: Color(0xFF10B981), size: 24),
+            tooltip: context.loc.addTimeBlock,
+            onPressed: _showAddBlockDialog,
           ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppDimens.space16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.space14,
+          vertical: AppDimens.space12,
+        ),
         children: [
-          // 1. Philosophy & Friction Breaker Banner
-          _buildFrictionBreakerCard(),
-          const SizedBox(height: 20),
+          // 1. Compact 5-Minute Kickstart Widget (One-line card)
+          _buildCompactKickstartWidget(isHindi),
+          const SizedBox(height: 12),
 
-          // 2. Non-Negotiable Blocks Header
+          // 2. Section Header: Daily Focus Blocks / दैनिक कार्य ब्लॉक
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'NON-NEGOTIABLE DAILY BLOCKS (${_triggers.length})',
+                '${context.loc.dailyFocusBlocks} (${_triggers.length})',
                 style: AppTextStyles.labelBadge.copyWith(
-                  color: AppColors.textMuted,
+                  color: AppColors.textSecondary,
                   fontSize: 10,
-                  letterSpacing: 1.2,
+                  letterSpacing: 1.0,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              Text(
-                'ZERO-SNOOZE MANDATE',
-                style: AppTextStyles.labelBadge.copyWith(
-                  color: const Color(0xFF10B981),
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
+              TextButton.icon(
+                onPressed: _showAddBlockDialog,
+                icon: const Icon(Icons.add_rounded, size: 14, color: Color(0xFF10B981)),
+                label: Text(
+                  context.loc.addTimeBlock,
+                  style: const TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
-          // 3. Execution Trigger Blocks List
-          ..._triggers.map((trigger) => _buildTriggerCard(trigger)),
+          // 3. Blocks List (Single slim row per block)
+          if (_triggers.isEmpty)
+            _buildEmptyBlocksCard(isHindi)
+          else
+            ..._triggers.map((trigger) => _buildSlimBlockRow(trigger, isHindi)),
+
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildFrictionBreakerCard() {
+  Widget _buildCompactKickstartWidget(bool isHindi) {
     return Container(
-      padding: const EdgeInsets.all(AppDimens.space16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusLarge),
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
         border: Border.all(
           color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
           width: 1.0,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.local_fire_department_rounded,
-                      size: 14,
-                      color: Color(0xFFF59E0B),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'FRICTION-BREAKER',
-                      style: AppTextStyles.labelBadge.copyWith(
-                        color: const Color(0xFFF59E0B),
-                        fontSize: 9,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                '$_microIgnitionCount COMPLETED',
-                style: AppTextStyles.labelBadge.copyWith(
-                  color: AppColors.textSecondary,
-                  fontSize: 9.5,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            context.loc.microIgnitionCardTitle,
-            style: AppTextStyles.heading,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            context.loc.microIgnitionCardDesc,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-              fontSize: 11.5,
-              height: 1.45,
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(
+              Icons.bolt_rounded,
+              size: 18,
+              color: Color(0xFFF59E0B),
             ),
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF59E0B),
-                foregroundColor: Colors.black,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Row(
+              children: [
+                Text(
+                  context.loc.fiveMinKickstart,
+                  style: AppTextStyles.labelBadge.copyWith(
+                    color: const Color(0xFFF59E0B),
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
                 ),
-              ),
-              icon: const Icon(Icons.bolt_rounded, size: 20),
-              label: Text(
-                context.loc.launchMicroIgnitionAction,
-                style: const TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.0,
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    '• ${context.loc.fiveMinTimerSubtitle}',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11.5,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+              ],
+            ),
+          ),
+          FilledButton(
+            onPressed: _openMicroIgnition,
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFF59E0B),
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
               ),
-              onPressed: _openMicroIgnition,
+            ),
+            child: Text(
+              context.loc.startAction,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ],
@@ -375,147 +517,167 @@ class _ExecutionTriggerScreenState extends State<ExecutionTriggerScreen> {
     );
   }
 
-  Widget _buildTriggerCard(ExecutionTrigger trigger) {
+  Widget _buildSlimBlockRow(ExecutionTrigger trigger, bool isHindi) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(AppDimens.space16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+        borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
         border: Border.all(
           color: trigger.isEnabled
               ? AppColors.borderSubtle
-              : AppColors.borderSubtle.withValues(alpha: 0.5),
+              : AppColors.borderSubtle.withValues(alpha: 0.4),
           width: 1.0,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.borderSubtle),
-                    ),
-                    child: Text(
-                      trigger.timeOfDay,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      trigger.category.toUpperCase(),
-                      style: const TextStyle(
-                        color: Color(0xFF10B981),
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
-                ],
+          // Left: Time badge (e.g., "09:30 AM")
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Text(
+              trigger.timeOfDay,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'monospace',
               ),
-              Switch(
-                value: trigger.isEnabled,
-                activeThumbColor: const Color(0xFF10B981),
-                onChanged: (val) => _toggleTrigger(trigger, val),
-              ),
-            ],
+            ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(width: 10),
+
+          // Editable Block Title
+          Expanded(
+            child: Text(
+              trigger.title,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: trigger.isEnabled ? AppColors.textPrimary : AppColors.textMuted,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+          // Middle: Quick bell/test chime icon
+          IconButton(
+            icon: const Icon(Icons.notifications_active_outlined, size: 17),
+            color: trigger.isEnabled ? const Color(0xFF10B981) : AppColors.textMuted,
+            tooltip: context.loc.testChimeTooltip,
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onPressed: () => _testChime(trigger),
+          ),
+          const SizedBox(width: 2),
+
+          // Right: Toggle switch (On/Off)
+          Transform.scale(
+            scale: 0.72,
+            child: Switch(
+              value: trigger.isEnabled,
+              activeTrackColor: const Color(0xFF10B981).withValues(alpha: 0.5),
+              activeThumbColor: const Color(0xFF10B981),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onChanged: (val) => _toggleTrigger(trigger, val),
+            ),
+          ),
+
+          // Popup menu (Edit / Delete)
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded, size: 17, color: AppColors.textMuted),
+            color: AppColors.surfaceElevated,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onSelected: (action) {
+              if (action == 'edit') {
+                _showEditBlockDialog(trigger);
+              } else if (action == 'delete') {
+                _confirmDeleteBlock(trigger);
+              }
+            },
+            itemBuilder: (ctx) => [
+              PopupMenuItem(
+                value: 'edit',
+                height: 36,
+                child: Row(
                   children: [
+                    const Icon(Icons.edit_outlined, size: 15, color: AppColors.textSecondary),
+                    const SizedBox(width: 8),
+                    Text(context.loc.editTimeBlock, style: const TextStyle(fontSize: 12)),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                height: 36,
+                child: Row(
+                  children: [
+                    const Icon(Icons.delete_outline_rounded, size: 15, color: AppColors.roseDanger),
+                    const SizedBox(width: 8),
                     Text(
-                      context.loc.isHindi
-                          ? trigger.devanagariSubtitle
-                          : trigger.category.toUpperCase(),
-                      style: AppTextStyles.labelBadge.copyWith(
-                        color: AppColors.textMuted,
-                        fontSize: 8.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      trigger.title,
-                      style: AppTextStyles.heading.copyWith(fontSize: 15),
+                      context.loc.deleteTimeBlock,
+                      style: const TextStyle(fontSize: 12, color: AppColors.roseDanger),
                     ),
                   ],
                 ),
               ),
-              if (trigger.streakCount > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '🔥 ${trigger.streakCount} STREAK',
-                    style: const TextStyle(
-                      color: Color(0xFFF59E0B),
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyBlocksCard(bool isHindi) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.schedule_rounded,
+            size: 32,
+            color: AppColors.textMuted.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(
-            trigger.intent,
-            style: AppTextStyles.bodySmall.copyWith(
+            context.loc.noDailyBlocks,
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textSecondary,
-              fontSize: 11.5,
-              height: 1.4,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            height: 38,
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF10B981),
-                side: const BorderSide(
-                  color: Color(0xFF10B981),
-                  width: 1.0,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              icon: const Icon(Icons.notifications_active_outlined, size: 16),
-              label: const Text(
-                'TEST CHIME / EXECUTE NOW',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                ),
-              ),
-              onPressed: () => _triggerChimeNow(trigger),
+          const SizedBox(height: 4),
+          Text(
+            context.loc.noDailyBlocksSub,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textMuted,
+              fontSize: 11,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _showAddBlockDialog,
+            icon: const Icon(Icons.add_rounded, size: 16),
+            label: Text(context.loc.addTimeBlock, style: const TextStyle(fontSize: 11.5)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF10B981),
+              side: const BorderSide(color: Color(0xFF10B981)),
+              visualDensity: VisualDensity.compact,
             ),
           ),
         ],

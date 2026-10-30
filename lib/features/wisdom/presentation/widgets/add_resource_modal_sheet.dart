@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/database/hive_storage.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/resource_link.dart';
 
@@ -21,6 +22,7 @@ class AddResourceModalSheet extends StatefulWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -139,16 +141,16 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
     if (mounted) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
-              SizedBox(width: 8),
-              Text('Resource link saved to offline Sanctuary', style: TextStyle(fontSize: 12)),
+              const Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
+              const SizedBox(width: 8),
+              Text(context.loc.resourceLinkSavedNotice, style: const TextStyle(fontSize: 12)),
             ],
           ),
           backgroundColor: AppColors.surfaceElevated,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -158,15 +160,17 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppDimens.space16,
-        right: AppDimens.space16,
-        top: AppDimens.space16,
-        bottom: bottomInset + AppDimens.space24,
-      ),
-      child: Form(
-        key: _formKey,
+    return SafeArea(
+      bottom: true,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: AppDimens.space16,
+          right: AppDimens.space16,
+          top: AppDimens.space16,
+          bottom: bottomInset + AppDimens.space24,
+        ),
+        child: Form(
+          key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -215,7 +219,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
               const SizedBox(height: 14),
 
               // Media Type Selector
-              Text('MEDIA CLASSIFICATION', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.mediaClassificationBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -286,7 +290,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
               const SizedBox(height: 14),
 
               // Title Field
-              Text('RESOURCE TITLE', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.resourceTitleBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _titleController,
@@ -308,7 +312,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
-                    return 'Title is required';
+                    return context.loc.titleRequired;
                   }
                   return null;
                 },
@@ -316,7 +320,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
               const SizedBox(height: 12),
 
               // URL Field
-              Text('RESOURCE URL / LINK', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.resourceUrlBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _urlController,
@@ -351,7 +355,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
               const SizedBox(height: 12),
 
               // Category Selector
-              Text('CATEGORY CLUSTER', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.categoryClusterBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -383,7 +387,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
               const SizedBox(height: 12),
 
               // Optional Notes Field
-              Text('KEY TAKEAWAYS / NOTES (OPTIONAL)', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.keyTakeawaysOptionalBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _notesController,
@@ -413,7 +417,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
                 child: ElevatedButton.icon(
                   onPressed: _handleSave,
                   icon: const Icon(Icons.bookmark_add_rounded, size: 18),
-                  label: const Text('SAVE TO PERSONAL SANCTUARY'),
+                  label: Text(context.loc.saveToPersonalSanctuaryButton),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.shieldPrimary,
                     foregroundColor: AppColors.background,
@@ -428,6 +432,7 @@ class _AddResourceModalSheetState extends State<AddResourceModalSheet> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

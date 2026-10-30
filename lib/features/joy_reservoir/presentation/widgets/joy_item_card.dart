@@ -1,17 +1,20 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
-import '../../../wisdom/utils/resource_launcher_service.dart';
 import '../../data/models/joy_item.dart';
+import '../../data/services/joy_audio_service.dart';
 
 /// JoyItemCard renders a personal emotional anchor:
-/// - Music tracks with embedded play action (YouTube/Web)
+/// - Offline local audio files with inline playback controls (Play, Pause, Stop, Seek)
+/// - YouTube and YouTube Music tracks with one-tap native app launching
 /// - Visual memories with tap-to-expand image viewer
 /// - Comfort words and quotes in serene typography
-/// - Soul milestones and grounding memories
 class JoyItemCard extends StatelessWidget {
   final JoyItem item;
   final VoidCallback onDelete;
@@ -25,19 +28,38 @@ class JoyItemCard extends StatelessWidget {
   bool get _hasMedia =>
       item.mediaUrlOrPath != null && item.mediaUrlOrPath!.trim().isNotEmpty;
 
-  bool get _isYoutube =>
-      _hasMedia && ResourceLauncherService.isYoutubeUrl(item.mediaUrlOrPath!);
-
-  void _handleMediaAction(BuildContext context) {
+  Future<void> _launchExternalMedia(BuildContext context) async {
     if (!_hasMedia) return;
     HapticService.selectionClick();
-    ResourceLauncherService.openUrl(
-      context,
-      url: item.mediaUrlOrPath!,
-      title: item.title,
-      category: item.category.displayName,
-      notes: item.note,
-    );
+
+    final rawUrl = item.mediaUrlOrPath!.trim();
+    final uri = Uri.tryParse(rawUrl);
+    if (uri == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.loc.invalidResourceUrl),
+            backgroundColor: AppColors.roseDanger,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && context.mounted) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      debugPrint('[JoyItemCard] External launch error: $e');
+      if (context.mounted) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    }
   }
 
   void _showImageDialog(BuildContext context) {
@@ -67,7 +89,10 @@ class JoyItemCard extends StatelessWidget {
                 errorBuilder: (_, __, ___) => Container(
                   padding: const EdgeInsets.all(24),
                   color: AppColors.surfaceElevated,
-                  child: const Text('Unable to load image anchor.', style: TextStyle(color: Colors.white70)),
+                  child: Text(
+                    context.loc.unableToLoadImage,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                 ),
               ),
             ),
@@ -106,18 +131,25 @@ class JoyItemCard extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Remove Anchor?', style: AppTextStyles.heading),
+        title: Text(context.loc.removeAnchorTitle, style: AppTextStyles.heading),
         content: Text(
-          'Remove "${item.title}" from your Joy Reservoir?',
+          '${context.loc.removeAnchorConfirm}\n\n"${item.title}"',
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted)),
+            child: Text(
+              context.loc.cancelButton,
+              style: const TextStyle(color: AppColors.textMuted),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
+              // Stop audio if currently playing this item
+              if (JoyAudioService().isActive(item.id)) {
+                JoyAudioService().stop();
+              }
               Navigator.of(ctx).pop();
               onDelete();
             },
@@ -125,16 +157,199 @@ class JoyItemCard extends StatelessWidget {
               backgroundColor: AppColors.roseDanger,
               foregroundColor: Colors.white,
             ),
-            child: const Text('REMOVE'),
+            child: Text(context.loc.removeButton),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildLocalAudioPlayer(BuildContext context, Color catColor) {
+    return ListenableBuilder(
+      listenable: JoyAudioService(),
+      builder: (context, _) {
+        final audioService = JoyAudioService();
+        final isPlaying = audioService.isPlaying(item.id);
+        final isPaused = audioService.isPaused(item.id);
+        final isActive = audioService.isActive(item.id);
+
+        final currentPos = isActive ? audioService.position : Duration.zero;
+        final totalDuration = isActive ? audioService.duration : Duration.zero;
+
+        final posSec = currentPos.inSeconds.toDouble();
+        final maxSec = totalDuration.inSeconds.toDouble() > 0
+            ? totalDuration.inSeconds.toDouble()
+            : 1.0;
+        final sliderValue = posSec.clamp(0.0, maxSec);
+
+        final fileName = item.mediaUrlOrPath != null
+            ? item.mediaUrlOrPath!.split(Platform.pathSeparator).last
+            : '';
+
+        return Container(
+          margin: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.all(AppDimens.space12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+            border: Border.all(
+              color: isActive
+                  ? AppColors.shieldPrimary.withValues(alpha: 0.6)
+                  : AppColors.borderSubtle,
+              width: 1.0,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Audio File Info Row
+              Row(
+                children: [
+                  Icon(
+                    isPlaying
+                        ? Icons.graphic_eq_rounded
+                        : Icons.audiotrack_rounded,
+                    size: 16,
+                    color: isPlaying ? AppColors.shieldPrimary : catColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      fileName.isNotEmpty ? fileName : context.loc.localAudioFile,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? AppColors.shieldPrimary.withValues(alpha: 0.15)
+                          : AppColors.surface,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Text(
+                      isPlaying
+                          ? context.loc.nowPlaying.toUpperCase()
+                          : isPaused
+                              ? context.loc.pausedStatus.toUpperCase()
+                              : context.loc.localAudioAnchor.toUpperCase(),
+                      style: AppTextStyles.labelBadge.copyWith(
+                        fontSize: 8,
+                        color: isPlaying
+                            ? AppColors.shieldPrimary
+                            : AppColors.textMuted,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+
+              // Seek Slider
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  trackHeight: 3.0,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 12.0),
+                  activeTrackColor: AppColors.shieldPrimary,
+                  inactiveTrackColor: AppColors.borderSubtle,
+                  thumbColor: AppColors.shieldPrimary,
+                  overlayColor: AppColors.shieldPrimary.withValues(alpha: 0.2),
+                ),
+                child: Slider(
+                  value: sliderValue,
+                  max: maxSec,
+                  onChanged: isActive && totalDuration.inSeconds > 0
+                      ? (val) {
+                          audioService.seek(Duration(seconds: val.toInt()));
+                        }
+                      : null,
+                ),
+              ),
+
+              // Controls & Timers Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    JoyAudioService.formatDuration(currentPos),
+                    style: AppTextStyles.labelBadge.copyWith(
+                      fontSize: 10,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      // Play / Pause Button
+                      IconButton(
+                        icon: Icon(
+                          isPlaying
+                              ? Icons.pause_circle_filled_rounded
+                              : Icons.play_circle_filled_rounded,
+                          size: 32,
+                          color: AppColors.shieldPrimary,
+                        ),
+                        tooltip: isPlaying
+                            ? context.loc.pauseAudio
+                            : context.loc.playAudio,
+                        onPressed: () {
+                          HapticService.selectionClick();
+                          if (isPlaying) {
+                            audioService.pause();
+                          } else {
+                            audioService.playLocal(
+                              joyId: item.id,
+                              filePath: item.mediaUrlOrPath!,
+                            );
+                          }
+                        },
+                      ),
+                      // Stop Button
+                      if (isActive)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.stop_circle_outlined,
+                            size: 26,
+                            color: AppColors.textMuted,
+                          ),
+                          tooltip: context.loc.stopAudio,
+                          onPressed: () {
+                            HapticService.selectionClick();
+                            audioService.stop();
+                          },
+                        ),
+                    ],
+                  ),
+                  Text(
+                    totalDuration.inSeconds > 0
+                        ? JoyAudioService.formatDuration(totalDuration)
+                        : '--:--',
+                    style: AppTextStyles.labelBadge.copyWith(
+                      fontSize: 10,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final catColor = item.category.accentColor;
+    final isMusic = item.category == JoyCategory.music;
+    final isLocalAudio = isMusic && item.isLocalAudio;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -178,9 +393,13 @@ class JoyItemCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded, size: 18, color: AppColors.textMuted),
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    size: 18,
+                    color: AppColors.textMuted,
+                  ),
                   onPressed: () => _confirmDelete(context),
-                  tooltip: 'Remove Anchor',
+                  tooltip: context.loc.removeButton,
                   visualDensity: VisualDensity.compact,
                 ),
               ],
@@ -216,22 +435,39 @@ class JoyItemCard extends StatelessWidget {
                           height: 100,
                           color: AppColors.surfaceElevated,
                           alignment: Alignment.center,
-                          child: const Icon(Icons.broken_image_rounded, color: AppColors.textMuted),
+                          child: const Icon(
+                            Icons.broken_image_rounded,
+                            color: AppColors.textMuted,
+                          ),
                         ),
                       ),
                       Container(
                         margin: const EdgeInsets.all(8),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.65),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.fullscreen_rounded, size: 14, color: Colors.white),
-                            SizedBox(width: 4),
-                            Text('VIEW', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                            const Icon(
+                              Icons.fullscreen_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              context.loc.viewImage,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -272,19 +508,31 @@ class JoyItemCard extends StatelessWidget {
               ),
             ],
 
-            // Music / Media Action Button
-            if (item.category == JoyCategory.music && _hasMedia) ...[
+            // Local Audio Player Section
+            if (isLocalAudio) ...[
+              _buildLocalAudioPlayer(context, catColor),
+            ]
+            // Online Music / YouTube / YouTube Music Action Button
+            else if (isMusic && _hasMedia) ...[
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _handleMediaAction(context),
+                  onPressed: () => _launchExternalMedia(context),
                   icon: Icon(
-                    _isYoutube ? Icons.play_arrow_rounded : Icons.headphones_rounded,
+                    item.isYouTubeMusic
+                        ? Icons.music_note_rounded
+                        : item.isYouTube
+                            ? Icons.play_arrow_rounded
+                            : Icons.headphones_rounded,
                     size: 16,
                   ),
                   label: Text(
-                    _isYoutube ? 'PLAY SERENITY AUDIO / VIDEO' : 'LISTEN TO AUDIO ANCHOR',
+                    item.isYouTubeMusic
+                        ? context.loc.openInYoutubeMusic
+                        : item.isYouTube
+                            ? context.loc.openInYoutube
+                            : context.loc.externalPlayer,
                     style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -297,14 +545,19 @@ class JoyItemCard extends StatelessWidget {
                   ),
                 ),
               ),
-            ] else if (_hasMedia && item.category != JoyCategory.visual) ...[
+            ]
+            // General external link for non-visual anchors
+            else if (_hasMedia && item.category != JoyCategory.visual) ...[
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
-                  onPressed: () => _handleMediaAction(context),
+                  onPressed: () => _launchExternalMedia(context),
                   icon: const Icon(Icons.open_in_new_rounded, size: 13),
-                  label: const Text('OPEN LINK', style: TextStyle(fontSize: 11)),
+                  label: Text(
+                    context.loc.openLink,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   style: TextButton.styleFrom(
                     foregroundColor: catColor,
                     visualDensity: VisualDensity.compact,

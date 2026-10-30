@@ -19,7 +19,8 @@ class ArchetypeGuidance {
   final String subtitleHindi;
   final String subtitleEnglish;
   final String coreDoctrine;
-  final String sampleResponse;
+  final String sampleResponseHindi;
+  final String sampleResponseEnglish;
   final IconData icon;
 
   const ArchetypeGuidance({
@@ -27,12 +28,17 @@ class ArchetypeGuidance {
     required this.subtitleHindi,
     required this.subtitleEnglish,
     required this.coreDoctrine,
-    required this.sampleResponse,
+    required this.sampleResponseHindi,
+    required this.sampleResponseEnglish,
     required this.icon,
   });
+
+  String get sampleResponse => sampleResponseEnglish;
+  String getLocalizedSampleResponse(bool isHindi) =>
+      isHindi ? sampleResponseHindi : sampleResponseEnglish;
 }
 
-/// PostIncidentRecoveryScreen enables a rapid 30-second post-mortem,
+/// PostIncidentRecoveryScreen enables a rapid 30-second equanimity review,
 /// archetype reflection, 2-minute box breathing, and damage control re-write.
 class PostIncidentRecoveryScreen extends StatefulWidget {
   const PostIncidentRecoveryScreen({super.key});
@@ -46,11 +52,11 @@ class _PostIncidentRecoveryScreenState
     extends State<PostIncidentRecoveryScreen> {
   final HiveStorage _storage = HiveStorage();
 
-  // Screen Tab State: 0 = Post-Mortem Audit & Drills, 1 = Emergency Perspective (60s Read)
+  // Screen Tab State: 0 = Equanimity Review & Drills, 1 = Emergency Perspective (60s Read)
   int _selectedRecoveryTab = 0;
   int _selectedPerspectiveIndex = 0;
 
-  // 1. Post-Mortem selections
+  // 1. Equanimity Review selections
   String _selectedTrigger = 'Toxic Boss';
   String _selectedMistake = 'Gave unnecessary explanation';
   String _selectedPhysicalState = 'Shallow breathing';
@@ -98,24 +104,36 @@ class _PostIncidentRecoveryScreenState
       title: 'The Stoic',
       subtitleHindi: 'स्थितप्रज्ञ',
       subtitleEnglish: 'Absolute Poise',
-      coreDoctrine: 'Detached, zero emotional reaction, sticks strictly to objective reality. External events cannot disturb internal peace unless judged as harm.',
-      sampleResponse: 'भाषा या एंगल में क्या विशिष्ट फैक्चुअल बदलाव चाहिए? कृपया बिंदु स्पष्ट करें।',
+      coreDoctrine:
+          'Detached, zero emotional reaction, sticks strictly to objective reality. External events cannot disturb internal peace unless judged as harm.',
+      sampleResponseHindi:
+          'भाषा या एंगल में क्या विशिष्ट फैक्चुअल बदलाव चाहिए? कृपया बिंदु स्पष्ट करें।',
+      sampleResponseEnglish:
+          'What specific factual changes are needed in wording or angle? Please clarify points.',
       icon: Icons.shield_rounded,
     ),
     ArchetypeGuidance(
       title: 'The Strategist',
       subtitleHindi: 'रणनीतिकार',
       subtitleEnglish: 'Tactical Restraint',
-      coreDoctrine: 'Puts the burden of proof back on the agitator, minimal words, strategic silence. Does not explain or defend.',
-      sampleResponse: 'इस दावे का आधार क्या डेटा है? जब आप बिंदुवार विश्लेषण साझा करेंगे, तब मैं समीक्षा करूँगा।',
+      coreDoctrine:
+          'Puts the burden of proof back on the agitator, minimal words, strategic silence. Does not explain or defend.',
+      sampleResponseHindi:
+          'इस दावे का आधार क्या डेटा है? जब आप बिंदुवार विश्लेषण साझा करेंगे, तब मैं समीक्षा करूँगा।',
+      sampleResponseEnglish:
+          'What data supports this claim? I will review once you share point-by-point analysis.',
       icon: Icons.psychology_rounded,
     ),
     ArchetypeGuidance(
       title: 'The Executive',
       subtitleHindi: 'प्रशासक',
       subtitleEnglish: 'Unruffled Governance',
-      coreDoctrine: 'Demands written clarity/specifics, ignores passive-aggressive tone completely. Aligns solely on verified deliverables.',
-      sampleResponse: 'Regarding deliverables: let\'s calibrate milestone expectations in writing before allocating engineering capacity.',
+      coreDoctrine:
+          'Demands written clarity/specifics, ignores passive-aggressive tone completely. Aligns solely on verified deliverables.',
+      sampleResponseHindi:
+          'परिणामों के संबंध में: क्षमता आवंटन से पूर्व लिखित में अपेक्षाओं को स्पष्ट करें।',
+      sampleResponseEnglish:
+          'Regarding deliverables: let\'s calibrate milestone expectations in writing before allocating engineering capacity.',
       icon: Icons.account_balance_rounded,
     ),
   ];
@@ -182,16 +200,16 @@ class _PostIncidentRecoveryScreenState
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle_rounded,
                 color: AppColors.emeraldSuccess,
                 size: 18,
               ),
-              const SizedBox(width: 8),
-              const Expanded(
+              SizedBox(width: 8),
+              Expanded(
                 child: Text(
                   'Post-Incident Logged. Composure and frame restored.',
                   style: TextStyle(fontSize: 12),
@@ -200,7 +218,7 @@ class _PostIncidentRecoveryScreenState
             ],
           ),
           backgroundColor: AppColors.surfaceElevated,
-          duration: const Duration(seconds: 3),
+          duration: Duration(seconds: 3),
         ),
       );
       Navigator.of(context).pop();
@@ -259,7 +277,7 @@ class _PostIncidentRecoveryScreenState
               ),
               child: Row(
                 children: [
-                  _buildTabButton(0, context.loc.postMortemAndDrills, Icons.assignment_outlined),
+                  _buildTabButton(0, context.loc.reviewAndDrills, Icons.assignment_outlined),
                   const SizedBox(width: 4),
                   _buildTabButton(1, context.loc.emergencyPerspectiveTab, Icons.auto_stories_rounded),
                 ],
@@ -268,7 +286,7 @@ class _PostIncidentRecoveryScreenState
           ),
           Expanded(
             child: _selectedRecoveryTab == 0
-                ? _buildPostMortemListView(activeArch)
+                ? _buildReviewListView(activeArch)
                 : _buildEmergencyPerspectiveView(),
           ),
         ],
@@ -326,7 +344,7 @@ class _PostIncidentRecoveryScreenState
     );
   }
 
-  Widget _buildPostMortemListView(ArchetypeGuidance activeArch) {
+  Widget _buildReviewListView(ArchetypeGuidance activeArch) {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       children: [
@@ -337,7 +355,7 @@ class _PostIncidentRecoveryScreenState
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
             border: Border.all(
-              color: AppColors.amberWarning.withOpacity(0.3),
+              color: AppColors.amberWarning.withValues(alpha: 0.3),
               width: 1.0,
             ),
           ),
@@ -387,7 +405,7 @@ class _PostIncidentRecoveryScreenState
             decoration: BoxDecoration(
               color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
-              border: Border.all(color: AppColors.amberWarning.withOpacity(0.4)),
+              border: Border.all(color: AppColors.amberWarning.withValues(alpha: 0.4)),
             ),
             child: Row(
               children: [
@@ -411,10 +429,10 @@ class _PostIncidentRecoveryScreenState
         const SizedBox(height: 16),
 
           // -----------------------------------------------------------
-          // STEP 1: 30-SECOND POST-MORTEM
+          // STEP 1: 30-SECOND EQUANIMITY REVIEW
           // -----------------------------------------------------------
           Text(
-            context.loc.thirtySecondPostMortem,
+            context.loc.thirtySecondReview,
             style: AppTextStyles.labelBadge.copyWith(
               color: AppColors.shieldPrimary,
               fontSize: 10.5,
@@ -431,9 +449,9 @@ class _PostIncidentRecoveryScreenState
           ),
           const SizedBox(height: 14),
 
-          // Mistake Type
+          // Reaction Pattern
           _buildChipSection(
-            label: 'MISTAKE TYPE (HOW YOU REACTED)',
+            label: 'REACTION PATTERN (OBSERVED RESPONSE)',
             options: _mistakes,
             selectedValue: _selectedMistake,
             onSelected: (val) => setState(() => _selectedMistake = val),
@@ -638,7 +656,7 @@ class _PostIncidentRecoveryScreenState
                   height: 40,
                   decoration: BoxDecoration(
                     color: _boxBreathingCompleted
-                        ? AppColors.emeraldSuccess.withOpacity(0.15)
+                        ? AppColors.emeraldSuccess.withValues(alpha: 0.15)
                         : AppColors.surfaceElevated,
                     shape: BoxShape.circle,
                   ),
@@ -783,7 +801,7 @@ class _PostIncidentRecoveryScreenState
           ElevatedButton.icon(
             onPressed: _saveRecoveryLog,
             icon: const Icon(Icons.check_circle_rounded, size: 18),
-            label: const Text('SAVE & RECLAIM COMPOSURE'),
+            label: Text(context.loc.saveAndReclaimComposureAction),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.shieldPrimary,
               foregroundColor: AppColors.background,
@@ -872,14 +890,14 @@ class _PostIncidentRecoveryScreenState
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
-            border: Border.all(color: AppColors.amberWarning.withOpacity(0.35)),
+            border: Border.all(color: AppColors.amberWarning.withValues(alpha: 0.35)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.amberWarning.withOpacity(0.12),
+                  color: AppColors.amberWarning.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -941,7 +959,7 @@ class _PostIncidentRecoveryScreenState
                       });
                     }
                   },
-                  selectedColor: AppColors.amberWarning.withOpacity(0.15),
+                  selectedColor: AppColors.amberWarning.withValues(alpha: 0.15),
                   backgroundColor: AppColors.surface,
                   side: BorderSide(
                     color: isSelected
@@ -970,7 +988,7 @@ class _PostIncidentRecoveryScreenState
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
             border: Border.all(
-              color: AppColors.amberWarning.withOpacity(0.3),
+              color: AppColors.amberWarning.withValues(alpha: 0.3),
               width: 1.0,
             ),
           ),
@@ -1033,12 +1051,12 @@ class _PostIncidentRecoveryScreenState
                   color: AppColors.surfaceElevated,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppColors.amberWarning.withOpacity(0.2),
+                    color: AppColors.amberWarning.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Text(
                   '"${activePerspective.originalText}"',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'serif',
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
@@ -1113,7 +1131,7 @@ class _PostIncidentRecoveryScreenState
         ),
         const SizedBox(height: 16),
 
-        // Quick Action Buttons: Box Breathing & Return to Post-Mortem
+        // Quick Action Buttons: Box Breathing & Return to Review
         Row(
           children: [
             Expanded(

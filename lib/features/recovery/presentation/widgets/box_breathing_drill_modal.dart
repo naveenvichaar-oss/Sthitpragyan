@@ -262,7 +262,7 @@ class _BoxBreathingDrillModalState extends State<BoxBreathingDrillModal>
           LinearProgressIndicator(
             value: completedRatio,
             backgroundColor: AppColors.surface,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.shieldPrimary),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.shieldPrimary),
             minHeight: 3,
             borderRadius: BorderRadius.circular(2),
           ),
@@ -285,15 +285,15 @@ class _BoxBreathingDrillModalState extends State<BoxBreathingDrillModal>
                         width: 220 * scale,
                         height: 220 * scale,
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.06),
+                          color: color.withValues(alpha: 0.06),
                           borderRadius: BorderRadius.circular(28 * scale),
                           border: Border.all(
-                            color: color.withOpacity(0.3),
+                            color: color.withValues(alpha: 0.3),
                             width: 1.5,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: color.withOpacity(0.12),
+                              color: color.withValues(alpha: 0.12),
                               blurRadius: 24,
                               spreadRadius: 2,
                             ),

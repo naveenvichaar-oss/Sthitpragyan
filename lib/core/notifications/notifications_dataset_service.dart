@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import '../database/hive_storage.dart';
 import 'notification_service.dart';
 
 /// NotificationsDatasetService parses and provides daily scheduled triggers
@@ -46,9 +47,10 @@ class NotificationsDatasetService {
       final parts = timeStr.split(':');
       final hour = int.tryParse(parts[0]) ?? 5;
       final minute = int.tryParse(parts[1]) ?? 45;
+      final triggerId = hour * 100 + minute;
 
-      return NotificationTrigger(
-        id: hour * 100 + minute,
+      var trigger = NotificationTrigger(
+        id: triggerId,
         hour: hour,
         minute: minute,
         title: slot['title'] as String? ?? '',
@@ -57,6 +59,24 @@ class NotificationsDatasetService {
         titleEn: slot['title_en'] as String?,
         bodyEn: slot['body_en'] as String?,
       );
+
+      try {
+        if (HiveStorage().isInitialized) {
+          final override = HiveStorage().getCustomTriggerOverride(triggerId);
+          if (override != null) {
+            trigger = trigger.copyWith(
+              hour: override['hour'] as int?,
+              minute: override['minute'] as int?,
+              title: override['title'] as String?,
+              body: override['body'] as String?,
+              titleEn: override['titleEn'] as String?,
+              bodyEn: override['bodyEn'] as String?,
+            );
+          }
+        }
+      } catch (_) {}
+
+      return trigger;
     }).toList();
   }
 

@@ -61,15 +61,15 @@ class _SOSShieldButtonState extends State<SOSShieldButton>
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppColors.shieldPrimary.withOpacity(
-                  _glowAnimation.value + 0.2,
+                color: AppColors.shieldPrimary.withValues(
+                  alpha: (_glowAnimation.value + 0.2).clamp(0.0, 1.0),
                 ),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shieldPrimary.withOpacity(
-                    _glowAnimation.value * 0.4,
+                  color: AppColors.shieldPrimary.withValues(
+                    alpha: (_glowAnimation.value * 0.4).clamp(0.0, 1.0),
                   ),
                   blurRadius: 24,
                   spreadRadius: 2,
@@ -87,13 +87,13 @@ class _SOSShieldButtonState extends State<SOSShieldButton>
                     shape: BoxShape.circle,
                     color: AppColors.surfaceElevated,
                     border: Border.all(
-                      color: AppColors.shieldPrimary.withOpacity(0.8),
+                      color: AppColors.shieldPrimary.withValues(alpha: 0.8),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.shieldPrimary.withOpacity(
-                          _glowAnimation.value,
+                        color: AppColors.shieldPrimary.withValues(
+                          alpha: _glowAnimation.value.clamp(0.0, 1.0),
                         ),
                         blurRadius: 12,
                         spreadRadius: 1,
@@ -125,7 +125,7 @@ class _SOSShieldButtonState extends State<SOSShieldButton>
                               color: AppColors.roseMuted,
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: AppColors.roseDanger.withOpacity(0.5),
+                                color: AppColors.roseDanger.withValues(alpha: 0.5),
                               ),
                             ),
                             child: Text(

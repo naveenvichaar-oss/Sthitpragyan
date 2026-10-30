@@ -12,51 +12,73 @@ import '../../../wisdom/data/models/resource_link.dart';
 
 /// Supported target destinations when content is shared into Sthitaprajna
 enum ShareDestination {
+  recoveryReference,
   cognitionVault,
-  joyReservoir,
-  recoveryReference;
+  joyReservoir;
+
+  String getDisplayName(bool isHindi) {
+    switch (this) {
+      case ShareDestination.recoveryReference:
+        return isHindi ? 'अभ्यास' : 'Training';
+      case ShareDestination.cognitionVault:
+        return isHindi ? 'संज्ञान कोष' : 'Cognition Vault';
+      case ShareDestination.joyReservoir:
+        return isHindi ? 'जॉय बॉक्स' : 'Joy Box';
+    }
+  }
+
+  String getBadgeLabel(bool isHindi) {
+    switch (this) {
+      case ShareDestination.recoveryReference:
+        return isHindi ? 'अभ्यास' : 'TRAINING';
+      case ShareDestination.cognitionVault:
+        return isHindi ? 'संज्ञान कोष' : 'COGNITION VAULT';
+      case ShareDestination.joyReservoir:
+        return isHindi ? 'जॉय बॉक्स' : 'JOY BOX';
+    }
+  }
 
   String get displayName {
     switch (this) {
+      case ShareDestination.recoveryReference:
+        return 'Training / अभ्यास';
       case ShareDestination.cognitionVault:
         return 'Cognition Vault';
       case ShareDestination.joyReservoir:
-        return 'Joy Reservoir';
-      case ShareDestination.recoveryReference:
-        return 'Recovery Reference';
+        return 'Joy Box';
     }
   }
 
   String get badgeLabel {
     switch (this) {
+      case ShareDestination.recoveryReference:
+        return 'TRAINING / अभ्यास';
       case ShareDestination.cognitionVault:
         return 'COGNITION VAULT';
       case ShareDestination.joyReservoir:
-        return 'JOY RESERVOIR';
-      case ShareDestination.recoveryReference:
-        return 'RECOVERY REFERENCE';
+        return 'JOY BOX';
     }
   }
 
   IconData get iconData {
     switch (this) {
+      case ShareDestination.recoveryReference:
+        return Icons.shield_rounded;
       case ShareDestination.cognitionVault:
         return Icons.psychology_rounded;
       case ShareDestination.joyReservoir:
         return Icons.spa_rounded;
-      case ShareDestination.recoveryReference:
-        return Icons.shield_rounded;
     }
   }
 
   Color get accentColor {
     switch (this) {
+      case ShareDestination.recoveryReference:
+        return const Color(0xFFF59E0B); // Amber Warning / Defense
       case ShareDestination.cognitionVault:
         return const Color(0xFF38BDF8); // Sky Blue
       case ShareDestination.joyReservoir:
         return const Color(0xFFF43F5E); // Rose Serenity
-      case ShareDestination.recoveryReference:
-        return const Color(0xFFF59E0B); // Amber Warning / Defense
     }
   }
 }
@@ -108,7 +130,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
   late TextEditingController _titleController;
   late TextEditingController _noteController;
 
-  ShareDestination _selectedDestination = ShareDestination.cognitionVault;
+  ShareDestination _selectedDestination = ShareDestination.recoveryReference;
 
   // Cognition Vault fields
   ResourceMediaType _selectedMediaType = ResourceMediaType.webLink;
@@ -124,13 +146,13 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
   // Joy Reservoir fields
   JoyCategory _joyCategory = JoyCategory.music;
 
-  // Recovery Reference sub-tags
+  // Training & Recovery sub-tags
   String _recoveryTag = 'De-Escalation';
   final List<String> _recoveryTags = [
     'De-Escalation',
     'Damage Control',
     'Emotional Detachment',
-    'Boardroom Manipulation',
+    'Composure / Stoic Calm',
     'Boundary Enforcement',
   ];
 
@@ -245,7 +267,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
         final recoveryResource = ResourceLink(
           id: 'rec_ref_${DateTime.now().millisecondsSinceEpoch}',
           title: '[$_recoveryTag] $title',
-          category: 'Recovery Reference',
+          category: 'Training / अभ्यास',
           mediaType: ResourceLink.detectMediaTypeFromUrl(content),
           url: content,
           isUserAdded: true,
@@ -345,8 +367,8 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
-                        'SAVE TO STHITAPRAJNA',
+                      Text(
+                        context.loc.saveToSthitaprajna,
                         style: AppTextStyles.heading,
                       ),
                     ],
@@ -360,7 +382,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
               const SizedBox(height: 14),
 
               // Destination Selection Chips
-              Text('SELECT DESTINATION', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.selectDestinationBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 8),
               Row(
                 children: ShareDestination.values.map((dest) {
@@ -389,15 +411,18 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                             children: [
                               Icon(dest.iconData, size: 16, color: isSelected ? color : AppColors.textMuted),
                               const SizedBox(height: 4),
-                              Text(
-                                dest.badgeLabel,
-                                style: TextStyle(
-                                  fontSize: 8.5,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                  color: isSelected ? color : AppColors.textSecondary,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  dest.getBadgeLabel(context.loc.isHindi),
+                                  style: TextStyle(
+                                    fontSize: 8.5,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSelected ? color : AppColors.textSecondary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
                                 ),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
                               ),
                             ],
                           ),
@@ -410,7 +435,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
               const SizedBox(height: 16),
 
               // Shared Content Preview Field
-              Text('SHARED CONTENT / URL', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.sharedContentUrlBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _contentController,
@@ -431,7 +456,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
-                    return 'Shared content is required';
+                    return context.loc.contentOrLinkRequired;
                   }
                   return null;
                 },
@@ -439,13 +464,13 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
               const SizedBox(height: 12),
 
               // Title Field
-              Text('RESOURCE / ANCHOR TITLE', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+              Text(context.loc.resourceAnchorTitleBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _titleController,
                 style: AppTextStyles.bodyMedium,
                 decoration: InputDecoration(
-                  hintText: 'Enter a descriptive title...',
+                  hintText: context.loc.enterDescriptiveTitleHint,
                   hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                   filled: true,
                   fillColor: AppColors.surfaceElevated,
@@ -461,7 +486,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
-                    return 'Title is required';
+                    return context.loc.titleRequired;
                   }
                   return null;
                 },
@@ -470,7 +495,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
 
               // Dynamic Category / Sub-tag Selector based on Destination
               if (_selectedDestination == ShareDestination.cognitionVault) ...[
-                Text('COGNITION CATEGORY CLUSTER', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+                Text(context.loc.cognitionClusterBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -499,7 +524,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                 ),
                 const SizedBox(height: 12),
               ] else if (_selectedDestination == ShareDestination.joyReservoir) ...[
-                Text('JOY RESERVOIR ANCHOR TYPE', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+                Text(context.loc.joyAnchorTypeBadge, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
@@ -531,7 +556,10 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                 ),
                 const SizedBox(height: 12),
               ] else ...[
-                Text('RECOVERY SITUATIONAL TAG', style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+                Text(
+                  context.loc.recoverySituationalTagBadge,
+                  style: AppTextStyles.labelBadge.copyWith(fontSize: 9),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
@@ -564,7 +592,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
 
               // Comment Note: "Why I am saving this / Personal Note"
               Text(
-                'WHY I AM SAVING THIS / PERSONAL CONTEXT (COMMENT FIELD)',
+                context.loc.whySavingCommentBadge,
                 style: AppTextStyles.labelBadge.copyWith(fontSize: 9),
               ),
               const SizedBox(height: 6),
@@ -574,10 +602,10 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                 style: AppTextStyles.bodySmall,
                 decoration: InputDecoration(
                   hintText: _selectedDestination == ShareDestination.cognitionVault
-                      ? 'e.g., Key mental model for countering boardroom gaslighting...'
+                      ? 'e.g., Key mental model for overcoming friction or cognitive bias...'
                       : _selectedDestination == ShareDestination.joyReservoir
-                          ? 'e.g., Listen when acute panic spikes; immediate heartbeat reset...'
-                          : 'e.g., De-escalation script to use when a toxic manager shifts blame...',
+                          ? 'e.g., Listen when feeling overwhelmed; reset state...'
+                          : 'e.g., Tactical response protocol or calming practice drill...',
                   hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                   filled: true,
                   fillColor: AppColors.surfaceElevated,
@@ -600,7 +628,7 @@ class _IncomingShareModalSheetState extends State<IncomingShareModalSheet> {
                 child: ElevatedButton.icon(
                   onPressed: _handleSave,
                   icon: const Icon(Icons.save_rounded, size: 18),
-                  label: Text('SAVE TO ${_selectedDestination.badgeLabel}'),
+                  label: Text(context.loc.saveToDestinationButton(_selectedDestination.getBadgeLabel(context.loc.isHindi))),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: destColor,
                     foregroundColor: AppColors.background,

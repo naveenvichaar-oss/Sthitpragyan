@@ -1,21 +1,18 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
-import '../../../../core/database/hive_storage.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/local_html_tool.dart';
+import '../../data/services/html_tool_storage_service.dart';
 
-/// ImportHtmlToolModalSheet lets users pick an .html / .htm file from device storage,
-/// securely copies it to the app's persistent documents directory, prompts for metadata,
-/// and registers it in the offline HTML Tools repository.
+/// ImportHtmlToolModalSheet lets executives pick an .html / .htm file from device storage,
+/// permanently embeds it inside the app's persistent `app_html_tools/` sandbox,
+/// checks for safe overwrites to prevent duplicate cards, and registers it in Hive.
 class ImportHtmlToolModalSheet extends StatefulWidget {
   final ValueChanged<LocalHtmlTool>? onImported;
 
@@ -28,6 +25,7 @@ class ImportHtmlToolModalSheet extends StatefulWidget {
     BuildContext context, {
     ValueChanged<LocalHtmlTool>? onImported,
   }) {
+    HapticService.selectionClick();
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -44,14 +42,15 @@ class ImportHtmlToolModalSheet extends StatefulWidget {
 }
 
 class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
-  final HiveStorage _storage = HiveStorage();
+  final HtmlToolStorageService _storageService = HtmlToolStorageService();
 
   String? _pickedFileName;
   String? _pickedFilePath;
   Uint8List? _pickedFileBytes;
   int _pickedFileSize = 0;
-  String? _htmlString;
   bool _isPicking = false;
+  bool _isSaving = false;
+  bool _isOverwriteMode = false;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController(text: 'Dashboard');
@@ -68,7 +67,6 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
   @override
   void initState() {
     super.initState();
-    // Auto-open file picker when sheet opens for zero friction
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _pickHtmlFile();
     });
@@ -94,13 +92,6 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
         final file = files.first;
         final bytes = await file.readAsBytes();
         final size = await file.length() ?? bytes.length;
-        String? content;
-
-        try {
-          content = utf8.decode(bytes);
-        } catch (_) {
-          content = String.fromCharCodes(bytes);
-        }
 
         // Clean default title from filename
         var cleanTitle = file.name;
@@ -109,17 +100,29 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
         } else if (cleanTitle.toLowerCase().endsWith('.htm')) {
           cleanTitle = cleanTitle.substring(0, cleanTitle.length - 4);
         }
-        cleanTitle = cleanTitle.replaceAll('_', ' ').replaceAll('-', ' ');
+        cleanTitle = cleanTitle.replaceAll('_', ' ').replaceAll('-', ' ').trim();
+
+        // Check if a tool with this sanitized file name already exists in sandbox
+        final sanitized = _storageService.sanitizeFileName(file.name);
+        final existing = await _storageService.findExistingTool(sanitized);
 
         setState(() {
           _pickedFileName = file.name;
           _pickedFilePath = file.path;
           _pickedFileBytes = bytes;
           _pickedFileSize = size;
-          _htmlString = content;
-          _titleController.text = cleanTitle;
+          _isOverwriteMode = existing != null;
+
+          if (existing != null) {
+            _titleController.text = existing.title;
+            _categoryController.text = existing.category;
+            _descriptionController.text = existing.description ?? '';
+          } else {
+            _titleController.text = cleanTitle;
+          }
           _isPicking = false;
         });
+
         HapticService.selectionClick();
       } else {
         setState(() => _isPicking = false);
@@ -130,7 +133,7 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('File picker error: $e'),
+            content: Text('${context.loc.audioPickingError}: $e'),
             backgroundColor: AppColors.roseDanger,
           ),
         );
@@ -141,8 +144,8 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
   Future<void> _saveImportedTool() async {
     if (_pickedFileName == null || _pickedFileBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select an HTML file to import.'),
+        SnackBar(
+          content: Text(context.loc.selectHtmlFileFirst),
           backgroundColor: AppColors.surfaceElevated,
         ),
       );
@@ -152,69 +155,66 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please specify a title for this tool.'),
+        SnackBar(
+          content: Text(context.loc.specifyTitleFirst),
           backgroundColor: AppColors.surfaceElevated,
         ),
       );
       return;
     }
 
+    setState(() => _isSaving = true);
     HapticService.heavyImpact();
 
-    String persistentPath = '';
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final sanitizedFileName = '${timestamp}_$_pickedFileName';
-
-    if (!kIsWeb) {
-      try {
-        final appDir = await getApplicationDocumentsDirectory();
-        final toolsDir = Directory('${appDir.path}/html_tools');
-        if (!await toolsDir.exists()) {
-          await toolsDir.create(recursive: true);
-        }
-
-        final targetFile = File('${toolsDir.path}/$sanitizedFileName');
-        await targetFile.writeAsBytes(_pickedFileBytes!);
-        persistentPath = targetFile.path;
-      } catch (e) {
-        debugPrint('[ImportHtmlTool] File copy error: $e');
-        persistentPath = _pickedFilePath ?? '';
-      }
-    } else {
-      persistentPath = 'web_storage/$sanitizedFileName';
-    }
-
-    final tool = LocalHtmlTool(
-      id: 'tool_$timestamp',
-      title: title,
-      localFilePath: persistentPath,
-      htmlContent: _htmlString,
-      addedDate: DateTime.now(),
-      category: _categoryController.text.trim().isEmpty
-          ? 'Personal Tool'
-          : _categoryController.text.trim(),
-      fileName: _pickedFileName!,
-      description: _descriptionController.text.trim().isEmpty
-          ? null
-          : _descriptionController.text.trim(),
-      fileSizeBytes: _pickedFileSize,
-    );
-
-    await _storage.saveHtmlTool(tool);
-
-    if (mounted) {
-      Navigator.of(context).pop();
-      widget.onImported?.call(tool);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Imported "${tool.title}" into Offline HTML Tools.',
-            style: const TextStyle(fontSize: 12),
-          ),
-          backgroundColor: AppColors.surfaceElevated,
-        ),
+    try {
+      final result = await _storageService.importOrOverwriteTool(
+        sourceFilePath: _pickedFilePath,
+        originalFileName: _pickedFileName!,
+        bytes: _pickedFileBytes!,
+        title: title,
+        category: _categoryController.text.trim().isEmpty
+            ? 'Personal Tool'
+            : _categoryController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
       );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        widget.onImported?.call(result.tool);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: AppColors.emeraldSuccess, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    result.isOverwrite
+                        ? '${context.loc.toolOverwrittenNotice} ("${result.tool.title}")'
+                        : '${context.loc.toolImportedNotice} ("${result.tool.title}")',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.surfaceElevated,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('[ImportHtmlTool] Save error: $e');
+      setState(() => _isSaving = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save tool: $e'),
+            backgroundColor: AppColors.roseDanger,
+          ),
+        );
+      }
     }
   }
 
@@ -222,31 +222,32 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
   Widget build(BuildContext context) {
     final hasFile = _pickedFileName != null;
     final fileSizeKb = hasFile ? (_pickedFileSize / 1024).toStringAsFixed(1) : '0';
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Padding(
       padding: EdgeInsets.only(
         left: AppDimens.space16,
         right: AppDimens.space16,
         top: AppDimens.space16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + AppDimens.space24,
+        bottom: bottomInset + AppDimens.space24,
       ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag handle
+            // Handle bar
             Center(
               child: Container(
                 width: 36,
                 height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
                   color: AppColors.borderSubtle,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
+            const SizedBox(height: 14),
 
             // Header
             Row(
@@ -256,176 +257,287 @@ class _ImportHtmlToolModalSheetState extends State<ImportHtmlToolModalSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      context.loc.offlineLocalTools,
+                      context.loc.localHtmlSandbox.toUpperCase(),
                       style: AppTextStyles.labelBadge.copyWith(
                         color: const Color(0xFF10B981),
-                        fontSize: 9.5,
-                        letterSpacing: 1.2,
-                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text('Import HTML Tool / Dashboard', style: AppTextStyles.heading),
+                    Text(
+                      context.loc.importHtmlToolTitle,
+                      style: AppTextStyles.heading,
+                    ),
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20, color: AppColors.textMuted),
+                  icon: const Icon(Icons.close_rounded, color: AppColors.textMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // File Selection Box
-            Container(
-              padding: const EdgeInsets.all(AppDimens.space14),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppDimens.radiusMedium),
-                border: Border.all(
-                  color: hasFile
-                      ? const Color(0xFF10B981).withValues(alpha: 0.4)
-                      : AppColors.borderSubtle,
+            // Safe Overwrite vs New Tool Status Banner
+            if (hasFile) ...[
+              Container(
+                padding: const EdgeInsets.all(AppDimens.space12),
+                decoration: BoxDecoration(
+                  color: _isOverwriteMode
+                      ? const Color(0xFFF59E0B).withValues(alpha: 0.12)
+                      : const Color(0xFF10B981).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  border: Border.all(
+                    color: _isOverwriteMode
+                        ? const Color(0xFFF59E0B).withValues(alpha: 0.4)
+                        : const Color(0xFF10B981).withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      _isOverwriteMode
+                          ? Icons.published_with_changes_rounded
+                          : Icons.verified_rounded,
+                      size: 18,
+                      color: _isOverwriteMode
+                          ? const Color(0xFFF59E0B)
+                          : const Color(0xFF10B981),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _isOverwriteMode
+                                ? context.loc.safeOverwriteMode
+                                : 'PERSISTENT SANDBOX STORAGE',
+                            style: AppTextStyles.labelBadge.copyWith(
+                              fontSize: 9,
+                              color: _isOverwriteMode
+                                  ? const Color(0xFFF59E0B)
+                                  : const Color(0xFF10B981),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _isOverwriteMode
+                                ? context.loc.safeOverwriteNotice
+                                : context.loc.newToolImportMode,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              fontSize: 10.5,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: hasFile
-                          ? const Color(0xFF10B981).withValues(alpha: 0.12)
-                          : AppColors.surface,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      hasFile ? Icons.html_rounded : Icons.file_open_outlined,
-                      size: 24,
-                      color: hasFile
-                          ? const Color(0xFF10B981)
-                          : AppColors.textMuted,
-                    ),
+              const SizedBox(height: 14),
+            ],
+
+            // File Selector Box
+            GestureDetector(
+              onTap: _isPicking ? null : _pickHtmlFile,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  border: Border.all(
+                    color: hasFile ? const Color(0xFF10B981) : AppColors.borderSubtle,
+                    width: 1.2,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          hasFile ? _pickedFileName! : 'No HTML File Selected',
-                          style: AppTextStyles.titleSmall.copyWith(fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          hasFile
-                              ? '$fileSizeKb KB • Permanent Local Copy'
-                              : 'Select any standalone .html / .htm file',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textMuted,
-                            fontSize: 11,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.html_rounded, color: Color(0xFF10B981), size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            hasFile ? _pickedFileName! : 'Tap to Select .html / .htm File',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: hasFile ? AppColors.textPrimary : AppColors.shieldPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            hasFile
+                                ? '$fileSizeKb KB • app_html_tools/'
+                                : 'Pure offline dashboard, calculator, or decision matrix',
+                            style: AppTextStyles.labelBadge.copyWith(
+                              fontSize: 9,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  OutlinedButton(
-                    onPressed: _isPicking ? null : _pickHtmlFile,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.shieldPrimary,
-                      side: const BorderSide(color: AppColors.shieldPrimary),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    child: Text(_isPicking ? 'PICKING...' : (hasFile ? 'CHANGE' : 'BROWSE')),
-                  ),
-                ],
+                    if (_isPicking)
+                      const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    else
+                      Icon(
+                        hasFile ? Icons.swap_horiz_rounded : Icons.folder_open_rounded,
+                        color: AppColors.textMuted,
+                        size: 20,
+                      ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Title Field
+            Text(context.loc.toolTitleLabel, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+            const SizedBox(height: 6),
             TextField(
               controller: _titleController,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Tool Title',
-                hintText: 'e.g., Executive Decision Matrix',
+              decoration: InputDecoration(
+                hintText: 'e.g., Executive Decision Matrix / Stress Calculator',
+                hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 12),
 
-            // Category Field
+            // Category Field & Suggestion Chips
+            Text(context.loc.toolCategoryLabel, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+            const SizedBox(height: 6),
             TextField(
               controller: _categoryController,
               style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Category / Tag',
-                hintText: 'e.g., Dashboard, Calculator, Matrix',
+              decoration: InputDecoration(
+                hintText: 'e.g., Dashboard, Calculator, Mental Model',
+                hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 8),
-
-            // Quick Category Chips
-            Wrap(
-              spacing: 6,
-              runSpacing: 4,
-              children: _suggestedCategories.map((cat) {
-                return ActionChip(
-                  label: Text(cat, style: const TextStyle(fontSize: 10)),
-                  backgroundColor: AppColors.surfaceElevated,
-                  side: const BorderSide(color: AppColors.borderSubtle),
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  onPressed: () {
-                    HapticService.selectionClick();
-                    setState(() => _categoryController.text = cat);
-                  },
-                );
-              }).toList(),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _suggestedCategories.map((cat) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ActionChip(
+                      label: Text(cat, style: const TextStyle(fontSize: 10)),
+                      backgroundColor: AppColors.surfaceElevated,
+                      side: const BorderSide(color: AppColors.borderSubtle),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () {
+                        HapticService.selectionClick();
+                        setState(() => _categoryController.text = cat);
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
             const SizedBox(height: 12),
 
             // Description Field
+            Text(context.loc.toolDescriptionLabel, style: AppTextStyles.labelBadge.copyWith(fontSize: 9)),
+            const SizedBox(height: 6),
             TextField(
               controller: _descriptionController,
               maxLines: 2,
-              style: AppTextStyles.bodyMedium,
-              decoration: const InputDecoration(
-                labelText: 'Description / Purpose (Optional)',
-                hintText: 'What cognitive friction or workflow does this offline dashboard solve?',
+              style: AppTextStyles.bodySmall,
+              decoration: InputDecoration(
+                hintText: 'What cognitive, operational, or psychological problem does this tool solve?',
+                hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                 filled: true,
                 fillColor: AppColors.surfaceElevated,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Submit Button
+            // Action Button
             SizedBox(
               width: double.infinity,
-              height: 48,
               child: ElevatedButton.icon(
+                onPressed: (!hasFile || _isSaving) ? null : _saveImportedTool,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Icon(
+                        _isOverwriteMode
+                            ? Icons.published_with_changes_rounded
+                            : Icons.save_rounded,
+                        size: 18,
+                      ),
+                label: Text(
+                  _isOverwriteMode
+                      ? context.loc.updateHtmlTool
+                      : context.loc.saveHtmlTool,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
+                  backgroundColor: _isOverwriteMode
+                      ? const Color(0xFFF59E0B)
+                      : const Color(0xFF10B981),
                   foregroundColor: Colors.black,
-                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
                   ),
                 ),
-                icon: const Icon(Icons.check, size: 18),
-                label: const Text(
-                  'IMPORT & SAVE OFFLINE',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-                onPressed: _saveImportedTool,
               ),
             ),
           ],

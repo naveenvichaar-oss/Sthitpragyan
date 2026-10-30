@@ -335,7 +335,7 @@ class _DefensiveScriptEditSheetState extends State<DefensiveScriptEditSheet> {
                             final isSel = !_isCustomCategory &&
                                 _selectedCategory == cat;
                             return ChoiceChip(
-                              label: Text(cat),
+                              label: Text(context.loc.getDefensiveCategoryName(cat)),
                               selected: isSel,
                               onSelected: (selected) {
                                 if (selected) {

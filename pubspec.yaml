@@ -1,5 +1,5 @@
 name: sthitaprajna
-description: "Sthitaprajna - Stoic Executive Shield for workplace toxicity and acute anxiety."
+description: "Sthitaprajna - Daily Execution, Wisdom Vault, and Mindful Reflection."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -29,6 +29,7 @@ dependencies:
   receive_sharing_intent: ^1.9.0
   audioplayers: ^6.8.1
   file_picker: ^13.1.0
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

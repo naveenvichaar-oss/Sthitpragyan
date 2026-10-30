@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/haptic_service.dart';
 import '../../data/models/media_record_log.dart';
 import '../../data/services/media_vault_service.dart';
@@ -211,7 +212,7 @@ class _RenameMediaDialogState extends State<RenameMediaDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('CANCEL', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          child: Text(context.loc.cancelButton, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
         ),
         ElevatedButton(
           onPressed: _isSaving ? null : _submitRename,
@@ -228,7 +229,7 @@ class _RenameMediaDialogState extends State<RenameMediaDialog> {
                   height: 14,
                   child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.background),
                 )
-              : const Text('SAVE NAME', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+              : Text(context.loc.saveNameButton, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
         ),
       ],
     );
