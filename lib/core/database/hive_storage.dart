@@ -92,8 +92,21 @@ class HiveStorage {
       }
 
       // Pre-seed default defensive scripts and keep canonical definitions updated
+      final canonicalIds = <String>{};
       for (final script in DefensiveScriptsVault.scripts) {
+        canonicalIds.add(script.id);
         await _defensiveScriptsBox.put(script.id, script.toMap());
+      }
+      // Clean any obsolete built-in scripts from prior versions
+      final staleKeys = <dynamic>[];
+      for (final entry in _defensiveScriptsBox.toMap().entries) {
+        final isCustom = entry.value['isCustom'] == true;
+        if (!isCustom && !canonicalIds.contains(entry.key.toString())) {
+          staleKeys.add(entry.key);
+        }
+      }
+      for (final key in staleKeys) {
+        await _defensiveScriptsBox.delete(key);
       }
 
       // Pre-seed starter anchors for Joy Reservoir if not present
@@ -731,27 +744,36 @@ class HiveStorage {
 
   List<DefensiveScript> getAllDefensiveScripts() {
     if (!_initialized) return DefensiveScriptsVault.scripts;
-    final list = <DefensiveScript>[];
-    final defaultScriptMap = {for (final s in DefensiveScriptsVault.scripts) s.id: s};
+    final list = <DefensiveScript>[...DefensiveScriptsVault.scripts];
+    final canonicalMap = {for (final s in DefensiveScriptsVault.scripts) s.id: s};
+    final customScripts = <DefensiveScript>[];
+    final obsoleteKeys = <dynamic>[];
 
-    for (final raw in _defensiveScriptsBox.values) {
+    for (final entry in _defensiveScriptsBox.toMap().entries) {
       try {
-        final map = Map<String, dynamic>.from(raw);
-        var script = DefensiveScript.fromMap(map);
+        final map = Map<String, dynamic>.from(entry.value);
+        final isCustom = map['isCustom'] == true;
+        final id = map['id'] as String? ?? entry.key.toString();
 
-        // Auto-upgrade built-in scripts with latest canonical bilingual translations
-        if (!script.isCustom && defaultScriptMap.containsKey(script.id)) {
-          final def = defaultScriptMap[script.id]!;
-          script = def;
-          _defensiveScriptsBox.put(script.id, script.toMap());
+        if (isCustom) {
+          customScripts.add(DefensiveScript.fromMap(map));
+        } else if (!canonicalMap.containsKey(id)) {
+          obsoleteKeys.add(entry.key);
+        } else {
+          // Keep persistent storage refreshed with canonical translations
+          final canonical = canonicalMap[id]!;
+          _defensiveScriptsBox.put(entry.key, canonical.toMap());
         }
-
-        list.add(script);
       } catch (e) {
         debugPrint('[HiveStorage] Error parsing DefensiveScript: $e');
       }
     }
-    if (list.isEmpty) return DefensiveScriptsVault.scripts;
+
+    for (final key in obsoleteKeys) {
+      _defensiveScriptsBox.delete(key);
+    }
+
+    list.addAll(customScripts);
     return list;
   }
 

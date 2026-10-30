@@ -38,6 +38,24 @@ enum CharacterTraitCategory {
     }
   }
 
+  String localizedName(bool isHindi) => isHindi ? devanagari : displayName;
+
+  String localizedSubtitle(bool isHindi) {
+    if (!isHindi) return subtitle;
+    switch (this) {
+      case CharacterTraitCategory.magnanimity:
+        return 'विशाल-हृदय समत्व • क्षुद्रता से ऊपर उठना';
+      case CharacterTraitCategory.gravitas:
+        return 'अटल प्रतिक्रिया • शारीरिक व मौखिक स्थिरता';
+      case CharacterTraitCategory.joy:
+        return 'आंतरिक आधार • उज्ज्वल आंतरिक शांति';
+      case CharacterTraitCategory.restraint:
+        return 'रणनीतिक मौन • सचेत गैर-प्रतिक्रिया';
+      case CharacterTraitCategory.custom:
+        return 'व्यक्तिगत गुण • व्यक्तिगत गुण साधना';
+    }
+  }
+
   String get subtitle {
     switch (this) {
       case CharacterTraitCategory.magnanimity:

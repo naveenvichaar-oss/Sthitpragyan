@@ -239,7 +239,7 @@ class _CharacterLedgerScreenState extends State<CharacterLedgerScreen> {
                     ),
                     Text(
                       _selectedCategoryFilter != null
-                          ? _selectedCategoryFilter!.displayName.toUpperCase()
+                          ? _selectedCategoryFilter!.localizedName(context.loc.isHindi).toUpperCase()
                           : context.loc.sovereignEquanimityBadge,
                       style: AppTextStyles.labelBadge.copyWith(
                         color: _selectedCategoryFilter != null

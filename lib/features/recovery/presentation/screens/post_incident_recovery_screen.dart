@@ -875,7 +875,14 @@ class _PostIncidentRecoveryScreenState
     }
 
     if (perspectives.isEmpty) {
-      return const Center(child: Text('No emergency perspectives available'));
+      return Center(
+        child: Text(
+          context.loc.isHindi
+              ? 'कोई आपातकालीन दृष्टिकोण उपलब्ध नहीं है'
+              : 'No emergency perspectives available',
+          style: AppTextStyles.bodyMedium,
+        ),
+      );
     }
 
     final safeIndex = _selectedPerspectiveIndex % perspectives.length;

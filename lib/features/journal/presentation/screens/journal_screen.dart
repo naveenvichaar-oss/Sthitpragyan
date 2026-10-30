@@ -142,7 +142,7 @@ class _JournalScreenState extends State<JournalScreen> {
           reactionScore: entry.reactionControlScore,
           boundaryMaintained: entry.boundaryMaintained,
           distractionAvoided: entry.provocationHandled,
-          tags: const ['समीक्षा', 'समत्व'],
+          tags: isHindi ? const ['समीक्षा', 'समत्व'] : const ['Review', 'Equanimity'],
         );
         _storage.saveReflection(reflection);
         _reflections.add(reflection);
@@ -247,7 +247,7 @@ class _JournalScreenState extends State<JournalScreen> {
       distractionAvoided: _provocationController.text.trim().isEmpty
           ? null
           : _provocationController.text.trim(),
-      tags: const ['दैनिक समीक्षा', 'समत्व'],
+      tags: context.loc.isHindi ? const ['दैनिक समीक्षा', 'समत्व'] : const ['Daily Review', 'Equanimity'],
     );
     await _storage.saveReflection(reflection);
 

@@ -36,7 +36,7 @@ void main() {
     test('Category filtering functions correctly for core specification categories', () {
       final unjust = DefensiveScriptsVault.getByCategory('Unjust Accusation');
       expect(unjust.isNotEmpty, isTrue);
-      expect(unjust.first.executiveScript, contains('विशिष्ट फैक्चुअल बदलाव'));
+      expect(unjust.first.executiveScript, contains('विशिष्ट तथ्यात्मक बदलाव'));
 
       final intimidation = DefensiveScriptsVault.getByCategory('Intimidation');
       expect(intimidation.isNotEmpty, isTrue);
@@ -159,6 +159,37 @@ void main() {
       // In English mode, returns English text
       expect(int01.getLocalizedHostileTrigger(false), contains('stop you right there'));
       expect(int01.getLocalizedExecutiveScript(false), contains('Allow me 60 seconds'));
+    });
+
+    test('All canonical scripts have zero Devanagari characters in English mode', () {
+      final devanagariRegex = RegExp(r'[\u0900-\u097F]');
+      for (final script in DefensiveScriptsVault.scripts) {
+        final triggerEn = script.getLocalizedHostileTrigger(false);
+        final scriptEn = script.getLocalizedExecutiveScript(false);
+        final rationaleEn = script.getLocalizedTacticalRationale(false);
+        final toneEn = script.getLocalizedToneGuidance(false);
+
+        expect(
+          devanagariRegex.hasMatch(triggerEn),
+          isFalse,
+          reason: 'Script ${script.id} has Devanagari in hostileTriggerEn: $triggerEn',
+        );
+        expect(
+          devanagariRegex.hasMatch(scriptEn),
+          isFalse,
+          reason: 'Script ${script.id} has Devanagari in executiveScriptEn: $scriptEn',
+        );
+        expect(
+          devanagariRegex.hasMatch(rationaleEn),
+          isFalse,
+          reason: 'Script ${script.id} has Devanagari in tacticalRationaleEn: $rationaleEn',
+        );
+        expect(
+          devanagariRegex.hasMatch(toneEn),
+          isFalse,
+          reason: 'Script ${script.id} has Devanagari in toneGuidanceEn: $toneEn',
+        );
+      }
     });
   });
 }

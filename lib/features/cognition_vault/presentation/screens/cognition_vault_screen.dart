@@ -161,10 +161,10 @@ class CognitionVaultScreenState extends State<CognitionVaultScreen> {
     _loadResources();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Resource removed from Sanctuary.', style: TextStyle(fontSize: 12)),
+        SnackBar(
+          content: Text(context.loc.resourceRemovedFromSanctuary, style: const TextStyle(fontSize: 12)),
           backgroundColor: AppColors.surfaceElevated,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }

@@ -250,7 +250,7 @@ class _ResponseScriptCardState extends State<ResponseScriptCard> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '"${widget.script.getLocalizedExecutiveScript(context.loc.isHindi)}"',
+                  '"${widget.script.getLocalizedExecutiveScript(context.loc.isHindi).replaceAll(RegExp(r'^"+|"+$'), '')}"',
                   style: AppTextStyles.scriptVerbatim,
                 ),
               ],

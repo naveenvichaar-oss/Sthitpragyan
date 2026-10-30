@@ -57,7 +57,7 @@ class CharacterCard extends StatelessWidget {
                     Icon(category.icon, size: 13, color: accent),
                     const SizedBox(width: 6),
                     Text(
-                      '${category.displayName.toUpperCase()} • ${category.devanagari}',
+                      category.localizedName(context.loc.isHindi).toUpperCase(),
                       style: AppTextStyles.labelBadge.copyWith(
                         color: accent,
                         fontSize: 8.5,
