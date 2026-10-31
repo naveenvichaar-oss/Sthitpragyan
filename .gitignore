@@ -78,3 +78,10 @@ release_builds/
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# Play Store Service Account Key
+*play-publisher-key.json
+*.json
+
+tool/play_publisher/node_modules/
+!tool/play_publisher/package.json
