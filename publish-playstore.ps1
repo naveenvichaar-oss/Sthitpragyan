@@ -14,3 +14,4 @@ if (!(Test-Path $AabPath)) {
 }
 
 node tool\play_publisher\publish.js $AabPath $PackageName $Track
+
